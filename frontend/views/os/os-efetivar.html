@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="../../assets/css/style.css">
+	<title>Sistema Campos Moto Peças - Efetivar Serviço</title>
+</head>
+<body>
+	<section id="sidebar">
+		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<ul class="side-menu">
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="principal">Principal</li>
+			<li><a href="os-consulta.html" class="active"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestão">Gestão</li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+		</ul>
+	</section>
+	<section id="content">
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<div class="theme-toggle">
+				<input type="checkbox" id="theme-toggle-checkbox">
+				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+					<i class='bx bxs-sun'></i>
+					<i class='bx bxs-moon'></i>
+				</label>
+			</div>
+			<a href="#" class="nav-link" style="margin-left: auto;">
+				<i class='bx bxs-bell icon' ></i>
+			</a>
+			<span class="divider"></span>
+			<div class="profile">
+				<a href="#" class="nav-link">
+					<i class='bx bxs-cog icon' title="Configurações"></i>
+				</a>
+				<a href="#" class="nav-link">
+					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
+				</a>
+			</div>
+		</nav>
+		<main>
+			<h1 class="title">Efetivar Ordem de Serviço</h1>
+			<ul class="breadcrumbs">
+				<li><a href="../../index.html">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="orcamentos-consulta.html">Orçamentos</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Efetivar O.S.</a></li>
+			</ul>
+			<div class="data">
+				<div class="content-data">
+					<div class="head">
+						<h3>Ordem de Serviço - OS-0004 (Baseado no Orçamento ORC-001)</h3>
+					</div>
+					<form action="#" class="os-form">
+						<h4>Dados do Cliente e Veículo (Importado do orçamento)</h4>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Cliente</label>
+								<input type="text" value="João Silva" readonly>
+							</div>
+							<div class="form-group">
+								<label>Motocicleta</label>
+								<input type="text" value="Honda Biz 125" readonly>
+							</div>
+							<div class="form-group">
+								<label>Placa</label>
+								<input type="text" value="ABC-1234" readonly>
+							</div>
+						</div>
+						<h4 style="margin-top: 20px;">Peças e Serviços a Executar</h4>
+						<div class="orders">
+							<table id="itens-orcamento">
+								<thead>
+									<tr>
+										<th>Descrição</th>
+										<th>Valor (R$)</th>
+										<th>Ação</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><input type="text" value="Troca de Óleo Mobil" required></td>
+										<td><input type="text" class="valor-item" value="120,00" required></td>
+										<td><button type="button" class="btn-remove-item"><i class='bx bx-trash'></i></button></td>
+									</tr>
+									<tr>
+										<td><input type="text" value="Mão de Obra" required></td>
+										<td><input type="text" class="valor-item" value="80,00" required></td>
+										<td><button type="button" class="btn-remove-item"><i class='bx bx-trash'></i></button></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<button type="button" class="btn-secondary" id="add-item" style="margin-top: 10px;">Adicionar Item</button>
+						<div class="form-group" style="margin-top: 20px;">
+							<label for="observacoes">Observações do Mecânico</label>
+							<textarea id="observacoes" rows="3" placeholder="Detalhes sobre a execução do serviço, peças trocadas, etc."></textarea>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn-primary">Salvar e Iniciar Serviço</button>
+							<a href="orcamentos-consulta.html" class="btn-secondary">Cancelar</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+	</section>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module" src="../../assets/js/main.js"></script>
+</body>
+</html>

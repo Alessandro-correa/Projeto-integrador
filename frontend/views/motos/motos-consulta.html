@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="../../assets/css/style.css">
+	<title>Sistema Campos Moto Peças - Motocicletas</title>
+</head>
+<body>
+	
+	<section id="sidebar">
+		<a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<ul class="side-menu">
+			<li><a href="../../views/dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="principal">Principal</li>
+			<li><a href="../../views/os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../../views/orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestão">Gestão</li>
+			<li><a href="../../views/clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="motos-consulta.html" class="active"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../../views/marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../../views/fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+			<li><a href="../../views/pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../../views/usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+		</ul>
+	</section>
+
+	<section id="content">
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<div class="theme-toggle">
+				<input type="checkbox" id="theme-toggle-checkbox">
+				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+					<i class='bx bxs-sun'></i>
+					<i class='bx bxs-moon'></i>
+				</label>
+			</div>
+			<a href="#" class="nav-link" style="margin-left: auto;">
+				<i class='bx bxs-bell icon' ></i>
+			</a>
+			<span class="divider"></span>
+			<div class="profile">
+				<a href="#" class="nav-link">
+					<i class='bx bxs-cog icon' title="Configurações"></i>
+				</a>
+				<a href="#" class="nav-link">
+					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
+				</a>
+			</div>
+		</nav>
+
+		<main>
+			<h1 class="title">Motocicletas</h1>
+			<ul class="breadcrumbs">
+				<li><a href="../../index.html">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Motocicletas</a></li>
+			</ul>
+
+			<div class="filter-container">
+				<div class="filter-group">
+					<input type="text" id="filter-text" placeholder="Buscar por Placa, Modelo, Cliente...">
+				</div>
+				<div class="filter-group">
+					<select id="filter-marca">
+						<option value="">Todas as Marcas</option>
+						<option value="Honda">Honda</option>
+						<option value="Yamaha">Yamaha</option>
+						<option value="Suzuki">Suzuki</option>
+						<option value="Kawasaki">Kawasaki</option>
+					</select>
+					<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
+				</div>
+			</div>
+			
+			<div class="data">
+				<div class="content-data">
+					<div class="head">
+						<h3>Lista de Motocicletas</h3>
+						<a href="motos-cadastro.html" class="btn-primary">Nova Motocicleta</a>
+					</div>
+					<div class="orders">
+						<table id="motos-table">
+							<thead>
+								<tr>
+									<th>Placa</th>
+									<th>Modelo</th>
+									<th>Marca</th>
+									<th>Ano</th>
+									<th>Proprietário</th>
+									<th>Ações</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><p>ABC-1234</p></td>
+									<td><p>Biz 125</p></td>
+									<td><p>Honda</p></td>
+									<td>2022</td>
+									<td><p>João Silva</p></td>
+									<td>
+										<a href="#" class="action-icon"><i class='bx bx-edit'></i></a>
+									</td>
+								</tr>
+								<tr>
+									<td><p>XYZ-5678</p></td>
+									<td><p>Fazer 250</p></td>
+									<td><p>Yamaha</p></td>
+									<td>2023</td>
+									<td><p>Maria Oliveira</p></td>
+									<td>
+										<a href="#" class="action-icon"><i class='bx bx-edit'></i></a>
+									</td>
+								</tr>
+								<tr>
+									<td><p>QWE-9101</p></td>
+									<td><p>GSX-S750</p></td>
+									<td><p>Suzuki</p></td>
+									<td>2021</td>
+									<td><p>Carlos Souza</p></td>
+									<td>
+										<a href="#" class="action-icon"><i class='bx bx-edit'></i></a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</main>
+	</section>
+
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module" src="../../assets/js/main.js"></script>
+</body>
+</html>

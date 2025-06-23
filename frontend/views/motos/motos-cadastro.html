@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="../../assets/css/style.css">
+	<title>Sistema Campos Moto Peças - Cadastro de Motocicleta</title>
+</head>
+<body>
+	
+	<section id="sidebar">
+		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<ul class="side-menu">
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="principal">Principal</li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestão">Gestão</li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="motos-consulta.html" class="active"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+		</ul>
+	</section>
+
+	<section id="content">
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<div class="theme-toggle">
+				<input type="checkbox" id="theme-toggle-checkbox">
+				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+					<i class='bx bxs-sun'></i>
+					<i class='bx bxs-moon'></i>
+				</label>
+			</div>
+			<a href="#" class="nav-link" style="margin-left: auto;">
+				<i class='bx bxs-bell icon' ></i>
+			</a>
+			<span class="divider"></span>
+			<div class="profile">
+				<a href="#" class="nav-link">
+					<i class='bx bxs-cog icon' title="Configurações"></i>
+				</a>
+				<a href="#" class="nav-link">
+					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
+				</a>
+			</div>
+		</nav>
+
+		<main>
+			<h1 class="title">Motocicletas</h1>
+			<ul class="breadcrumbs">
+				<li><a href="../../index.html">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="motos-consulta.html">Motocicletas</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Nova Motocicleta</a></li>
+			</ul>
+			
+			<div class="data">
+				<div class="content-data">
+					<div class="head">
+						<h3>Nova Motocicleta</h3>
+					</div>
+					<form action="#" class="os-form">
+						<div class="form-row">
+							<div class="form-group">
+								<label for="cliente">Cliente</label>
+								<input type="text" id="cliente" placeholder="Nome do proprietário" required>
+							</div>
+							<div class="form-group">
+								<label for="placa">Placa</label>
+								<input type="text" id="placa" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="marca">Marca</label>
+								<select id="marca" required>
+									<option value="">Selecione...</option>
+									<option value="honda">Honda</option>
+									<option value="yamaha">Yamaha</option>
+									<option value="suzuki">Suzuki</option>
+									<option value="kawasaki">Kawasaki</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="modelo">Modelo</label>
+								<input type="text" id="modelo" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="ano">Ano</label>
+								<input type="number" id="ano" required>
+							</div>
+							<div class="form-group">
+								<label for="cor">Cor</label>
+								<input type="text" id="cor" required>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="cilindrada">Cilindrada (CC)</label>
+								<input type="number" id="cilindrada" required>
+							</div>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn-primary">Cadastrar Motocicleta</button>
+							<a href="motos-consulta.html" class="btn-secondary">Cancelar</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+	</section>
+
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module" src="../../assets/js/main.js"></script>
+</body>
+</html>
