@@ -3,10 +3,10 @@ const router = express.Router();
 const OrcamentoController = require('../controllers/orcamento.controller');
 
 // Rotas para orçamentos
-router.post('/', OrcamentoController.create);        // Criar orçamento
-router.get('/', OrcamentoController.findAll);        // Listar todos os orçamentos
-router.get('/:id', OrcamentoController.findOne);     // Buscar orçamento por ID
-router.put('/:id', OrcamentoController.update);      // Atualizar orçamento
-router.delete('/:id', OrcamentoController.delete);   // Remover orçamento
+router.post('/', OrcamentoController.create);        
+router.get('/', OrcamentoController.findAll);      
+router.get('/:id', OrcamentoController.findOne);   
+router.put('/:id', OrcamentoController.update);     
+router.delete('/:id', OrcamentoController.delete);   
 
 module.exports = router; 

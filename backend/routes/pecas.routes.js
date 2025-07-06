@@ -3,10 +3,10 @@ const router = express.Router();
 const PecaController = require('../controllers/peca.controller');
 
 // Rotas para peças
-router.post('/', PecaController.create);        // Criar peça
-router.get('/', PecaController.findAll);        // Listar todas as peças
-router.get('/:id', PecaController.findOne);     // Buscar peça por ID
-router.put('/:id', PecaController.update);      // Atualizar peça
-router.delete('/:id', PecaController.delete);   // Remover peça
+router.post('/', PecaController.create);       
+router.get('/', PecaController.findAll);      
+router.get('/:id', PecaController.findOne);    
+router.put('/:id', PecaController.update);      
+router.delete('/:id', PecaController.delete); 
 
 module.exports = router; 

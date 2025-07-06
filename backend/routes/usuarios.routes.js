@@ -3,10 +3,10 @@ const router = express.Router();
 const UsuarioController = require('../controllers/usuario.controller');
 
 // Rotas para usuários
-router.post('/', UsuarioController.create);           // Criar usuário
-router.get('/', UsuarioController.findAll);           // Listar todos os usuários
-router.get('/:cpf', UsuarioController.findOne);       // Buscar usuário por CPF
-router.put('/:cpf', UsuarioController.update);        // Atualizar usuário
-router.delete('/:cpf', UsuarioController.delete);     // Remover usuário
+router.post('/', UsuarioController.create);           
+router.get('/', UsuarioController.findAll);           
+router.get('/:cpf', UsuarioController.findOne);      
+router.put('/:cpf', UsuarioController.update);       
+router.delete('/:cpf', UsuarioController.delete);    
 
 module.exports = router; 

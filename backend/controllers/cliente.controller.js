@@ -14,7 +14,7 @@ class ClienteController {
         });
       }
 
-      // Validar formato do CPF
+      // formato do CPF
       const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
       if (!cpfRegex.test(cpf)) {
         return res.status(400).json({
@@ -23,7 +23,7 @@ class ClienteController {
         });
       }
 
-      // Validar formato do email
+      // formato do email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         return res.status(400).json({

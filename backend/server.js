@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const db = require('./config/db'); // Importa o seu arquivo de conexão
+const db = require('./config/db'); 
 
 // Importar rotas
 const usuariosRoutes = require('./routes/usuarios.routes');
@@ -20,11 +20,11 @@ const aquisicoesRoutes = require('./routes/aquisicoes.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuração de rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100 // limite de 100 requests por IP
+  windowMs: 15 * 60 * 1000,
+  max: 100 
 });
+
 
 // Middlewares
 app.use(helmet());
@@ -42,7 +42,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rota raiz para teste
+
 app.get('/', (req, res) => {
   res.json({
     message: 'API da Oficina de Motocicletas',
@@ -91,5 +91,5 @@ db.one('SELECT 1')
   })
   .catch(error => {
     console.error('Falha na conexão com o banco:', error);
-    process.exit(1); // Encerra a aplicação pois não tem banco conectado
+    process.exit(1); 
   });
