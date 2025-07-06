@@ -94,6 +94,23 @@
 							<label for="data">Data</label>
 							<input type="date" id="data" required>
 						</div>
+						<div class="form-group">
+							<label for="descricao">Descrição</label>
+							<input type="text" id="descricao" name="descricao" required>
+						</div>
+						<div class="form-group">
+							<label for="status">Status</label>
+							<select id="status" name="status" required>
+								<option value="">Selecione...</option>
+								<option value="aberta">Aberta</option>
+								<option value="em_andamento">Em andamento</option>
+								<option value="finalizada">Finalizada</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="usuarioCpf">Usuário Responsável</label>
+							<input type="text" id="usuarioCpf" name="usuarioCpf" required>
+						</div>
 						<h4 style="margin-top: 20px;">Peças e Serviços</h4>
 						<div class="orders">
 							<table id="itens-orcamento">

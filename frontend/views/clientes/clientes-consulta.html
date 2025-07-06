@@ -54,51 +54,45 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Clientes</a></li>
 			</ul>
-			<div class="filter-container">
-				<div class="filter-group">
-					<input type="text" id="filter-text" placeholder="Buscar por Nome, CPF, Telefone...">
-				</div>
-				<div class="filter-group">
-					<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
-				</div>
-			</div>
 			<div class="data">
 				<div class="content-data">
 					<div class="head">
 						<h3>Lista de Clientes</h3>
-						<a href="clientes-cadastro.html" class="btn-primary">Novo Cliente <i class='bx bx-plus'></i></a>
+						<div class="menu">
+							<a href="clientes-cadastro.html" class="btn-primary">
+								<i class='bx bxs-plus-circle'></i> Novo Cliente
+							</a>
+						</div>
 					</div>
-					<div class="orders">
+					<div class="filters">
+						<div class="filter-group">
+							<input type="text" id="filter-text" placeholder="Buscar...">
+						</div>
+						<div class="filter-group">
+							<select id="filter-status">
+								<option value="">Todos os sexos</option>
+								<option value="Masculino">Masculino</option>
+								<option value="Feminino">Feminino</option>
+							</select>
+						</div>
+						<div class="filter-group">
+							<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
+						</div>
+					</div>
+					<div class="table-container">
 						<table id="clientes-table">
 							<thead>
 								<tr>
 									<th>Nome</th>
-									<th>CPF</th>
+									<th>Email</th>
 									<th>Telefone</th>
+									<th>CPF</th>
+									<th>Endereço</th>
 									<th>Ações</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>Rhuan Gabriel</td>
-									<td>123.456.789-00</td>
-									<td>(99) 99999-9999</td>
-									<td>
-										<a href="clientes-visualizar.html?id=Rhuan%20Gabriel" class="action-icon" title="Visualizar"><i class='bx bx-show'></i></a>
-										<a href="clientes-cadastro.html?id=Rhuan%20Gabriel" class="action-icon" title="Editar"><i class='bx bxs-edit-alt'></i></a>
-										<a href="#" class="action-icon"><i class='bx bxs-trash'></i></a>
-									</td>
-								</tr>
-								<tr>
-									<td>Maria Oliveira</td>
-									<td>098.765.432-11</td>
-									<td>(88) 88888-8888</td>
-									<td>
-										<a href="clientes-visualizar.html?id=Maria%20Oliveira" class="action-icon" title="Visualizar"><i class='bx bx-show'></i></a>
-										<a href="clientes-cadastro.html?id=Maria%20Oliveira" class="action-icon" title="Editar"><i class='bx bxs-edit-alt'></i></a>
-										<a href="#" class="action-icon"><i class='bx bxs-trash'></i></a>
-									</td>
-								</tr>
+								<!-- Dados serão carregados dinamicamente -->
 							</tbody>
 						</table>
 					</div>

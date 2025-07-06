@@ -29,11 +29,13 @@ class App {
     initPageSpecificControllers() {
         // Inicializar filtros baseado na tabela presente na página
         const tableIds = ['os-table', 'clientes-table', 'motos-table', 'marcas-table', 
-                         'fornecedores-table', 'pecas-table', 'orcamentos-table'];
+                         'fornecedores-table', 'pecas-table', 'orcamentos-table', 'usuarios-table'];
         
         tableIds.forEach(tableId => {
             if (document.getElementById(tableId)) {
                 this.filterController = new FilterController(tableId);
+                // Tornar globalmente acessível para os botões de ação
+                window.filterController = this.filterController;
             }
         });
     }

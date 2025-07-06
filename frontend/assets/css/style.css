@@ -586,23 +586,26 @@ main .content-data .head .btn-primary:hover {
 }
 
 /* TABELA DE CONSULTA */
-main .content-data .orders table {
+main .content-data .orders table, .content-data table {
 	width: 100%;
 	border-collapse: collapse;
+	background: #fff;
 }
-main .content-data .orders table th {
+main .content-data .orders table th, .content-data th {
 	padding-bottom: 12px;
 	font-size: 13px;
 	text-align: left;
 	border-bottom: 1px solid var(--grey);
+	background: #f8f9fa;
+	font-weight: bold;
 }
-main .content-data .orders table td {
+main .content-data .orders table td, .content-data td {
 	padding: 16px 0;
 }
-main .content-data .orders table tr:hover {
+main .content-data .orders table tr:hover, .content-data tr:hover {
 	background: var(--grey);
 }
-main .content-data .orders table td .status-completed {
+main .content-data .orders table td .status-completed, .content-data td .status-completed {
 	background: var(--light-green);
 	color: var(--green);
 	padding: 6px 16px;
@@ -610,7 +613,7 @@ main .content-data .orders table td .status-completed {
 	font-weight: 700;
 	font-size: 12px;
 }
-main .content-data .orders table td .status-pending {
+main .content-data .orders table td .status-pending, .content-data td .status-pending {
 	background: var(--light-blue);
 	color: var(--blue);
 	padding: 6px 16px;
@@ -618,7 +621,7 @@ main .content-data .orders table td .status-pending {
 	font-weight: 700;
 	font-size: 12px;
 }
-main .content-data .orders table td .status-process {
+main .content-data .orders table td .status-process, .content-data td .status-process {
 	background: #fff0c2;
     color: #ffc107;
 	padding: 6px 16px;
@@ -626,7 +629,7 @@ main .content-data .orders table td .status-process {
 	font-weight: 700;
 	font-size: 12px;
 }
-main .content-data .orders table td .status-adjustment {
+main .content-data .orders table td .status-adjustment, .content-data td .status-adjustment {
 	background: #f8d7da;
 	color: #721c24;
 	padding: 6px 16px;
@@ -634,13 +637,13 @@ main .content-data .orders table td .status-adjustment {
 	font-weight: 700;
 	font-size: 12px;
 }
-main .content-data .orders table td .action-icon {
+main .content-data .orders table td .action-icon, .content-data td .action-icon {
 	color: var(--dark-grey);
 	font-size: 20px;
 	margin-right: 10px;
 	transition: all .3s ease;
 }
-main .content-data .orders table td .action-icon:hover {
+main .content-data .orders table td .action-icon:hover, .content-data td .action-icon:hover {
 	color: var(--blue);
 }
 
@@ -1058,4 +1061,158 @@ body.dark .form-group-login input {
     background: var(--dark-bg);
     border-color: var(--dark-border);
     color: var(--dark-text-primary);
+}
+
+/* Estilos para filtros */
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background: var(--light);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--blue);
+}
+
+/* Estilos para tabelas */
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+table tr:hover {
+    background: #f5f5f5;
+}
+
+/* Estilos para botões de ação */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-edit,
+.btn-delete {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-edit {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #138496;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+}
+
+/* Estilos para botões */
+.btn-primary,
+.btn-secondary {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--dark-blue);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Estilos para modo escuro */
+body.dark .filters input,
+body.dark .filters select {
+    background: var(--dark-surface);
+    color: var(--dark-text-primary);
+    border-color: var(--dark-border);
+}
+
+body.dark table th {
+    background: var(--dark-surface);
+    color: var(--dark-text-primary);
+}
+
+body.dark table tr:hover {
+    background: var(--dark-surface);
+}
+
+body.dark .btn-secondary {
+    background: #495057;
+}
+
+body.dark .btn-secondary:hover {
+    background: #343a40;
 } 

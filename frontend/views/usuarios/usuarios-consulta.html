@@ -58,6 +58,43 @@
 				<div class="content-data">
 					<div class="head">
 						<h3>Lista de Usuários</h3>
+						<div class="menu">
+							<a href="usuarios-cadastro.html" class="btn-primary">
+								<i class='bx bxs-plus-circle'></i> Novo Usuário
+							</a>
+						</div>
+					</div>
+					<div class="filters">
+						<div class="filter-group">
+							<input type="text" id="filter-text" placeholder="Buscar...">
+						</div>
+						<div class="filter-group">
+							<select id="filter-status">
+								<option value="">Todos os status</option>
+								<option value="Ativo">Ativo</option>
+								<option value="Inativo">Inativo</option>
+							</select>
+						</div>
+						<div class="filter-group">
+							<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
+						</div>
+					</div>
+					<div class="table-container">
+						<table id="usuarios-table">
+							<thead>
+								<tr>
+									<th>Nome</th>
+									<th>Email</th>
+									<th>Função</th>
+									<th>Telefone</th>
+									<th>CPF</th>
+									<th>Ações</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Dados serão carregados dinamicamente -->
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>
