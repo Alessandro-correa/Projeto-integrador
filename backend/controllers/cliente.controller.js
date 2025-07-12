@@ -4,10 +4,10 @@ class ClienteController {
   // Criar cliente
   async create(req, res) {
     try {
-      const { cpf, nome, sexo, endereco, telefone, email, profissao, dataDeNascimento } = req.body;
+      const { cpf, nome, sexo, endereco, telefone: telefoneOriginal, email, profissao, dataDeNascimento } = req.body;
 
       // Validações
-      if (!cpf || !nome || !sexo || !endereco || !telefone || !email || !profissao || !dataDeNascimento) {
+      if (!cpf || !nome || !sexo || !endereco || !telefoneOriginal || !email || !profissao || !dataDeNascimento) {
         return res.status(400).json({
           success: false,
           message: 'Todos os campos são obrigatórios'
@@ -24,11 +24,25 @@ class ClienteController {
       }
 
       // formato do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z.]{2,}$/;
+      const validTlds = [
+        'com', 'net', 'org', 'edu', 'gov', 'mil', 'br',
+        'com.br', 'net.br', 'org.br', 'gov.br', 'edu.br'
+      ];
       if (!emailRegex.test(email)) {
         return res.status(400).json({
           success: false,
           message: 'Formato de email inválido'
+        });
+      }
+      const domain = email.split('@')[1].toLowerCase();
+      const tld = domain.split('.').slice(-2).join('.');
+      const tldSimple = domain.split('.').pop();
+    //  console.log('Email:', email, '| tld:', tld, '| tldSimple:', tldSimple);
+      if (!validTlds.includes(tld) && !validTlds.includes(tldSimple)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Domínio de e-mail inválido'
         });
       }
 
@@ -46,6 +60,25 @@ class ClienteController {
         return res.status(400).json({
           success: false,
           message: 'Data de nascimento inválida'
+        });
+      }
+
+      // Validar ano (ex: entre 1920 e ano atual - 10 anos)
+      const anoAtual = new Date().getFullYear();
+      const anoNasc = dataNasc.getFullYear();
+      if (anoNasc < 1920 || anoNasc > (anoAtual - 10)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Ano de nascimento inválido. Use um ano entre 1920 e ' + (anoAtual - 10)
+        });
+      }
+
+      // Padronizar telefone para só números
+      let telefone = telefoneOriginal.replace(/\D/g, '');
+      if (!/^\d{10,11}$/.test(telefone)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Telefone inválido. Use o formato (99) 99999-9999'
         });
       }
 
@@ -82,7 +115,27 @@ class ClienteController {
       });
 
     } catch (error) {
-      console.error('Erro ao criar cliente:', error);
+      if (error.code === '23505') {
+        if (error.detail && error.detail.includes('telefone')) {
+          return res.status(409).json({
+            success: false,
+            message: 'Telefone já cadastrado'
+          });
+        }
+        if (error.detail && error.detail.includes('email')) {
+          return res.status(409).json({
+            success: false,
+            message: 'Email já cadastrado'
+          });
+        }
+        if (error.detail && error.detail.includes('cpf')) {
+          return res.status(409).json({
+            success: false,
+            message: 'CPF já cadastrado'
+          });
+        }
+      }
+      console.error('Erro ao criar cliente:', error, JSON.stringify(error));
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -115,9 +168,11 @@ class ClienteController {
   // Buscar cliente por CPF
   async findOne(req, res) {
     try {
-      const { cpf } = req.params;
+      let { cpf } = req.params;
+      cpf = cpf.replace(/\D/g, ''); 
 
-      const cliente = await db.oneOrNone('SELECT * FROM Cliente WHERE cpf = $1', [cpf]);
+      const clientes = await db.any('SELECT * FROM Cliente');
+      const cliente = clientes.find(c => c.cpf.replace(/\D/g, '') === cpf);
 
       if (!cliente) {
         return res.status(404).json({
@@ -165,7 +220,7 @@ class ClienteController {
       }
 
       // Validar formato do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/;
       if (!emailRegex.test(email)) {
         return res.status(400).json({
           success: false,
@@ -187,6 +242,25 @@ class ClienteController {
         return res.status(400).json({
           success: false,
           message: 'Data de nascimento inválida'
+        });
+      }
+
+      // Validar ano (ex: entre 1920 e ano atual - 10 anos)
+      const anoAtual = new Date().getFullYear();
+      const anoNasc = dataNasc.getFullYear();
+      if (anoNasc < 1920 || anoNasc > (anoAtual - 10)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Ano de nascimento inválido. Use um ano entre 1920 e ' + (anoAtual - 10)
+        });
+      }
+
+      // Padronizar telefone para só números
+      telefone = telefone.replace(/\D/g, '');
+      if (!/^\d{10,11}$/.test(telefone)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Telefone inválido. Use o formato (99) 99999-9999'
         });
       }
 

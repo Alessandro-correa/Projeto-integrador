@@ -177,7 +177,7 @@ class FilterController {
                 return [
                     item.nome || '',
                     item.email || '',
-                    item.telefone || '',
+                    this.formatarTelefone(item.telefone),
                     item.cpf || '',
                     item.endereco || ''
                 ];
@@ -263,6 +263,9 @@ class FilterController {
     }
 
     getDeleteId(item) {
+        if (this.entity === 'motocicletas') {
+            return item.placa;
+        }
         return item.id || item.codigo || item.cpf || item.cnpj;
     }
 
@@ -294,6 +297,17 @@ class FilterController {
 
     showError(message) {
         alert('Erro: ' + message);
+    }
+
+    // Função utilitária para formatar telefone
+    formatarTelefone(telefone) {
+        telefone = (telefone || '').replace(/\D/g, '');
+        if (telefone.length === 11) {
+            // Celular: (99) 99999-9999
+            return `(${telefone.substr(0,2)}) ${telefone.substr(2,5)}-${telefone.substr(7,4)}`;
+        }
+        // Se não for celular, retorna como está (sem formatação de fixo)
+        return telefone;
     }
 }
 

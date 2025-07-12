@@ -3,12 +3,30 @@ const db = require('../config/db');
 class FornecedorController {
   async create(req, res) {
     try {
-      const { cnpj, email, endereco, nome } = req.body;
+      const { cnpj, email, endereco, nome, telefone: telefoneOriginal } = req.body;
 
-      if (!cnpj || !email || !endereco || !nome) {
+      if (!cnpj || !email || !endereco || !nome || !telefoneOriginal) {
         return res.status(400).json({
           success: false,
           message: 'Todos os campos são obrigatórios'
+        });
+      }
+
+      // Padronizar telefone para só números
+      let telefone = telefoneOriginal.replace(/\D/g, '');
+      if (!/^\d{11}$/.test(telefone)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Telefone inválido. Use apenas celulares no formato (99) 99999-9999'
+        });
+      }
+
+      // Verificar se telefone já existe
+      const existingTel = await db.oneOrNone('SELECT telefone FROM Fornecedor WHERE telefone = $1', [telefone]);
+      if (existingTel) {
+        return res.status(409).json({
+          success: false,
+          message: 'Telefone já cadastrado'
         });
       }
 
@@ -30,13 +48,36 @@ class FornecedorController {
         });
       }
 
+      // formato do email
+      const emailRegex = /^[^\s@]+@[^-\s@]+\.[a-zA-Z.]{2,}$/;
+      const validTlds = [
+        'com', 'net', 'org', 'edu', 'gov', 'mil', 'br',
+        'com.br', 'net.br', 'org.br', 'gov.br', 'edu.br'
+     
+      ];
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Formato de email inválido'
+        });
+      }
+      const domain = email.split('@')[1].toLowerCase();
+      const tld = domain.split('.').slice(-2).join('.');
+      const tldSimple = domain.split('.').pop();
+      if (!validTlds.includes(tld) && !validTlds.includes(tldSimple)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Domínio de e-mail inválido'
+        });
+      }
+
       const query = `
-        INSERT INTO Fornecedor (cnpj, email, endereco, nome)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO Fornecedor (cnpj, email, endereco, nome, telefone)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
 
-      const novoFornecedor = await db.one(query, [cnpj, email, endereco, nome]);
+      const novoFornecedor = await db.one(query, [cnpj, email, endereco, nome, telefone]);
 
       res.status(201).json({
         success: true,

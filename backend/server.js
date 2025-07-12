@@ -86,7 +86,8 @@ db.one('SELECT 1')
     console.log('Conexão com banco de dados bem sucedida');
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);
-      console.log(`Ambiente: ${process.env.NODE_ENV || 'não definido'}`);
+      console.log('Ambiente:', process.env.NODE_ENV || 'não definido');
+      console.log('✅ Nodemon funcionando - alterações detectadas automaticamente!');
     });
   })
   .catch(error => {

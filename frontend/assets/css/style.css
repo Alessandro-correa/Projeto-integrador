@@ -1216,3 +1216,10 @@ body.dark .btn-secondary {
 body.dark .btn-secondary:hover {
     background: #343a40;
 } 
+
+.input-bloqueado {
+    background: #eee !important;
+    cursor: not-allowed !important;
+    color: #888 !important;
+    opacity: 0.8;
+} 

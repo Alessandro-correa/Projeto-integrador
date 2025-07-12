@@ -173,7 +173,28 @@ class App {
     }
 }
 
+// Preencher select de aquisições na tela de cadastro de peças
+function preencherSelectAquisicoes() {
+    const select = document.getElementById('aquisicaoId');
+    if (!select) return;
+    fetch('http://localhost:3000/api/aquisicoes')
+        .then(res => res.json())
+        .then(result => {
+            if (result.success && Array.isArray(result.data)) {
+                result.data.forEach(aq => {
+                    const option = document.createElement('option');
+                    // Exibe id e data formatada
+                    const data = aq.dia_da_compra ? new Date(aq.dia_da_compra).toLocaleDateString() : '';
+                    option.value = aq.id;
+                    option.textContent = `${aq.id} - ${data}`;
+                    select.appendChild(option);
+                });
+            }
+        });
+}
+
 // Inicializar a aplicação quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
     new App();
+    preencherSelectAquisicoes();
 });

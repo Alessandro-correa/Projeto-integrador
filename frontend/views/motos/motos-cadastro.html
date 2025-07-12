@@ -59,6 +59,7 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Nova Motocicleta</a></li>
 			</ul>
+			<div id="cpf-orientacao" style="color: #b00; margin-bottom: 10px;">Preencha um CPF de cliente já cadastrado para liberar o cadastro da motocicleta.</div>
 			
 			<div class="data">
 				<div class="content-data">
@@ -126,5 +127,135 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script>
+function setMotoFieldsReadOnly(readOnly) {
+    const inputIds = ['cliente', 'placa', 'modelo', 'ano', 'cor', 'cilindrada'];
+    const selectIds = ['marca'];
+    inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.readOnly = readOnly;
+            if (readOnly) {
+                el.value = '';
+                el.classList.add('input-bloqueado');
+            } else {
+                el.classList.remove('input-bloqueado');
+            }
+        }
+    });
+    selectIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.disabled = readOnly;
+            if (readOnly) {
+                el.selectedIndex = 0;
+                el.classList.add('input-bloqueado');
+            } else {
+                el.classList.remove('input-bloqueado');
+            }
+        }
+    });
+    // O campo 'cliente' (nome) deve SEMPRE ser readonly
+    const clienteInput = document.getElementById('cliente');
+    if (clienteInput) clienteInput.readOnly = true;
+    // Mostra/esconde a mensagem de orientação
+    const orientacao = document.getElementById('cpf-orientacao');
+    if (orientacao) orientacao.style.display = readOnly ? 'block' : 'none';
+}
+
+// Inicialmente bloqueia todos os campos exceto CPF
+document.addEventListener('DOMContentLoaded', function() {
+    setMotoFieldsReadOnly(true);
+    document.getElementById('clienteCpf').readOnly = false;
+    
+    // Adicionar elemento para mensagem do ano
+    const anoField = document.getElementById('ano');
+    const mensagemElement = document.createElement('div');
+    mensagemElement.id = 'ano-mensagem';
+    mensagemElement.style.fontSize = '12px';
+    mensagemElement.style.marginTop = '5px';
+    mensagemElement.style.fontWeight = 'bold';
+    anoField.parentNode.appendChild(mensagemElement);
+});
+
+document.getElementById('clienteCpf').addEventListener('input', async function(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = v;
+
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    const clienteInput = document.getElementById('cliente');
+    if (cpfRegex.test(e.target.value)) {
+        // Buscar nome do cliente no backend
+        try {
+            const response = await fetch(`http://localhost:3000/api/clientes/${e.target.value}`);
+            const data = await response.json();
+            if (response.ok && data && data.success && data.data && data.data.nome) {
+                clienteInput.value = data.data.nome;
+                clienteInput.readOnly = true;
+                setMotoFieldsReadOnly(false);
+                clienteInput.readOnly = true; 
+            } else {
+                clienteInput.value = '';
+                clienteInput.readOnly = false;
+                setMotoFieldsReadOnly(true);
+                document.getElementById('clienteCpf').readOnly = false;
+                alert('Cliente não encontrado para este CPF.');
+            }
+        } catch (err) {
+            clienteInput.value = '';
+            clienteInput.readOnly = false;
+            setMotoFieldsReadOnly(true);
+            document.getElementById('clienteCpf').readOnly = false;
+            alert('Erro ao buscar cliente.');
+        }
+    } else {
+        clienteInput.value = '';
+        clienteInput.readOnly = false;
+        setMotoFieldsReadOnly(true);
+        document.getElementById('clienteCpf').readOnly = false;
+    }
+});
+
+document.getElementById('placa').addEventListener('input', function(e) {
+    let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (v.length > 7) v = v.slice(0, 7);
+    e.target.value = v;
+});
+
+document.getElementById('ano').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 4) v = v.slice(0, 4);
+    
+    const mensagemElement = document.getElementById('ano-mensagem');
+    
+    // Se tem 4 dígitos, valida imediatamente
+    if (v.length === 4) {
+        const ano = parseInt(v);
+        if (ano < 1900 || ano > 2026) {
+            // Remove o último dígito se for inválido
+            v = v.slice(0, 3);
+            e.target.style.borderColor = 'red';
+            e.target.title = 'Ano inválido. Use um ano entre 1900 e 2026';
+            mensagemElement.textContent = '❌ Ano inválido';
+            mensagemElement.style.color = 'red';
+        } else {
+            e.target.style.borderColor = 'green';
+            e.target.title = '';
+            mensagemElement.textContent = '✅ Ano válido';
+            mensagemElement.style.color = 'green';
+        }
+    } else {
+        e.target.style.borderColor = '';
+        e.target.title = '';
+        mensagemElement.textContent = '';
+    }
+    
+    e.target.value = v;
+});
+    </script>
 </body>
 </html>

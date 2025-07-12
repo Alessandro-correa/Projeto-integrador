@@ -69,7 +69,7 @@
 							</div>
 							<div class="form-group">
 								<label for="cpf">CPF</label>
-								<input type="text" id="cpf" name="cpf" placeholder="XXX.XXX.XXX-XX" required>
+								<input type="text" id="cpf" name="cpf" required>
 							</div>
 						</div>
 						<div class="form-group">
@@ -115,5 +115,86 @@
 	</section>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
+	<script>
+document.getElementById('cpf').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    e.target.value = v;
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const telInput = document.getElementById('telefone');
+    if (!telInput) return;
+
+    // Adiciona elemento para mensagem
+    const msg = document.createElement('div');
+    msg.id = 'telefone-msg';
+    msg.style.fontSize = '12px';
+    msg.style.marginTop = '5px';
+    msg.style.fontWeight = 'bold';
+    telInput.parentNode.appendChild(msg);
+
+    telInput.addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0, 11);
+
+        // Máscara: (99) 99999-9999 ou (99) 9999-9999
+        if (v.length > 10) {
+            v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+        } else if (v.length > 6) {
+            v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+        } else if (v.length > 2) {
+            v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+        }
+        e.target.value = v;
+
+        // Validação visual: só aceita celular (11 dígitos)
+        const isValid = /^\(\d{2}\) 9\d{4}-\d{4}$/.test(v);
+        if (v.length > 0) {
+            if (isValid) {
+                e.target.style.borderColor = 'green';
+                msg.textContent = '✅ Número válido';
+                msg.style.color = 'green';
+            } else {
+                e.target.style.borderColor = 'red';
+                msg.textContent = '❌ Número inválido (apenas celular)';
+                msg.style.color = 'red';
+            }
+        } else {
+            e.target.style.borderColor = '';
+            msg.textContent = '';
+        }
+    });
+
+    // Impede envio do formulário se telefone for inválido
+    const form = telInput.closest('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const v = telInput.value;
+            const isValid = /^\(\d{2}\) 9\d{4}-\d{4}$/.test(v);
+            if (!isValid) {
+                telInput.focus();
+                msg.textContent = '❌ Número inválido (apenas celular)';
+                msg.style.color = 'red';
+                telInput.style.borderColor = 'red';
+                e.preventDefault();
+            }
+        });
+    }
+
+    // Restringe datas no campo de nascimento
+    const dataInput = document.getElementById('dataDeNascimento');
+    if (dataInput) {
+        dataInput.setAttribute('min', '1920-01-01');
+        const hoje = new Date();
+        const anoMax = hoje.getFullYear() - 10;
+        dataInput.setAttribute('max', anoMax + '-12-31');
+    }
+});
+</script>
 </body>
 </html>

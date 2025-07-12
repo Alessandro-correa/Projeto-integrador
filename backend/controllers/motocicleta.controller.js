@@ -4,12 +4,31 @@ class MotocicletaController {
   // Criar motocicleta
   async create(req, res) {
     try {
-      const { placa, ano, cor, modelo, cilindrada, clienteCpf, ordemDeServicoCod } = req.body;
+      let { placa, ano, cor, modelo, cilindrada, clienteCpf, ordemDeServicoCod } = req.body;
+      placa = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
       if (!placa || !ano || !cor || !modelo || !cilindrada || !clienteCpf) {
         return res.status(400).json({
           success: false,
           message: 'Todos os campos são obrigatórios'
+        });
+      }
+
+      // Validar formato do CPF
+      const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+      if (!cpfRegex.test(clienteCpf)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Formato de CPF inválido. Use o formato: XXX.XXX.XXX-XX'
+        });
+      }
+
+      // Validar ano
+      const anoAtual = new Date().getFullYear();
+      if (ano < 1900 || ano > (anoAtual + 1)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Ano inválido. Use um ano entre 1900 e ' + (anoAtual + 1)
         });
       }
 
@@ -37,7 +56,13 @@ class MotocicletaController {
       });
 
     } catch (error) {
-      console.error('Erro ao criar motocicleta:', error);
+      console.error('Erro ao criar motocicleta:', error, JSON.stringify(error));
+      if (error.code === '23505' || (error.message && error.message.includes('duplicate key'))) {
+        return res.status(409).json({
+          success: false,
+          message: 'Já existe uma motocicleta cadastrada com esta placa.'
+        });
+      }
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -143,9 +168,11 @@ class MotocicletaController {
   // Remover motocicleta
   async delete(req, res) {
     try {
-      const { placa } = req.params;
+      let { placa } = req.params;
+      placa = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-      const existingMotocicleta = await db.oneOrNone('SELECT * FROM Motocicleta WHERE placa = $1', [placa]);
+      const motocicletas = await db.any('SELECT * FROM Motocicleta');
+      const existingMotocicleta = motocicletas.find(m => m.placa.toUpperCase().replace(/[^A-Z0-9]/g, '') === placa);
       if (!existingMotocicleta) {
         return res.status(404).json({
           success: false,
@@ -153,7 +180,7 @@ class MotocicletaController {
         });
       }
 
-      await db.none('DELETE FROM Motocicleta WHERE placa = $1', [placa]);
+      await db.none('DELETE FROM Motocicleta WHERE placa = $1', [existingMotocicleta.placa]);
 
       res.json({
         success: true,

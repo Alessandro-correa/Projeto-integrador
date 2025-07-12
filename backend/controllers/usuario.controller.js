@@ -23,12 +23,34 @@ class UsuarioController {
         });
       }
 
-      // Validar formato do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // Validar formato do email (regex + TLDs válidos)
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z.]{2,}$/;
+      const validTlds = [
+        'com', 'net', 'org', 'edu', 'gov', 'mil', 'br',
+        'com.br', 'net.br', 'org.br', 'gov.br', 'edu.br'
+      ];
       if (!emailRegex.test(email)) {
         return res.status(400).json({
           success: false,
           message: 'Formato de email inválido'
+        });
+      }
+      const domain = email.split('@')[1].toLowerCase();
+      const tld = domain.split('.').slice(-2).join('.');
+      const tldSimple = domain.split('.').pop();
+      if (!validTlds.includes(tld) && !validTlds.includes(tldSimple)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Domínio de e-mail inválido'
+        });
+      }
+
+      // Padronizar telefone para só números
+      let telefoneNumeros = telefone.replace(/\D/g, '');
+      if (!/^\d{10,11}$/.test(telefoneNumeros)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Telefone inválido. Use o formato (99) 99999-9999'
         });
       }
 
@@ -51,7 +73,7 @@ class UsuarioController {
       }
 
       // Verificar se telefone já existe
-      const existingTelefone = await db.oneOrNone('SELECT telefone FROM Usuario WHERE telefone = $1', [telefone]);
+      const existingTelefone = await db.oneOrNone('SELECT telefone FROM Usuario WHERE telefone = $1', [telefoneNumeros]);
       if (existingTelefone) {
         return res.status(409).json({
           success: false,
@@ -74,7 +96,7 @@ class UsuarioController {
         RETURNING *
       `;
 
-      const novoUsuario = await db.one(query, [cpf, nome, funcao, senha, email, telefone, codigo]);
+      const novoUsuario = await db.one(query, [cpf, nome, funcao, senha, email, telefoneNumeros, codigo]);
 
       res.status(201).json({
         success: true,
