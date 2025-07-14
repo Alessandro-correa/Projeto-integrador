@@ -9,13 +9,13 @@ class OrdemServicoApiController {
   // Criar ordem de serviço
   async create(req, res) {
     try {
-      const { titulo, data, descricao, status, observacao, validada, clienteCpf, motocicletaPlaca } = req.body;
+      const { titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, valorMaoDeObra, validada, usuarioCpf, clienteCpf, motocicletaPlaca } = req.body;
 
       // Validações
-      if (!titulo || !data || !descricao || !status || !clienteCpf || !motocicletaPlaca) {
+      if (!titulo || !data || !descricao || !status || !usuarioCpf || !clienteCpf || !motocicletaPlaca) {
         return res.status(400).json({
           success: false,
-          message: 'Título, data, descrição, status, CPF do cliente e placa da motocicleta são obrigatórios'
+          message: 'Título, data, descrição, status, CPF do usuário, CPF do cliente e placa da motocicleta são obrigatórios'
         });
       }
 
@@ -34,6 +34,15 @@ class OrdemServicoApiController {
         return res.status(400).json({
           success: false,
           message: 'Status inválido. Status válidos: ' + statusValidos.join(', ')
+        });
+      }
+
+      // Verificar se usuário existe
+      const usuario = await db.oneOrNone('SELECT cpf FROM Usuario WHERE cpf = $1', [usuarioCpf]);
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          message: 'Usuário não encontrado'
         });
       }
 
@@ -56,12 +65,16 @@ class OrdemServicoApiController {
       }
 
       const query = `
-        INSERT INTO Ordem_de_servico (titulo, data, descricao, status, observacao, validada, cliente_cpf, motocicleta_placa)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO Ordem_de_servico (titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, validada, usuario_cpf, cliente_cpf, motocicleta_placa)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING *
       `;
 
-      const novaOrdem = await db.one(query, [titulo, data, descricao, status, observacao || null, validada || false, clienteCpf, motocicletaPlaca]);
+      const valorFinal = valor ? parseFloat(valor) : 0.00;
+      const valorMaoDeObraFinal = valor_mao_de_obra ? parseFloat(valor_mao_de_obra) : 
+                                  valorMaoDeObra ? parseFloat(valorMaoDeObra) : 0.00;
+
+      const novaOrdem = await db.one(query, [titulo, data, descricao, status, observacao || null, valorFinal, valorMaoDeObraFinal, validada || false, usuarioCpf, clienteCpf, motocicletaPlaca]);
 
       res.status(201).json({
         success: true,
@@ -90,7 +103,12 @@ class OrdemServicoApiController {
           os.descricao,
           os.status,
           os.observacao,
+          os.valor,
+          os.valor_mao_de_obra,
           os.validada,
+          os.usuario_cpf,
+          u.nome AS usuario_nome,
+          u.funcao AS usuario_funcao,
           c.nome AS cliente_nome,
           c.cpf AS cliente_cpf,
           c.telefone AS cliente_telefone,
@@ -100,6 +118,7 @@ class OrdemServicoApiController {
           m.ano AS motocicleta_ano,
           m.cor AS motocicleta_cor
         FROM Ordem_de_servico os
+        JOIN Usuario u ON os.usuario_cpf = u.cpf
         JOIN Cliente c ON os.cliente_cpf = c.cpf
         JOIN Motocicleta m ON os.motocicleta_placa = m.placa
         ORDER BY os.data DESC
@@ -135,10 +154,14 @@ class OrdemServicoApiController {
           os.descricao,
           os.status,
           os.observacao,
+          os.valor,
+          os.valor_mao_de_obra,
           os.validada,
+          os.usuario_cpf,
           os.cliente_cpf,
           os.motocicleta_placa,
-          os.valor_total,
+          u.nome AS usuario_nome,
+          u.funcao AS usuario_funcao,
           c.nome AS cliente_nome,
           c.telefone AS cliente_telefone,
           c.email AS cliente_email,
@@ -147,6 +170,7 @@ class OrdemServicoApiController {
           m.cor AS motocicleta_cor,
           m.cilindrada AS motocicleta_cilindrada
         FROM Ordem_de_servico os
+        JOIN Usuario u ON os.usuario_cpf = u.cpf
         JOIN Cliente c ON os.cliente_cpf = c.cpf
         JOIN Motocicleta m ON os.motocicleta_placa = m.placa
         WHERE os.cod = $1
@@ -180,12 +204,55 @@ class OrdemServicoApiController {
           id,
           valor,
           validade,
-          status
+          status,
+          descricao
         FROM Orcamento
         WHERE ordem_servico_cod = $1
         ORDER BY id DESC
         LIMIT 1
       `, [id]);
+
+      // Processar descrição do orçamento se existir e estiver aprovado
+      let servicosProcessados = [];
+      let pecasProcessadas = [];
+      let valorTotalServicos = 0;
+      let valorTotalPecasOrcamento = 0;
+      let descricaoFormatada = '';
+      
+      if (orcamento && orcamento.status === 'A' && orcamento.descricao) {
+        const itens = orcamento.descricao.split(';');
+        
+        itens.forEach(item => {
+          if (item.trim().startsWith('SERVIÇO:')) {
+            const match = item.match(/SERVIÇO:\s*(.+?)\s*-\s*R\$\s*([\d,]+\.?\d*)/);
+            if (match) {
+              const descricao = match[1].trim();
+              const valor = parseFloat(match[2].replace(',', '.'));
+              servicosProcessados.push({ descricao, valor });
+              valorTotalServicos += valor;
+            }
+          } else if (item.trim().startsWith('PEÇA:')) {
+            const match = item.match(/PEÇA:\s*(.+?)\s*-\s*Qtd:\s*(\d+)\s*-\s*Valor unit:\s*R\$\s*([\d,]+\.?\d*)/);
+            if (match) {
+              const nome = match[1].trim();
+              const quantidade = parseInt(match[2]);
+              const valorUnit = parseFloat(match[3].replace(',', '.'));
+              const valorTotal = quantidade * valorUnit;
+              pecasProcessadas.push({ nome, quantidade, valor_unitario: valorUnit, valor_total: valorTotal });
+              valorTotalPecasOrcamento += valorTotal;
+            }
+          }
+        });
+
+        // Formatar descrição para exibição na OS
+        const servicosText = servicosProcessados.map(s => `• ${s.descricao} - R$ ${s.valor.toFixed(2)}`).join('\n');
+        const pecasText = pecasProcessadas.map(p => `• ${p.nome} (Qtd: ${p.quantidade}) - R$ ${p.valor_unitario.toFixed(2)} cada`).join('\n');
+        
+        descricaoFormatada = 'SERVIÇOS DO ORÇAMENTO:\n' + servicosText;
+        if (pecasText) {
+          descricaoFormatada += '\n\nPEÇAS DO ORÇAMENTO:\n' + pecasText;
+        }
+      }
 
       // Calcular valor total das peças
       let pecasFinais = pecas;
@@ -202,7 +269,8 @@ class OrdemServicoApiController {
         validada: ordem.validada,
         cliente_cpf: ordem.cliente_cpf,
         motocicleta_placa: ordem.motocicleta_placa,
-        valor_total: ordem.valor_total || 0,
+        valor: ordem.valor || 0, // Valor total das peças
+        valor_mao_de_obra: ordem.valor_mao_de_obra || 0, // Valor de mão de obra
         
         // Dados do cliente
         cliente_nome: ordem.cliente_nome,
@@ -219,9 +287,16 @@ class OrdemServicoApiController {
         pecas: pecasFinais,
         valor_total_pecas: valorTotalPecas,
         
-        // Orçamento
+        // Dados do orçamento processados
         orcamento: orcamento,
-        valor_total_os: orcamento ? parseFloat(orcamento.valor) : valorTotalPecas
+        servicos_orcamento: servicosProcessados,
+        pecas_orcamento: pecasProcessadas,
+        valor_total_servicos: valorTotalServicos,
+        valor_total_pecas_orcamento: valorTotalPecasOrcamento,
+        descricao_orcamento_formatada: descricaoFormatada,
+        
+        // Valor total da OS
+        valor_total_os: (ordem.valor || 0) + (ordem.valor_mao_de_obra || 0)
       };
 
       res.json({
@@ -253,8 +328,9 @@ class OrdemServicoApiController {
         validada,
         clienteCpf,
         cliente_cpf,
-        valorTotal,
-        valor_total,
+        valor, // Valor total das peças
+        valor_mao_de_obra, // Novo campo para valor de mão de obra
+        valorMaoDeObra, // Aceitar também em camelCase
         pecas
       } = req.body;
 
@@ -314,14 +390,15 @@ class OrdemServicoApiController {
 
       const query = `
         UPDATE Ordem_de_servico 
-        SET titulo = $1, data = $2, descricao = $3, status = $4, observacao = $5, validada = $6, cliente_cpf = $7, valor_total = $8
-        WHERE cod = $9
+        SET titulo = $1, data = $2, descricao = $3, status = $4, observacao = $5, validada = $6, cliente_cpf = $7, valor = $8, valor_mao_de_obra = $9
+        WHERE cod = $10
         RETURNING *
       `;
 
-      const valorTotalFinal = valorTotal !== undefined || valor_total !== undefined ? 
-        parseFloat(valorTotal !== undefined ? valorTotal : valor_total) || 0 : 
-        existingOrdem.valor_total || 0;
+      const valorFinal = valor !== undefined ? parseFloat(valor) || 0 : existingOrdem.valor || 0;
+      const valorMaoDeObraFinal = valor_mao_de_obra !== undefined ? parseFloat(valor_mao_de_obra) || 0 : 
+                                  valorMaoDeObra !== undefined ? parseFloat(valorMaoDeObra) || 0 : 
+                                  existingOrdem.valor_mao_de_obra || 0;
 
       const ordemAtualizada = await db.one(query, [
         tituloFinal,
@@ -331,9 +408,44 @@ class OrdemServicoApiController {
         observacao !== undefined ? observacao : existingOrdem.observacao,
         validada !== undefined ? validada : existingOrdem.validada,
         clienteCpfFinal,
-        valorTotalFinal,
+        valorFinal,
+        valorMaoDeObraFinal,
         id
       ]);
+
+      // Se peças foram enviadas, atualizá-las
+      if (pecas && Array.isArray(pecas)) {
+        // Primeiro, remover todas as peças existentes desta ordem
+        await db.none('DELETE FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [id]);
+
+        // Depois, inserir as novas peças
+        for (const peca of pecas) {
+          if (peca.nome && peca.quantidade > 0 && peca.valor > 0) {
+            // Verificar se a peça já existe no sistema
+            let pecaExistente = await db.oneOrNone('SELECT id FROM Peca WHERE nome = $1', [peca.nome]);
+            
+            let pecaId;
+            if (!pecaExistente) {
+              // Criar nova peça se não existir
+              pecaExistente = await db.one(
+                'INSERT INTO Peca (nome, descricao, valor) VALUES ($1, $2, $3) RETURNING id',
+                [peca.nome, peca.nome, peca.valor]
+              );
+              pecaId = pecaExistente.id;
+            } else {
+              pecaId = pecaExistente.id;
+              // Atualizar o valor da peça se necessário
+              await db.none('UPDATE Peca SET valor = $1 WHERE id = $2', [peca.valor, pecaId]);
+            }
+
+            // Inserir na tabela de relacionamento
+            await db.none(
+              'INSERT INTO Possui_peca (Ordem_de_servico_COD, Peca_ID, Qtd_pecas) VALUES ($1, $2, $3)',
+              [id, pecaId, peca.quantidade]
+            );
+          }
+        }
+      }
 
       res.json({
         success: true,

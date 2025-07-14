@@ -147,21 +147,25 @@
                         <h3>Valor e Peças</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="valor_total">Valor Total <span class="required">*</span></label>
-                                <input type="number" id="valor_total" name="valor_total" step="0.01" min="0" required placeholder="0.00">
+                                <label for="valor_mao_de_obra">Valor Mão de Obra <span class="required">*</span></label>
+                                <input type="number" id="valor_mao_de_obra" name="valor_mao_de_obra" step="0.01" min="0" required placeholder="0.00">
+                                <small class="form-text">Valor dos serviços executados (editável)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="valor_total">Valor Total das Peças</label>
+                                <input type="number" id="valor_total" name="valor_total" step="0.01" min="0" readonly placeholder="0.00">
+                                <small class="form-text">Calculado automaticamente a partir das peças</small>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Peças Utilizadas</label>
+                            <div class="pecas-header">
+                                <button type="button" id="addPecaBtn" class="btn btn-outline btn-sm">
+                                    <i class='bx bx-plus'></i> Adicionar Peça
+                                </button>
+                            </div>
                             <div id="pecas-container" class="pecas-container">
-                                <div class="pecas-header">
-                                    <button type="button" id="addPecaBtn" class="btn btn-outline btn-sm">
-                                        <i class='bx bx-plus'></i> Adicionar Peça
-                                    </button>
-                                </div>
-                                <div id="pecas-list" class="pecas-list">
-                                    <!-- Peças serão carregadas dinamicamente -->
-                                </div>
+                                <!-- Peças serão carregadas dinamicamente -->
                             </div>
                         </div>
                     </div>
@@ -178,6 +182,27 @@
 
         </main>
     </section>
+
+    <!-- Modal de Seleção de Peças -->
+    <div id="selectPecaModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Selecionar Peça</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="search-box">
+                    <input type="text" id="searchPeca" placeholder="Buscar peça..." class="form-control">
+                </div>
+                <div id="pecasDisponiveis" class="pecas-disponiveis">
+                    <div class="loading">Carregando peças...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelSelectPeca">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="../../src/components/SidebarController.js"></script>

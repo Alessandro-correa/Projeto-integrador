@@ -75,12 +75,33 @@ class MotocicletaApiController {
   // Listar todas as motocicletas
   async findAll(req, res) {
     try {
-      const motocicletas = await db.any(`
-        SELECT m.*, c.nome AS cliente
+      const { cliente_cpf } = req.query;
+      
+      let query = `
+        SELECT 
+          m.placa,
+          m.ano,
+          m.cor,
+          m.modelo,
+          m.cilindrada,
+          m.cliente_cpf,
+          c.nome AS cliente_nome,
+          ma.nome AS marca_nome
         FROM Motocicleta m
         LEFT JOIN Cliente c ON m.cliente_cpf = c.cpf
-        ORDER BY m.placa
-      `);
+        LEFT JOIN Marca ma ON ma.motocicleta_placa = m.placa
+      `;
+      
+      let queryParams = [];
+      
+      if (cliente_cpf) {
+        query += ` WHERE m.cliente_cpf = $1`;
+        queryParams.push(cliente_cpf);
+      }
+      
+      query += ` ORDER BY m.placa`;
+      
+      const motocicletas = await db.any(query, queryParams);
       
       res.json({
         success: true,
@@ -103,7 +124,14 @@ class MotocicletaApiController {
     try {
       const { placa } = req.params;
 
-      const motocicleta = await db.oneOrNone('SELECT * FROM Motocicleta WHERE placa = $1', [placa]);
+      const motocicleta = await db.oneOrNone(`
+        SELECT 
+          m.*,
+          ma.nome as marca_nome
+        FROM Motocicleta m
+        LEFT JOIN Marca ma ON m.placa = ma.motocicleta_placa
+        WHERE m.placa = $1
+      `, [placa]);
 
       if (!motocicleta) {
         return res.status(404).json({

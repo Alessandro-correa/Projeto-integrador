@@ -607,6 +607,7 @@ main .content-data .orders table td .status-completed, .content-data td .status-
 main .content-data .orders table td .status-pending, .content-data td .status-pending {
 	background: #fff3cd;
 	color: #856404;
+	border: 1px solid #ff8c00;
 	padding: 6px 16px;
 	border-radius: 20px;
 	font-weight: 700;
@@ -629,8 +630,19 @@ main .content-data .orders table td .status-adjustment, .content-data td .status
 	font-size: 12px;
 }
 main .content-data .orders table td .status-validation-pending {
-    background: #e1e5f2;
-    color: #4c63d2;
+    background: #f3e5f5;
+    color: #6a1b9a;
+    border: 1px solid #ce93d8;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-weight: bold;
+    font-size: 13px;
+    display: inline-block;
+}
+main .content-data .orders table td .status-progress {
+    background: #cce5ff;
+    color: #0066cc;
+    border: 1px solid #4da6ff;
     border-radius: 12px;
     padding: 4px 12px;
     font-weight: bold;

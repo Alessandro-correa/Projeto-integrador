@@ -402,14 +402,34 @@ body.dark .data-card h3 {
     color: var(--dark-text-primary);
 }
 
+body.dark .form-section h3 {
+    color: var(--dark-text-primary);
+    border-bottom-color: var(--dark-border);
+}
+
 body.dark input[type="text"],
 body.dark input[type="number"],
 body.dark input[type="email"],
 body.dark input[type="date"],
 body.dark textarea {
-    background: var(--dark-surface);
+    background: var(--dark-bg);
     border-color: var(--dark-border);
     color: var(--dark-text-primary);
+}
+
+body.dark input[type="text"]:disabled,
+body.dark input[type="number"]:disabled,
+body.dark input[type="email"]:disabled,
+body.dark input[type="date"]:disabled,
+body.dark input[type="text"][readonly],
+body.dark input[type="number"][readonly],
+body.dark input[type="email"][readonly],
+body.dark input[type="date"][readonly],
+body.dark select:disabled {
+    background: var(--dark-surface);
+    border-color: var(--dark-border);
+    color: var(--dark-text-secondary);
+    opacity: 0.7;
 }
 
 body.dark input[type="text"]:focus,
@@ -427,7 +447,15 @@ body.dark select:focus {
 }
 
 body.dark label {
-    color: var(--dark-text-primary);
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark .form-group label {
+    color: var(--dark-text-primary) !important;
+}
+
+body.dark .pecas-container label {
+    color: var(--dark-text-primary) !important;
 }
 
 body.dark .btn-secondary {
@@ -458,6 +486,18 @@ body.dark .pecas-header {
 
 body.dark .peca-item input,
 body.dark .peca-item textarea {
+    background: var(--dark-bg);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+body.dark .peca-item input:focus,
+body.dark .peca-item textarea:focus {
+    background: var(--dark-bg);
+    border-color: var(--blue);
+}
+
+body.dark .peca-item select {
     background: var(--dark-bg);
     border-color: var(--dark-border);
     color: var(--dark-text-primary);
@@ -643,37 +683,209 @@ body.dark .modal-content {
     color: var(--dark-text-primary);
 }
 
-body.dark .modal-header {
-    border-bottom-color: var(--dark-border);
+body.dark .modal-body {
+    background: var(--dark-surface);
+    color: var(--dark-text-primary);
 }
 
 body.dark .modal-footer {
     background: var(--dark-bg);
     border-top-color: var(--dark-border);
-}
-
-body.dark .detalhes-grid .detalhes-coluna h4 {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
-}
-
-body.dark .descricao-section,
-body.dark .observacao-section,
-body.dark .pecas-section,
-body.dark .orcamento-section {
-    background: var(--dark-bg);
-}
-
-body.dark .descricao-box,
-body.dark .observacao-box,
-body.dark .peca-item {
-    background: var(--dark-surface);
-    border-color: var(--dark-border);
     color: var(--dark-text-primary);
 }
 
-body.dark .orcamento-section {
-    background: rgba(0, 123, 255, 0.1);
+body.dark .detalhes-coluna h4 {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+}
+
+body.dark .detalhes-coluna .info-item label {
+    color: var(--dark-text-primary);
+}
+
+body.dark .detalhes-coluna .info-item span {
+    color: var(--dark-text-secondary);
+}
+
+/* Modal de Seleção de Peças */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--light);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--grey);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--dark);
+}
+
+.close {
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--dark-grey);
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: var(--danger);
+}
+
+.modal-body {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--grey);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.pecas-disponiveis {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--grey);
+    border-radius: 4px;
+}
+
+.peca-option {
+    padding: 12px;
+    border-bottom: 1px solid var(--grey);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.peca-option:last-child {
+    border-bottom: none;
+}
+
+.peca-option:hover {
+    background-color: var(--light-blue);
+}
+
+.peca-option.selected {
+    background-color: var(--blue);
+    color: white;
+}
+
+.peca-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.peca-nome {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.peca-descricao {
+    font-size: 12px;
+    color: var(--dark-grey);
+}
+
+.peca-valor {
+    font-weight: bold;
+    color: var(--blue);
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--dark-grey);
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    color: var(--dark-grey);
+    font-style: italic;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid var(--grey);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Dark theme para modal */
+.dark .modal-content {
+    background-color: var(--dark-bg);
+}
+
+.dark .modal-header {
+    border-bottom-color: var(--dark-border);
+}
+
+.dark .modal-header h3 {
+    color: var(--light) !important;
+}
+
+.dark .modal-body {
+    color: var(--light);
+}
+
+.dark .search-box input {
+    background-color: var(--dark-surface);
+    border-color: var(--dark-border);
+    color: var(--light);
+}
+
+.dark .pecas-disponiveis {
+    border-color: var(--dark-border);
+}
+
+.dark .peca-option {
+    border-bottom-color: var(--dark-border);
+    color: var(--light);
+}
+
+.dark .peca-option:hover {
+    background-color: var(--dark-surface);
+}
+
+.dark .peca-descricao {
+    color: var(--dark-text-muted);
+}
+
+.dark .modal-footer {
+    border-top-color: var(--dark-border);
 }
 
 @media (max-width: 768px) {

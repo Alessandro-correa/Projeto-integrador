@@ -11,21 +11,21 @@
 }
 
 .status-progress {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #90caf9;
 }
 
 .status-pending {
-    background: #e7f3ff;
-    color: #004085;
-    border: 1px solid #abd5ff;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ff8c00;
 }
 
 .status-validation-pending {
-    background: #e1f5fe;
-    color: #01579b;
-    border: 1px solid #81d4fa;
+    background: #f3e5f5;
+    color: #6a1b9a;
+    border: 1px solid #ce93d8;
 }
 
 .status-completed {
@@ -41,21 +41,21 @@
 }
 
 body.dark .status-progress {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffd54f;
-    border-color: rgba(255, 193, 7, 0.3);
-}
-
-body.dark .status-pending {
     background: rgba(33, 150, 243, 0.2);
     color: #90caf9;
     border-color: rgba(33, 150, 243, 0.3);
 }
 
+body.dark .status-pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffd54f;
+    border-color: rgba(255, 140, 0, 0.6);
+}
+
 body.dark .status-validation-pending {
-    background: rgba(0, 188, 212, 0.2);
-    color: #80deea;
-    border-color: rgba(0, 188, 212, 0.3);
+    background: rgba(156, 39, 176, 0.2);
+    color: #ce93d8;
+    border-color: rgba(156, 39, 176, 0.3);
 }
 
 body.dark .status-completed {

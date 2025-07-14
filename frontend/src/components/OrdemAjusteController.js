@@ -26,6 +26,7 @@ class OrdemAjusteController {
 
     init() {
         this.setupEventListeners();
+        this.setupPecaModal();
         
         setTimeout(() => this.loadOrdemFromURL(), 100);
     }
@@ -47,17 +48,165 @@ class OrdemAjusteController {
             refreshBtn.addEventListener('click', () => this.recarregarOS());
         }
 
-        const addPecaBtn = document.getElementById('addPecaBtn');
-        if (addPecaBtn) {
-            addPecaBtn.addEventListener('click', () => this.addPecaItem());
-        }
-
         const valorTotalInput = document.getElementById('valor_total');
+        const valorMaoDeObraInput = document.getElementById('valor_mao_de_obra');
+        
         if (valorTotalInput) {
             valorTotalInput.addEventListener('input', () => {
+                // Limpar indicações visuais quando usuário digitar manualmente
                 valorTotalInput.style.borderColor = '';
+                valorTotalInput.style.backgroundColor = '';
                 valorTotalInput.title = '';
             });
+            
+            // Adicionar dica sobre recálculo automático
+            valorTotalInput.addEventListener('focus', () => {
+                if (!valorTotalInput.title) {
+                    valorTotalInput.title = 'O valor é calculado automaticamente baseado nas peças. Somente leitura.';
+                }
+            });
+        }
+
+        if (valorMaoDeObraInput) {
+            valorMaoDeObraInput.addEventListener('input', () => {
+                // Limpar indicações visuais quando usuário digitar
+                valorMaoDeObraInput.style.borderColor = '';
+                valorMaoDeObraInput.style.backgroundColor = '';
+            });
+            
+            valorMaoDeObraInput.addEventListener('focus', () => {
+                if (!valorMaoDeObraInput.title) {
+                    valorMaoDeObraInput.title = 'Valor da mão de obra dos serviços executados. Valor editável.';
+                }
+            });
+        }
+    }
+
+    setupPecaModal() {
+        // Modal elements
+        this.modal = document.getElementById('selectPecaModal');
+        this.searchInput = document.getElementById('searchPeca');
+        this.pecasContainer = document.getElementById('pecasDisponiveis');
+        this.addPecaBtn = document.getElementById('addPecaBtn');
+        
+        if (!this.modal || !this.addPecaBtn) return;
+        
+        this.closeModal = this.modal.querySelector('.close');
+        this.cancelSelect = document.getElementById('cancelSelectPeca');
+
+        // Event listeners para o modal
+        this.addPecaBtn.addEventListener('click', () => this.showPecaModal());
+        this.closeModal.addEventListener('click', () => this.hidePecaModal());
+        this.cancelSelect.addEventListener('click', () => this.hidePecaModal());
+        
+        // Fechar modal clicando fora
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                this.hidePecaModal();
+            }
+        });
+
+        // Busca dinâmica
+        this.searchInput.addEventListener('input', () => this.filterPecas());
+    }
+
+    async showPecaModal() {
+        this.modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        await this.loadPecasDisponiveis();
+        this.searchInput.focus();
+    }
+
+    hidePecaModal() {
+        this.modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        this.searchInput.value = '';
+    }
+
+    async loadPecasDisponiveis() {
+        this.pecasContainer.innerHTML = '<div class="loading">Carregando peças...</div>';
+        
+        try {
+            const response = await fetch('http://localhost:3000/api/pecas');
+            const result = await response.json();
+            
+            if (result.success) {
+                this.allPecas = result.data;
+                this.renderPecas(this.allPecas);
+            } else {
+                this.pecasContainer.innerHTML = '<div class="no-results">Erro ao carregar peças</div>';
+            }
+        } catch (error) {
+            console.error('Erro ao carregar peças:', error);
+            this.pecasContainer.innerHTML = '<div class="no-results">Erro ao carregar peças</div>';
+        }
+    }
+
+    renderPecas(pecas) {
+        if (!pecas || pecas.length === 0) {
+            this.pecasContainer.innerHTML = '<div class="no-results">Nenhuma peça encontrada</div>';
+            return;
+        }
+
+        const html = pecas.map(peca => `
+            <div class="peca-option" data-peca-id="${peca.id}">
+                <div class="peca-info">
+                    <div>
+                        <div class="peca-nome">${peca.nome}</div>
+                        <div class="peca-descricao">${peca.descricao || ''}</div>
+                    </div>
+                    <div class="peca-valor">R$ ${parseFloat(peca.valor).toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('');
+
+        this.pecasContainer.innerHTML = html;
+
+        // Adicionar event listeners para cada peça
+        this.pecasContainer.querySelectorAll('.peca-option').forEach(option => {
+            option.addEventListener('click', () => this.selectPeca(option));
+        });
+    }
+
+    filterPecas() {
+        const searchTerm = this.searchInput.value.toLowerCase();
+        if (!this.allPecas) return;
+
+        const filteredPecas = this.allPecas.filter(peca => 
+            peca.nome.toLowerCase().includes(searchTerm) ||
+            (peca.descricao && peca.descricao.toLowerCase().includes(searchTerm))
+        );
+
+        this.renderPecas(filteredPecas);
+    }
+
+    selectPeca(option) {
+        const pecaId = option.dataset.pecaId;
+        const peca = this.allPecas.find(p => p.id == pecaId);
+        
+        if (peca) {
+            // Verificar se a peça já está adicionada
+            const existingPecas = document.querySelectorAll('.peca-item');
+            const alreadyExists = Array.from(existingPecas).some(item => 
+                item.dataset.pecaId == pecaId
+            );
+
+            if (alreadyExists) {
+                this.showNotification('Esta peça já foi adicionada à ordem de serviço', 'warning', null, 3000);
+                return;
+            }
+
+            // Adicionar peça com quantidade 1 inicial
+            const pecaData = {
+                id: peca.id,
+                nome: peca.nome,
+                valor: peca.valor,
+                quantidade: 1
+            };
+
+            this.addPecaItemReadonly(pecaData);
+            this.hidePecaModal();
+            this.showNotification('Peça adicionada com sucesso', 'success', null, 3000);
         }
     }
 
@@ -162,10 +311,49 @@ class OrdemAjusteController {
             document.getElementById('status').value = ordem.status || 'Em Andamento';
             document.getElementById('observacoes').value = ordem.observacao || '';
 
-            const valorTotal = ordem.valor_total || ordem.valor_total_os || ordem.valor_total_pecas || 0;
-            document.getElementById('valor_total').value = parseFloat(valorTotal).toFixed(2);
-
+            // Carregar peças primeiro para poder calcular o valor
             this.carregarPecas(ordem.pecas || []);
+            
+            // Lógica para valor de peças: sempre calculado automaticamente
+            const valorTotalInput = document.getElementById('valor_total');
+            const valorCalculadoPecas = this.calcularTotalPecas();
+            valorTotalInput.value = parseFloat(valorCalculadoPecas).toFixed(2);
+            
+            // Campo de valor de mão de obra
+            const valorMaoDeObraInput = document.getElementById('valor_mao_de_obra');
+            let valorMaoDeObra = 0;
+            
+            // Se há orçamento aprovado, usar valor dos serviços e adicionar descrição formatada
+            if (ordem.orcamento && ordem.orcamento.status === 'A' && ordem.servicos_orcamento) {
+                valorMaoDeObra = ordem.valor_total_servicos || 0;
+                
+                // Se a descrição atual não contém os serviços do orçamento, adicionar
+                const descricaoAtual = document.getElementById('descricao').value;
+                if (ordem.descricao_orcamento_formatada && !descricaoAtual.includes('SERVIÇOS DO ORÇAMENTO:')) {
+                    const novaDescricao = descricaoAtual + 
+                        (descricaoAtual ? '\n\n' : '') + 
+                        ordem.descricao_orcamento_formatada;
+                    document.getElementById('descricao').value = novaDescricao;
+                }
+            } else {
+                // Usar valor existente da mão de obra
+                valorMaoDeObra = ordem.valor_mao_de_obra || 0;
+            }
+            
+            valorMaoDeObraInput.value = parseFloat(valorMaoDeObra).toFixed(2);
+            
+            // Indicações visuais para os campos
+            if (valorCalculadoPecas > 0) {
+                valorTotalInput.style.borderColor = '#28a745';
+                valorTotalInput.style.backgroundColor = '#f8fff9';
+                valorTotalInput.title = 'Valor calculado automaticamente das peças (somente leitura)';
+            }
+            
+            if (valorMaoDeObra > 0) {
+                valorMaoDeObraInput.style.borderColor = '#007bff';
+                valorMaoDeObraInput.style.backgroundColor = '#f0f8ff';
+                valorMaoDeObraInput.title = ordem.orcamento ? 'Valor dos serviços do orçamento (editável)' : 'Valor da mão de obra (editável)';
+            }
 
         } catch (error) {
             console.error('Erro ao preencher formulário:', error);
@@ -240,17 +428,19 @@ class OrdemAjusteController {
         return 'R$ 0,00';
     }
 
-    getStatusBadgeClass(status) {
-        const classes = {
-            'Em Andamento': 'warning',
-            'Ajuste Pendente': 'info',
-            'Validação Pendente': 'info', 
-            'Validado': 'success',
-            'Validada': 'success',
-            'Rejeitado': 'danger',
-            'Rejeitada': 'danger'
+    getStatusClass(status) {
+        const map = {
+            'Em Andamento': 'progress',
+            'Ajuste Pendente': 'pending',     // Classe azul
+            'Validado': 'completed',
+            'Validada': 'completed',
+            'Validação Pendente': 'validation-pending',
+            'ValidaÇão Pendente': 'validation-pending', 
+            'ValidaþÒo Pendente': 'validation-pending', 
+            'Rejeitado': 'rejected',
+            'Rejeitada': 'rejected'
         };
-        return classes[status] || 'secondary';
+        return map[status] || 'secondary';
     }
 
     async handleSubmit(event) {
@@ -336,7 +526,8 @@ class OrdemAjusteController {
             descricao: formData.get('descricao'),
             status: formData.get('status'),
             observacao: formData.get('observacoes'),
-            valor_total: parseFloat(formData.get('valor_total')) || 0
+            valor: parseFloat(formData.get('valor_total')) || 0,
+            valor_mao_de_obra: parseFloat(formData.get('valor_mao_de_obra')) || 0
         };
 
         const pecas = this.getPecasFromForm();
@@ -350,7 +541,7 @@ class OrdemAjusteController {
     hasChanges(updateData) {
         if (!this.originalData) return true;
 
-        const fieldsToCompare = ['descricao', 'status', 'observacao', 'valor_total'];
+        const fieldsToCompare = ['descricao', 'status', 'observacao', 'valor', 'valor_mao_de_obra'];
         
         for (const field of fieldsToCompare) {
             const currentValue = updateData[field];
@@ -371,19 +562,200 @@ class OrdemAjusteController {
         return false;
     }
 
+    calcularTotalPecas() {
+        // Calcular valor total das peças carregadas
+        if (!this.currentItem || !this.currentItem.pecas) {
+            return 0;
+        }
+        
+        return this.currentItem.pecas.reduce((total, peca) => {
+            const quantidade = peca.quantidade || peca.qtd_pecas || 0;
+            const valor = parseFloat(peca.valor) || 0;
+            return total + (quantidade * valor);
+        }, 0);
+    }
+
     carregarPecas(pecas) {
         const container = document.getElementById('pecas-container');
         if (!container) return;
 
-        container.innerHTML = '';
+        // Limpar container mas manter o header
+        const existingItems = container.querySelectorAll('.peca-item');
+        existingItems.forEach(item => item.remove());
 
-        if (!pecas || pecas.length === 0) {
-            this.addPecaItem(); 
-            return;
+        // Carregar peças existentes da OS
+        if (pecas && pecas.length > 0) {
+            pecas.forEach(peca => {
+                this.addPecaItemReadonly(peca);
+            });
         }
+    }
 
-        pecas.forEach(peca => {
-            this.addPecaItem(peca);
+    addPecaItemReadonly(peca) {
+        const container = document.getElementById('pecas-container');
+        if (!container) return;
+
+        const index = container.querySelectorAll('.peca-item').length;
+        const pecaDiv = document.createElement('div');
+        pecaDiv.className = 'peca-item row mb-3';
+        pecaDiv.dataset.pecaId = peca.id || '';
+        
+        const qtd = peca.quantidade || peca.qtd_pecas || 1;
+        const valor = peca.valor || 0;
+        const total = qtd * valor;
+        
+        pecaDiv.innerHTML = `
+            <div class="col-md-4">
+                <label class="form-label">Nome da Peça</label>
+                <input type="text" class="form-control" name="pecas[${index}][nome]" 
+                       value="${peca.nome || ''}" readonly>
+                <input type="hidden" name="pecas[${index}][id]" value="${peca.id || ''}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Quantidade</label>
+                <input type="number" class="form-control peca-quantidade" name="pecas[${index}][quantidade]" 
+                       value="${qtd}" min="1" readonly>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Valor Unitário</label>
+                <input type="number" class="form-control peca-valor" name="pecas[${index}][valor]" 
+                       value="${valor}" step="0.01" min="0" readonly>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Total</label>
+                <input type="text" class="form-control total-peca" value="${this.formatMoney(total)}" readonly>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="btn-group d-block">
+                    <button type="button" class="btn btn-primary btn-sm edit-peca-btn">
+                        <i class="bx bx-edit"></i> Editar
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm save-peca-btn" style="display: none;">
+                        <i class="bx bx-check"></i> Salvar
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm cancel-peca-btn" style="display: none;">
+                        <i class="bx bx-x"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm remove-peca-btn">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(pecaDiv);
+        this.setupPecaEventListeners(pecaDiv);
+        this.updateTotalGeral();
+    }
+
+    setupPecaEventListeners(pecaDiv) {
+        const editBtn = pecaDiv.querySelector('.edit-peca-btn');
+        const saveBtn = pecaDiv.querySelector('.save-peca-btn');
+        const cancelBtn = pecaDiv.querySelector('.cancel-peca-btn');
+        const removeBtn = pecaDiv.querySelector('.remove-peca-btn');
+        const quantidadeInput = pecaDiv.querySelector('.peca-quantidade');
+        const valorInput = pecaDiv.querySelector('.peca-valor');
+
+        let originalValues = {};
+
+        // Botão Editar
+        editBtn.addEventListener('click', () => {
+            // Salvar valores originais
+            originalValues = {
+                quantidade: quantidadeInput.value,
+                valor: valorInput.value
+            };
+
+            // Habilitar edição
+            quantidadeInput.removeAttribute('readonly');
+            valorInput.removeAttribute('readonly');
+            quantidadeInput.focus();
+
+            // Mostrar/ocultar botões
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'inline-block';
+            removeBtn.style.display = 'none';
+        });
+
+        // Botão Salvar
+        saveBtn.addEventListener('click', () => {
+            // Validar valores
+            const quantidade = parseInt(quantidadeInput.value) || 0;
+            const valor = parseFloat(valorInput.value) || 0;
+
+            if (quantidade <= 0) {
+                this.showNotification('Quantidade deve ser maior que zero', 'warning', null, 3000);
+                quantidadeInput.focus();
+                return;
+            }
+
+            if (valor < 0) {
+                this.showNotification('Valor não pode ser negativo', 'warning', null, 3000);
+                valorInput.focus();
+                return;
+            }
+
+            // Desabilitar edição
+            quantidadeInput.setAttribute('readonly', true);
+            valorInput.setAttribute('readonly', true);
+
+            // Recalcular total
+            this.calculateItemTotal(pecaDiv);
+
+            // Mostrar/ocultar botões
+            editBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            removeBtn.style.display = 'inline-block';
+
+            this.updateTotalGeral();
+        });
+
+        // Botão Cancelar
+        cancelBtn.addEventListener('click', () => {
+            // Restaurar valores originais
+            quantidadeInput.value = originalValues.quantidade;
+            valorInput.value = originalValues.valor;
+
+            // Desabilitar edição
+            quantidadeInput.setAttribute('readonly', true);
+            valorInput.setAttribute('readonly', true);
+
+            // Recalcular total
+            this.calculateItemTotal(pecaDiv);
+
+            // Mostrar/ocultar botões
+            editBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            removeBtn.style.display = 'inline-block';
+
+            this.updateTotalGeral();
+        });
+
+        // Botão Remover
+        removeBtn.addEventListener('click', () => {
+            if (confirm('Deseja remover esta peça da ordem de serviço?')) {
+                pecaDiv.remove();
+                this.updateTotalGeral();
+            }
+        });
+
+        // Event listeners para recálculo durante edição
+        quantidadeInput.addEventListener('input', () => {
+            if (!quantidadeInput.hasAttribute('readonly')) {
+                this.calculateItemTotal(pecaDiv);
+                this.updateTotalGeral();
+            }
+        });
+
+        valorInput.addEventListener('input', () => {
+            if (!valorInput.hasAttribute('readonly')) {
+                this.calculateItemTotal(pecaDiv);
+                this.updateTotalGeral();
+            }
         });
     }
 
@@ -403,15 +775,15 @@ class OrdemAjusteController {
             </div>
             <div class="col-md-2">
                 <label class="form-label">Quantidade</label>
-                <input type="number" class="form-control" name="pecas[${index}][quantidade]" 
+                <input type="number" class="form-control peca-quantidade" name="pecas[${index}][quantidade]" 
                        value="${peca ? peca.quantidade || peca.qtd_pecas || 1 : 1}" 
-                       min="1" onchange="this.closest('.peca-item').querySelector('.calc-total').dispatchEvent(new Event('change'))">
+                       min="1">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Valor Unitário</label>
-                <input type="number" class="form-control calc-total" name="pecas[${index}][valor]" 
+                <input type="number" class="form-control peca-valor" name="pecas[${index}][valor]" 
                        value="${peca ? peca.valor || 0 : 0}" step="0.01" min="0" 
-                       placeholder="0.00" onchange="this.calculateTotal()">
+                       placeholder="0.00">
             </div>
             <div class="col-md-2">
                 <label class="form-label">Total</label>
@@ -419,7 +791,7 @@ class OrdemAjusteController {
             </div>
             <div class="col-md-1">
                 <label class="form-label">&nbsp;</label>
-                <button type="button" class="btn btn-danger btn-sm d-block" onclick="this.closest('.peca-item').remove(); this.updateTotalGeral()">
+                <button type="button" class="btn btn-danger btn-sm d-block remove-peca-btn">
                     <i class="bx bx-trash"></i>
                 </button>
             </div>
@@ -427,13 +799,77 @@ class OrdemAjusteController {
 
         container.appendChild(pecaDiv);
 
+        // Adicionar event listeners para os campos
+        const quantidadeInput = pecaDiv.querySelector('.peca-quantidade');
+        const valorInput = pecaDiv.querySelector('.peca-valor');
+        const nomeInput = pecaDiv.querySelector('[name*="[nome]"]');
+        const removeBtn = pecaDiv.querySelector('.remove-peca-btn');
+
+        // Event listener para o nome da peça - adicionar nova linha quando começar a digitar
+        nomeInput.addEventListener('input', () => {
+            // Se este é o último item e tem conteúdo, adicionar nova linha vazia
+            const allItems = container.querySelectorAll('.peca-item');
+            const isLastItem = pecaDiv === allItems[allItems.length - 1];
+            const hasContent = nomeInput.value.trim() !== '';
+            
+            if (isLastItem && hasContent) {
+                this.addPecaItem();
+            }
+        });
+
+        // Event listener para quantidade
+        quantidadeInput.addEventListener('input', () => {
+            this.calculateItemTotal(pecaDiv);
+            this.updateTotalGeral();
+        });
+
+        // Event listener para valor
+        valorInput.addEventListener('input', () => {
+            this.calculateItemTotal(pecaDiv);
+            this.updateTotalGeral();
+        });
+
+        // Event listener para remover
+        removeBtn.addEventListener('click', () => {
+            const allItems = container.querySelectorAll('.peca-item');
+            
+            // Não permitir remover se é o único item ou se é o último item vazio
+            if (allItems.length <= 1) {
+                this.showNotification('Deve haver pelo menos uma linha para adicionar peças', 'warning', null, 3000);
+                return;
+            }
+            
+            const isLastItem = pecaDiv === allItems[allItems.length - 1];
+            const isEmpty = !nomeInput.value.trim() && !quantidadeInput.value.trim() && !valorInput.value.trim();
+            
+            if (isLastItem && isEmpty) {
+                this.showNotification('Não é possível remover a linha vazia para adição de peças', 'warning', null, 3000);
+                return;
+            }
+            
+            pecaDiv.remove();
+            this.updateTotalGeral();
+        });
+
+        // Calcular total inicial se há dados
         if (peca && peca.valor) {
-            const qtd = peca.quantidade || peca.qtd_pecas || 1;
-            const total = parseFloat(peca.valor) * qtd;
-            pecaDiv.querySelector('.total-peca').value = this.formatMoney(total);
+            this.calculateItemTotal(pecaDiv);
         }
 
         this.updateTotalGeral();
+    }
+
+    calculateItemTotal(pecaDiv) {
+        const quantidadeInput = pecaDiv.querySelector('.peca-quantidade');
+        const valorInput = pecaDiv.querySelector('.peca-valor');
+        const totalInput = pecaDiv.querySelector('.total-peca');
+
+        const quantidade = parseInt(quantidadeInput.value) || 0;
+        const valor = parseFloat(valorInput.value) || 0;
+        const total = quantidade * valor;
+
+        totalInput.value = this.formatMoney(total);
+        return total;
     }
 
     getPecasFromForm() {
@@ -459,26 +895,21 @@ class OrdemAjusteController {
 
     updateTotalGeral() {
         const pecas = this.getPecasFromForm();
-        const total = pecas.reduce((sum, peca) => sum + (peca.valor * peca.quantidade), 0);
+        const totalPecas = pecas.reduce((sum, peca) => sum + (peca.valor * peca.quantidade), 0);
 
         const valorTotalInput = document.getElementById('valor_total');
-        if (valorTotalInput && !valorTotalInput.value) {
-            
-            valorTotalInput.value = total.toFixed(2);
-        }
-
-        if (valorTotalInput && valorTotalInput.value) {
-            const valorDigitado = parseFloat(valorTotalInput.value) || 0;
-            const diferenca = Math.abs(valorDigitado - total);
-            
-            if (diferenca > 0.01) {
-                
-                valorTotalInput.title = `Valor calculado das peças: R$ ${total.toFixed(2)}`;
-                valorTotalInput.style.borderColor = '#ffc107';
-            } else {
-                valorTotalInput.title = '';
-                valorTotalInput.style.borderColor = '';
-            }
+        
+        // Sempre atualizar o valor total baseado apenas nas peças
+        valorTotalInput.value = totalPecas.toFixed(2);
+        
+        if (totalPecas > 0) {
+            valorTotalInput.style.borderColor = '#28a745';
+            valorTotalInput.style.backgroundColor = '#f8fff9';
+            valorTotalInput.title = 'Valor calculado automaticamente das peças (somente leitura)';
+        } else {
+            valorTotalInput.style.borderColor = '';
+            valorTotalInput.style.backgroundColor = '';
+            valorTotalInput.title = 'Nenhuma peça adicionada';
         }
     }
 
@@ -616,20 +1047,12 @@ class OrdemAjusteController {
     }
 }
 
-function calculateTotal() {
-    const pecaItem = this.closest('.peca-item');
-    const quantidade = parseInt(pecaItem.querySelector('[name*="[quantidade]"]').value) || 0;
-    const valor = parseFloat(this.value) || 0;
-    const total = quantidade * valor;
-    
-    pecaItem.querySelector('.total-peca').value = total.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-
-    if (window.ordemAjusteController) {
-        window.ordemAjusteController.updateTotalGeral();
-    }
-}
-
 // Não é necessário inicialização automática aqui
+// OrdemAjusteController será inicializado manualmente
+
+// Instanciar controlador quando o documento estiver pronto
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('ajusteForm')) {
+        window.ordemAjusteController = new OrdemAjusteController();
+    }
+});

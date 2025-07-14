@@ -1,0 +1,177 @@
+/* Estilos para o ajuste de orçamentos */
+.item-row {
+    background-color: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.item-row:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #007bff;
+}
+
+.item-fields {
+    display: grid;
+    grid-template-columns: 120px 2fr 80px 140px 120px;
+    gap: 20px;
+    align-items: end;
+    margin-bottom: 20px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-group label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.field-group .form-control {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.15s ease-in-out;
+    background-color: #ffffff;
+}
+
+.field-group .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.field-group .form-control[readonly] {
+    background-color: #f9fafb;
+    color: #374151;
+    border-color: #e5e7eb;
+}
+
+.field-group .form-control.bg-light {
+    background-color: #f0f9ff !important;
+    color: #059669 !important;
+    font-weight: 600;
+    border-color: #bfdbfe;
+}
+
+.item-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+}
+
+.item-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 15px;
+}
+
+.add-items-section-top {
+    margin-bottom: 10px;
+    text-align: left;
+    padding: 5px 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.no-items {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 30px;
+    margin: 0;
+    background-color: #f8fafc;
+    border-radius: 8px;
+}
+
+/* Melhorias nos botões */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.btn-success:hover {
+    background-color: #059669;
+    border-color: #059669;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    border-color: #ef4444;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #6b7280;
+    border-color: #6b7280;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+    border-color: #4b5563;
+    transform: translateY(-1px);
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 1024px) {
+    .item-fields {
+        grid-template-columns: 1fr 2fr 80px 1fr;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .item-fields {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .item-buttons, .item-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .item-row {
+        padding: 15px;
+    }
+}
