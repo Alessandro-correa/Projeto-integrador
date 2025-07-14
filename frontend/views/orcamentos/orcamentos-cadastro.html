@@ -5,6 +5,71 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<style>
+		select {
+			padding: 12px 16px;
+			border-radius: 5px;
+			border: 1px solid var(--grey);
+			background: var(--grey);
+			outline: none;
+			width: 100%;
+			font-size: 14px;
+			transition: all .3s ease;
+			background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+			background-repeat: no-repeat !important;
+			background-position: right 12px center !important;
+			background-size: 16px !important;
+			-webkit-appearance: none !important;
+			-moz-appearance: none !important;
+			appearance: none !important;
+		}
+		
+		select:focus {
+			border-color: var(--blue);
+			box-shadow: 0 0 0 3px var(--light-blue);
+		}
+		
+		/* Dark theme support */
+		body.dark select {
+			background: var(--dark-surface);
+			border-color: var(--dark-border);
+			color: var(--dark-text-primary);
+			background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ccc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+			background-repeat: no-repeat !important;
+			background-position: right 12px center !important;
+			background-size: 16px !important;
+		}
+		
+		body.dark select:focus {
+			border-color: var(--blue);
+			background: var(--dark-surface);
+		}
+		
+		.btn-danger {
+			background-color: #dc3545;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+		}
+		.btn-danger:hover {
+			background-color: #c82333;
+		}
+		.total-section {
+			background-color: #f8f9fa;
+			padding: 15px;
+			border-radius: 5px;
+			border: 2px solid #28a745;
+		}
+		.total-section h3 {
+			margin: 0;
+			color: #28a745;
+		}
+		#itens-orcamento tbody tr:nth-child(even) {
+			background-color: #f8f9fa;
+		}
+	</style>
 	<title>Sistema Campos Moto Peças - Novo Orçamento</title>
 </head>
 <body>
@@ -84,31 +149,53 @@
 
 						<h4 style="margin-top: 20px;">Dados da Motocicleta</h4>
 						<div class="form-row">
-							<div class="form-group">
-								<label for="marca">Marca</label>
-								<input type="text" id="marca" placeholder="Ex: Honda" required>
-							</div>
-							<div class="form-group">
-								<label for="modelo">Modelo</label>
-								<input type="text" id="modelo" placeholder="Ex: Biz 125" required>
-							</div>
-							<div class="form-group">
-								<label for="ano">Ano</label>
-								<input type="number" id="ano" placeholder="Ex: 2023" required>
-							</div>
-							<div class="form-group">
-								<label for="placa">Placa</label>
-								<input type="text" id="placa" placeholder="ABC-1234" required>
+							<div class="form-group" style="flex: 2;">
+								<label for="motocicleta-select">Selecionar Motocicleta do Cliente</label>
+								<select id="motocicleta-select" required>
+									<option value="">Primeiro digite o CPF do cliente</option>
+								</select>
 							</div>
 						</div>
 						
 						<h4 style="margin-top: 20px;">Peças e Serviços</h4>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="tipo-item">Tipo de Item</label>
+								<select id="tipo-item">
+									<option value="peca">Peça</option>
+									<option value="servico">Serviço</option>
+								</select>
+							</div>
+							<div class="form-group" id="peca-select-group" style="display: none;">
+								<label for="peca-select">Selecionar Peça</label>
+								<select id="peca-select">
+									<option value="">Selecione uma peça</option>
+								</select>
+							</div>
+							<div class="form-group" id="descricao-group">
+								<label for="descricao-item">Descrição do Item</label>
+								<input type="text" id="descricao-item" placeholder="Digite a descrição da peça ou serviço">
+							</div>
+							<div class="form-group">
+								<label for="quantidade">Quantidade</label>
+								<input type="number" id="quantidade" min="1" value="1">
+							</div>
+							<div class="form-group">
+								<label for="valor-unitario">Valor Unitário (R$)</label>
+								<input type="number" id="valor-unitario" step="0.01" min="0">
+							</div>
+						</div>
+						<button type="button" class="btn-secondary" id="add-item" style="margin-top: 10px;">Adicionar Item</button>
+						
 						<div class="orders">
 							<table id="itens-orcamento">
 								<thead>
 									<tr>
+										<th>Tipo</th>
 										<th>Descrição</th>
-										<th>Valor (R$)</th>
+										<th>Qtd</th>
+										<th>Valor Unit.</th>
+										<th>Valor Total</th>
 										<th>Ação</th>
 									</tr>
 								</thead>
@@ -116,7 +203,6 @@
 								</tbody>
 							</table>
 						</div>
-						<button type="button" class="btn-secondary" id="add-item" style="margin-top: 10px;">Adicionar Item</button>
 
 						<div class="form-group" style="margin-top: 20px;">
 							<label for="observacoes">Observações</label>
@@ -124,11 +210,7 @@
 						</div>
 						<div class="form-row">
 							<div class="form-group">
-								<label for="data">Data de Emissão</label>
-								<input type="date" id="data" required>
-							</div>
-							<div class="form-group">
-								<label for="validade">Validade</label>
+								<label for="validade">Data de Validade</label>
 								<input type="date" id="validade" required>
 							</div>
 						</div>
@@ -144,5 +226,6 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/OrcamentoCadastroController.js"></script>
 </body>
 </html>

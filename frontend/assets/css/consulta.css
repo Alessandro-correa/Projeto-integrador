@@ -1,0 +1,322 @@
+[class*="status-"] {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.status-progress {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-pending {
+    background: #e7f3ff;
+    color: #004085;
+    border: 1px solid #abd5ff;
+}
+
+.status-validation-pending {
+    background: #e1f5fe;
+    color: #01579b;
+    border: 1px solid #81d4fa;
+}
+
+.status-completed {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #a3d9a4;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f1aeb5;
+}
+
+body.dark .status-progress {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffd54f;
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+body.dark .status-pending {
+    background: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+    border-color: rgba(33, 150, 243, 0.3);
+}
+
+body.dark .status-validation-pending {
+    background: rgba(0, 188, 212, 0.2);
+    color: #80deea;
+    border-color: rgba(0, 188, 212, 0.3);
+}
+
+body.dark .status-completed {
+    background: rgba(76, 175, 80, 0.2);
+    color: #a5d6a7;
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+body.dark .status-rejected {
+    background: rgba(244, 67, 54, 0.2);
+    color: #ef9a9a;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.action-btn, .action-icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: #fff;
+    color: #666;
+}
+
+.action-btn:hover, .action-icon:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+    color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body.dark .action-btn, body.dark .action-icon {
+    background: var(--dark-surface, #2d2d2d);
+    border-color: var(--dark-border, #444);
+    color: var(--dark-text-secondary, #aaa);
+}
+
+body.dark .action-btn:hover, body.dark .action-icon:hover {
+    background: var(--dark-bg, #3d3d3d);
+    border-color: var(--dark-text-secondary, #666);
+    color: var(--dark-text-primary, #fff);
+}
+
+@media (max-width: 768px) {
+    .actions {
+        gap: 6px;
+    }
+    
+    .action-btn, .action-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    [class*="status-"] {
+        font-size: 11px;
+        padding: 4px 8px;
+        letter-spacing: 0.5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .actions {
+        gap: 4px;
+    }
+    
+    .action-btn, .action-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    [class*="status-"] {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+}
+
+.action-btn[title], .action-icon[title] {
+    position: relative;
+}
+
+.action-btn[title]:hover::after, .action-icon[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.action-btn:disabled, .action-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.action-btn.loading, .action-icon.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.action-btn.loading::before, .action-icon.loading::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    table {
+        font-size: 14px;
+    }
+    
+    th, td {
+        padding: 8px 4px;
+    }
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.badge-primary {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.badge-secondary {
+    background: #f5f5f5;
+    color: #616161;
+    border: 1px solid #e0e0e0;
+}
+
+.badge-success {
+    background: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c8;
+}
+
+.badge-warning {
+    background: #fff8e1;
+    color: #f57c00;
+    border: 1px solid #ffecb3;
+}
+
+.badge-danger {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+body.dark .badge-primary {
+    background: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+    border-color: rgba(33, 150, 243, 0.3);
+}
+
+body.dark .badge-secondary {
+    background: rgba(158, 158, 158, 0.2);
+    color: #bdbdbd;
+    border-color: rgba(158, 158, 158, 0.3);
+}
+
+body.dark .badge-success {
+    background: rgba(76, 175, 80, 0.2);
+    color: #a5d6a7;
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+body.dark .badge-warning {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffcc02;
+    border-color: rgba(255, 152, 0, 0.3);
+}
+
+body.dark .badge-danger {
+    background: rgba(244, 67, 54, 0.2);
+    color: #ef9a9a;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.sortable:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+body.dark .sortable:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-icon {
+    margin-left: 8px;
+    font-size: 14px;
+    color: #999;
+    transition: color 0.2s ease;
+}
+
+.sortable:hover .sort-icon {
+    color: #666;
+}
+
+body.dark .sortable:hover .sort-icon {
+    color: #ccc;
+}
+
+.sort-icon.active {
+    color: var(--blue);
+}
+
+.sort-icon {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.sortable.sorted {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+body.dark .sortable.sorted {
+    background: rgba(33, 150, 243, 0.15);
+}

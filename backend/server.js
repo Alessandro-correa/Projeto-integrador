@@ -1,96 +1,76 @@
-require('dotenv').config();
+/**
+ * SERVIDOR PRINCIPAL - OFICINA MOTOCICLETAS
+ * Estrutura MVC organizada com separação clara entre backend e frontend
+ */
 
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const db = require('./config/db'); 
-
-// Importar rotas
-const usuariosRoutes = require('./routes/usuarios.routes');
-const clientesRoutes = require('./routes/clientes.routes');
-const ordensRoutes = require('./routes/ordens.routes');
-const orcamentosRoutes = require('./routes/orcamentos.routes');
-const motocicletasRoutes = require('./routes/motocicletas.routes');
-const marcasRoutes = require('./routes/marcas.routes');
-const pecasRoutes = require('./routes/pecas.routes');
-const fornecedoresRoutes = require('./routes/fornecedores.routes');
-const aquisicoesRoutes = require('./routes/aquisicoes.routes');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100 
-});
-
-
 // Middlewares
-app.use(helmet());
-app.use(limiter);
-app.use(cors({
-  origin: [
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'http://localhost:3000',
-    'http://localhost:5501',
-    'http://127.0.0.1:5501'
-  ],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Servir arquivos estáticos do frontend
+app.use(express.static(path.join(__dirname, '../frontend')));
 
+// Importar rotas com novos nomes
+const clienteRoutes = require('./src/routes/clientes.routes');
+const usuarioRoutes = require('./src/routes/usuarios.routes');
+const ordemRoutes = require('./src/routes/ordens.routes');
+const orcamentoRoutes = require('./src/routes/orcamentos.routes');
+const motocicletaRoutes = require('./src/routes/motocicletas.routes');
+const aquisicaoRoutes = require('./src/routes/aquisicoes.routes');
+const pecaRoutes = require('./src/routes/pecas.routes');
+const fornecedorRoutes = require('./src/routes/fornecedores.routes');
+const marcaRoutes = require('./src/routes/marcas.routes');
+const dashboardRoutes = require('./src/routes/dashboard.routes');
+
+// Configurar rotas da API
+app.use('/api/clientes', clienteRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/ordens', ordemRoutes);
+app.use('/api/orcamentos', orcamentoRoutes);
+app.use('/api/motocicletas', motocicletaRoutes);
+app.use('/api/aquisicoes', aquisicaoRoutes);
+app.use('/api/pecas', pecaRoutes);
+app.use('/api/fornecedores', fornecedorRoutes);
+app.use('/api/marcas', marcaRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
+// Rota para servir a página principal
 app.get('/', (req, res) => {
-  res.json({
-    message: 'API da Oficina de Motocicletas',
-    version: '1.0.0',
-    status: 'online'
-  });
+    res.sendFile(path.join(__dirname, '../frontend/views/dashboard/index.html'));
 });
-
-// Rotas da API
-app.use('/api/usuarios', usuariosRoutes);
-app.use('/api/clientes', clientesRoutes);
-app.use('/api/ordens', ordensRoutes);
-app.use('/api/orcamentos', orcamentosRoutes);
-app.use('/api/motocicletas', motocicletasRoutes);
-app.use('/api/marcas', marcasRoutes);
-app.use('/api/pecas', pecasRoutes);
-app.use('/api/fornecedores', fornecedoresRoutes);
-app.use('/api/aquisicoes', aquisicoesRoutes);
 
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Erro interno do servidor',
-    error: process.env.NODE_ENV === 'development' ? err.message : {}
-  });
+    console.error('Erro não tratado:', err);
+    res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor',
+        error: process.env.NODE_ENV === 'development' ? err.message : 'Algo deu errado'
+    });
 });
 
 // Middleware para rotas não encontradas
 app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Rota não encontrada'
-  });
+    res.status(404).json({
+        success: false,
+        message: 'Rota não encontrada'
+    });
 });
 
-// Testa conexão com o banco antes de iniciar o servidor
-db.one('SELECT 1')
-  .then(() => {
-    console.log('Conexão com banco de dados bem sucedida');
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-      console.log('Ambiente:', process.env.NODE_ENV || 'não definido');
-      console.log('✅ Nodemon funcionando - alterações detectadas automaticamente!');
-    });
-  })
-  .catch(error => {
-    console.error('Falha na conexão com o banco:', error);
-    process.exit(1); 
-  });
+// Iniciar servidor
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`📱 Frontend disponível em: http://localhost:${PORT}`);
+    console.log(`🔌 API disponível em: http://localhost:${PORT}/api`);
+    console.log(`📊 Dashboard: http://localhost:${PORT}/views/dashboard/index.html`);
+});
+
+module.exports = app;

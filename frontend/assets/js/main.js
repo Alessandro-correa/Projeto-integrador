@@ -10,31 +10,28 @@ class App {
     }
 
     init() {
-        // Inicializar controladores básicos
+        
         this.themeController = new ThemeController();
         this.sidebarController = new SidebarController();
         this.navbarController = new NavbarController();
         this.formController = new FormController();
 
-        // Inicializar controladores específicos baseados na página atual
         this.initPageSpecificControllers();
-        
-        // Inicializar progress bars
+
         this.initProgressBars();
-        
-        // Inicializar gráficos se existirem
+
         this.initCharts();
     }
 
     initPageSpecificControllers() {
-        // Inicializar filtros baseado na tabela presente na página
+        
         const tableIds = ['os-table', 'clientes-table', 'motos-table', 'marcas-table', 
                          'fornecedores-table', 'pecas-table', 'orcamentos-table', 'usuarios-table'];
         
         tableIds.forEach(tableId => {
             if (document.getElementById(tableId)) {
                 this.filterController = new FilterController(tableId);
-                // Tornar globalmente acessível para os botões de ação
+                
                 window.filterController = this.filterController;
             }
         });
@@ -48,17 +45,15 @@ class App {
     }
 
     initCharts() {
-        // Gráfico de barras (Dashboard)
+        
         if (document.querySelector("#chart")) {
             this.initBarChart();
         }
 
-        // Gráfico de rosca (Dashboard)
         if (document.querySelector("#donut-chart")) {
             this.initDonutChart();
         }
 
-        // Gráfico de pizza para motocicletas (Dashboard)
         if (document.querySelector("#pie-chart-moto")) {
             this.initPieChartMoto();
         }
@@ -173,7 +168,6 @@ class App {
     }
 }
 
-// Preencher select de aquisições na tela de cadastro de peças
 function preencherSelectAquisicoes() {
     const select = document.getElementById('aquisicaoId');
     if (!select) return;
@@ -183,7 +177,7 @@ function preencherSelectAquisicoes() {
             if (result.success && Array.isArray(result.data)) {
                 result.data.forEach(aq => {
                     const option = document.createElement('option');
-                    // Exibe id e data formatada
+                    
                     const data = aq.dia_da_compra ? new Date(aq.dia_da_compra).toLocaleDateString() : '';
                     option.value = aq.id;
                     option.textContent = `${aq.id} - ${data}`;
@@ -193,7 +187,6 @@ function preencherSelectAquisicoes() {
         });
 }
 
-// Inicializar a aplicação quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', () => {
     new App();
     preencherSelectAquisicoes();

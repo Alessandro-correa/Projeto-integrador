@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/dashboard.css">
 	<title>Sistema Campos Moto Peças - Dashboard</title>
 </head>
 <body>
@@ -54,75 +55,488 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Dashboard</a></li>
 			</ul>
-			<div class="info-data">
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>53</h2>
-							<p>Serviços no Mês</p>
+			
+			<!-- Botão de refresh e indicador de erro -->
+			<div class="dashboard-controls" style="margin-bottom: 20px;">
+				<button id="refresh-dashboard" class="btn btn-primary" style="margin-bottom: 10px;">
+					<i class='bx bx-refresh'></i> Atualizar Dados
+				</button>
+				<div id="dashboard-error" class="alert alert-danger" style="display: none;"></div>
+			</div>
+
+			<!-- Cards de Estatísticas -->
+			<div class="dashboard-stats">
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div class="stat-header">
+							<div class="stat-content">
+								<h2 id="servicos-mes" class="stat-number">-</h2>
+								<p class="stat-label">Serviços no Mês</p>
+							</div>
+							<div class="stat-icon">
+								<i class='bx bxs-calendar-check'></i>
+							</div>
 						</div>
-						<i class='bx bxs-calendar-check icon' ></i>
-					</div>
-					<span class="progress" data-value="70%"></span>
-					<span class="label">70%</span>
-				</div>
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>12</h2>
-							<p>Orçamentos Pendentes</p>
+						<div class="stat-footer">
+							<span class="stat-trend" id="crescimento-mensal">-</span>
 						</div>
-						<i class='bx bxs-file-find icon' ></i>
 					</div>
-					<span class="progress" data-value="60%"></span>
-					<span class="label">60%</span>
-				</div>
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>21</h2>
-							<p>Novos Clientes</p>
+					
+					<div class="stat-card">
+						<div class="stat-header">
+							<div class="stat-content">
+								<h2 id="orcamentos-pendentes" class="stat-number">-</h2>
+								<p class="stat-label">Orçamentos Pendentes</p>
+							</div>
+							<div class="stat-icon warning">
+								<i class='bx bxs-file-find'></i>
+							</div>
 						</div>
-						<i class='bx bxs-user-plus icon' ></i>
-					</div>
-					<span class="progress" data-value="30%"></span>
-					<span class="label">30%</span>
-				</div>
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>8</h2>
-							<p>Peças em Falta</p>
+						<div class="stat-footer">
+							<span class="stat-trend neutral">Pendentes</span>
 						</div>
-						<i class='bx bxs-error icon' ></i>
 					</div>
-					<span class="progress" data-value="10%"></span>
-					<span class="label">10%</span>
+					
+					<div class="stat-card">
+						<div class="stat-header">
+							<div class="stat-content">
+								<h2 id="total-servicos" class="stat-number">-</h2>
+								<p class="stat-label">Total de Serviços</p>
+							</div>
+							<div class="stat-icon success">
+								<i class='bx bxs-wrench'></i>
+							</div>
+						</div>
+						<div class="stat-footer">
+							<span class="stat-trend neutral">Total</span>
+						</div>
+					</div>
+					
+					<div class="stat-card">
+						<div class="stat-header">
+							<div class="stat-content">
+								<h2 id="taxa-retorno" class="stat-number">-</h2>
+								<p class="stat-label">Taxa de Retorno</p>
+							</div>
+							<div class="stat-icon danger">
+								<i class='bx bxs-error'></i>
+							</div>
+						</div>
+						<div class="stat-footer">
+							<span class="stat-trend neutral">Ajustes/Retornos</span>
+						</div>
+					</div>
+					
+					<div class="stat-card">
+						<div class="stat-header">
+							<div class="stat-content">
+								<h2 id="motos-manutencao" class="stat-number">-</h2>
+								<p class="stat-label">Motos em Manutenção</p>
+							</div>
+							<div class="stat-icon info">
+								<i class='bx bxs-motorcycle'></i>
+							</div>
+						</div>
+						<div class="stat-footer">
+							<span class="stat-trend neutral">Em andamento</span>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div class="data">
-				<div class="content-data full-width">
-					<div class="head">
-						<h3>Serviços Realizados por Mês</h3>
+
+			<!-- Gráficos -->
+			<div class="dashboard-charts">
+				<div class="charts-grid">
+					<div class="chart-card full-width">
+						<div class="chart-header">
+							<h3>Serviços Realizados por Mês</h3>
+							<div class="chart-actions">
+								<button class="btn-refresh" onclick="window.dashboardController?.loadCharts()">
+									<i class='bx bx-refresh'></i>
+								</button>
+							</div>
+						</div>
+						<div class="chart-container">
+							<div class="chart-loading" style="display: none;">
+								<i class='bx bx-loader bx-spin'></i>
+								<span>Carregando...</span>
+							</div>
+							<div class="chart" id="servicos-chart"></div>
+						</div>
 					</div>
-					<div class="chart" id="chart"></div>
-				</div>
-				<div class="content-data">
-					<div class="head">
-						<h3>Tipos de Serviços</h3>
+					
+					<div class="chart-card">
+						<div class="chart-header">
+							<h3>Tipos de Serviços</h3>
+						</div>
+						<div class="chart-container">
+							<div class="chart-loading" style="display: none;">
+								<i class='bx bx-loader bx-spin'></i>
+								<span>Carregando...</span>
+							</div>
+							<div class="chart" id="tipos-servicos-chart"></div>
+						</div>
 					</div>
-					<div class="chart" id="donut-chart"></div>
-				</div>
-				<div class="content-data">
-					<div class="head">
-						<h3>Tipos de Motocicletas</h3>
+					
+					<div class="chart-card">
+						<div class="chart-header">
+							<h3>Serviços por Marca de Moto</h3>
+						</div>
+						<div class="chart-container">
+							<div class="chart-loading" style="display: none;">
+								<i class='bx bx-loader bx-spin'></i>
+								<span>Carregando...</span>
+							</div>
+							<div class="chart" id="servicos-moto-chart"></div>
+						</div>
 					</div>
-					<div class="chart" id="pie-chart-moto"></div>
+					
+					<div class="chart-card">
+						<div class="chart-header">
+							<h3>Taxa de Retorno Mensal</h3>
+						</div>
+						<div class="chart-container">
+							<div class="chart-loading" style="display: none;">
+								<i class='bx bx-loader bx-spin'></i>
+								<span>Carregando...</span>
+							</div>
+							<div class="chart" id="taxa-retorno-chart"></div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</main>
 	</section>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
+	<script>
+		// Incluir DashboardController inline para garantir carregamento
+		class DashboardController {
+			constructor() {
+				this.API_BASE_URL = 'http://localhost:3000/api';
+				this.charts = {};
+				this.isLoading = false;
+				console.log('DashboardController: Inicializando...');
+				this.bindEvents();
+				this.handleOrientationChange();
+				
+				// Carregar dashboard imediatamente
+				setTimeout(async () => {
+					console.log('DashboardController: Carregando dashboard...');
+					this.loadDashboard();
+				}, 100);
+			}
+
+			bindEvents() {
+				// Event listener para refresh dos dados
+				const refreshBtn = document.getElementById('refresh-dashboard');
+				if (refreshBtn) {
+					refreshBtn.addEventListener('click', () => this.loadDashboard());
+				}
+			}
+
+			async loadDashboard() {
+				if (this.isLoading) return;
+				
+				this.isLoading = true;
+				this.showLoading();
+
+				try {
+					// Carregar estatísticas gerais
+					await this.loadStats();
+					
+					// Carregar todos os gráficos
+					await this.loadCharts();
+					
+				} catch (error) {
+					console.error('Erro ao carregar dashboard:', error);
+					this.showError('Erro ao carregar dados do dashboard: ' + error.message);
+				} finally {
+					this.isLoading = false;
+					this.hideLoading();
+				}
+			}
+
+			async loadStats() {
+				try {
+					console.log('DashboardController: Carregando estatísticas...');
+					const response = await fetch(`${this.API_BASE_URL}/dashboard/stats`);
+					
+					if (!response.ok) {
+						throw new Error(`Erro HTTP: ${response.status}`);
+					}
+					
+					const data = await response.json();
+					console.log('DashboardController: Dados de estatísticas recebidos:', data);
+
+					if (data.success) {
+						this.updateStatsCards(data.data);
+					} else {
+						throw new Error(data.message);
+					}
+				} catch (error) {
+					console.error('DashboardController: Erro ao carregar estatísticas:', error);
+					throw error;
+				}
+			}
+
+			updateStatsCards(stats) {
+				// Animar mudança de números
+				const animateNumber = (element, finalValue, suffix = '') => {
+					if (!element) return;
+					element.classList.add('updating');
+					
+					setTimeout(() => {
+						element.textContent = finalValue + suffix;
+						element.classList.remove('updating');
+					}, 300);
+				};
+
+				// Total de Serviços
+				const totalServicos = document.getElementById('total-servicos');
+				animateNumber(totalServicos, stats.totalServicos || '0');
+
+				// Serviços do Mês
+				const servicosMes = document.getElementById('servicos-mes');
+				animateNumber(servicosMes, stats.servicosNoMes || '0');
+
+				// Crescimento Mensal com indicador visual
+				const crescimentoMensal = document.getElementById('crescimento-mensal');
+				if (crescimentoMensal) {
+					const crescimento = stats.crescimentoMensal || 0;
+					const valor = `${crescimento >= 0 ? '+' : ''}${crescimento}%`;
+					crescimentoMensal.textContent = valor;
+					
+					// Remover classes antigas
+					crescimentoMensal.classList.remove('positive', 'negative', 'neutral');
+					
+					// Adicionar classe baseada no valor
+					if (crescimento > 0) {
+						crescimentoMensal.classList.add('positive');
+					} else if (crescimento < 0) {
+						crescimentoMensal.classList.add('negative');
+					} else {
+						crescimentoMensal.classList.add('neutral');
+					}
+				}
+
+				// Taxa de Retorno
+				const taxaRetorno = document.getElementById('taxa-retorno');
+				animateNumber(taxaRetorno, stats.taxaRetorno || '0', '%');
+
+				// Motos em Manutenção
+				const motosManutencao = document.getElementById('motos-manutencao');
+				animateNumber(motosManutencao, stats.motosEmManutencao || '0');
+
+				// Orçamentos Pendentes
+				const orcamentosPendentes = document.getElementById('orcamentos-pendentes');
+				animateNumber(orcamentosPendentes, stats.orcamentosPendentes || '0');
+			}
+
+			async loadCharts() {
+				try {
+					console.log('DashboardController: Carregando gráficos...');
+					const response = await fetch(`${this.API_BASE_URL}/dashboard/charts`);
+					
+					if (!response.ok) {
+						throw new Error(`Erro HTTP: ${response.status}`);
+					}
+					
+					const data = await response.json();
+					console.log('DashboardController: Dados de gráficos recebidos:', data);
+
+					if (data.success) {
+						const chartsData = data.data;
+						
+						// Criar gráficos
+						this.createServicosChart(chartsData.servicosPorMes);
+						this.createTiposServicosChart(chartsData.tiposServicos);
+						this.createServicosPorMotoChart(chartsData.servicosPorMoto);
+						this.createTaxaRetornoChart(chartsData.taxaRetorno);
+						
+						console.log('DashboardController: Gráficos criados com sucesso');
+					} else {
+						throw new Error(data.message);
+					}
+				} catch (error) {
+					console.error('DashboardController: Erro ao carregar gráficos:', error);
+					throw error;
+				}
+			}
+
+			createServicosChart(data) {
+				const chartElement = document.getElementById('servicos-chart');
+				if (!chartElement || !data) return;
+
+				if (this.charts.servicosChart) {
+					this.charts.servicosChart.destroy();
+				}
+
+				const isDark = document.body.classList.contains('dark');
+
+				const options = {
+					series: [{
+						name: 'Serviços',
+						data: data.map(item => item.total)
+					}],
+					chart: {
+						type: 'area',
+						height: 350,
+						toolbar: { show: false },
+						fontFamily: 'Open Sans, sans-serif',
+						foreColor: isDark ? '#A0A0A0' : '#666666'
+					},
+					colors: ['#3b82f6'],
+					dataLabels: { enabled: false },
+					stroke: { curve: 'smooth', width: 3 },
+					xaxis: { categories: data.map(item => item.mes) },
+					yaxis: { title: { text: 'Quantidade de Serviços' } },
+					fill: {
+						type: 'gradient',
+						gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.1, stops: [0, 100] }
+					},
+					tooltip: {
+						theme: isDark ? 'dark' : 'light',
+						y: { formatter: function(val) { return val + " serviços"; } }
+					}
+				};
+
+				this.charts.servicosChart = new ApexCharts(chartElement, options);
+				this.charts.servicosChart.render();
+			}
+
+			createTiposServicosChart(data) {
+				const chartElement = document.getElementById('tipos-servicos-chart');
+				if (!chartElement || !data) return;
+
+				if (this.charts.tiposChart) {
+					this.charts.tiposChart.destroy();
+				}
+
+				const isDark = document.body.classList.contains('dark');
+
+				const options = {
+					series: data.map(item => item.total),
+					chart: { type: 'donut', height: 350 },
+					labels: data.map(item => item.tipo),
+					colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#84cc16'],
+					legend: { position: 'bottom' },
+					tooltip: {
+						theme: isDark ? 'dark' : 'light',
+						y: { formatter: function(val) { return val + " serviços"; } }
+					}
+				};
+
+				this.charts.tiposChart = new ApexCharts(chartElement, options);
+				this.charts.tiposChart.render();
+			}
+
+			createServicosPorMotoChart(data) {
+				const chartElement = document.getElementById('servicos-moto-chart');
+				if (!chartElement || !data) return;
+
+				if (this.charts.motosChart) {
+					this.charts.motosChart.destroy();
+				}
+
+				const isDark = document.body.classList.contains('dark');
+
+				const options = {
+					series: [{ data: data.map(item => ({ x: item.marca, y: item.total })) }],
+					chart: { type: 'bar', height: 350, toolbar: { show: false } },
+					colors: ['#10b981'],
+					plotOptions: { bar: { horizontal: true, borderRadius: 6 } },
+					dataLabels: { enabled: true },
+					xaxis: { title: { text: 'Quantidade de Serviços' } },
+					yaxis: { title: { text: 'Marca da Motocicleta' } },
+					tooltip: {
+						theme: isDark ? 'dark' : 'light',
+						y: { formatter: function(val) { return val + " serviços"; } }
+					}
+				};
+
+				this.charts.motosChart = new ApexCharts(chartElement, options);
+				this.charts.motosChart.render();
+			}
+
+			createTaxaRetornoChart(data) {
+				const chartElement = document.getElementById('taxa-retorno-chart');
+				if (!chartElement || !data) return;
+
+				if (this.charts.retornoChart) {
+					this.charts.retornoChart.destroy();
+				}
+
+				const isDark = document.body.classList.contains('dark');
+
+				const options = {
+					series: [{ name: 'Taxa de Retorno', data: data.map(item => parseFloat(item.taxa_retorno)) }],
+					chart: { type: 'line', height: 350, toolbar: { show: false } },
+					colors: ['#ef4444'],
+					stroke: { curve: 'smooth', width: 4 },
+					xaxis: { categories: data.map(item => item.mes) },
+					yaxis: { title: { text: 'Taxa de Retorno (%)' }, min: 0, max: 100 },
+					markers: { size: 6 },
+					tooltip: {
+						theme: isDark ? 'dark' : 'light',
+						y: { formatter: function(val) { return val.toFixed(1) + "%"; } }
+					}
+				};
+
+				this.charts.retornoChart = new ApexCharts(chartElement, options);
+				this.charts.retornoChart.render();
+			}
+
+			showLoading() {
+				const loadingElements = document.querySelectorAll('.chart-loading');
+				loadingElements.forEach(element => {
+					element.style.display = 'flex';
+				});
+			}
+
+			hideLoading() {
+				const loadingElements = document.querySelectorAll('.chart-loading');
+				loadingElements.forEach(element => {
+					element.style.display = 'none';
+				});
+			}
+
+			showError(message) {
+				const errorContainer = document.getElementById('dashboard-error');
+				if (errorContainer) {
+					errorContainer.textContent = message;
+					errorContainer.style.display = 'block';
+					
+					setTimeout(() => {
+						errorContainer.style.display = 'none';
+					}, 5000);
+				}
+			}
+
+			handleOrientationChange() {
+				window.addEventListener('orientationchange', () => {
+					setTimeout(() => this.refreshChartsForTheme(), 500);
+				});
+			}
+
+			refreshChartsForTheme() {
+				setTimeout(() => {
+					if (this.charts.servicosChart) {
+						this.charts.servicosChart.destroy();
+						this.loadCharts();
+					}
+				}, 100);
+			}
+		}
+
+		// Inicializar dashboard
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', () => {
+				window.dashboardController = new DashboardController();
+			});
+		} else {
+			window.dashboardController = new DashboardController();
+		}
+	</script>
 </body>
 </html>

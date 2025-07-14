@@ -5,6 +5,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/template.css">
+	<link rel="stylesheet" href="../../assets/css/consulta.css">
+	<link rel="stylesheet" href="../../assets/css/usuarios.css">
+	<link rel="stylesheet" href="../../assets/css/clientes.css">
 	<title>Sistema Campos Moto Peças - Clientes</title>
 </head>
 <body>
@@ -69,7 +73,7 @@
 							<input type="text" id="filter-text" placeholder="Buscar...">
 						</div>
 						<div class="filter-group">
-							<select id="filter-status">
+							<select id="filter-sexo">
 								<option value="">Todos os sexos</option>
 								<option value="Masculino">Masculino</option>
 								<option value="Feminino">Feminino</option>
@@ -87,7 +91,8 @@
 									<th>Email</th>
 									<th>Telefone</th>
 									<th>CPF</th>
-									<th>Endereço</th>
+									<th>Sexo</th>
+									<th>Profissão</th>
 									<th>Ações</th>
 								</tr>
 							</thead>
@@ -102,5 +107,6 @@
 	</section>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/ClienteController.js"></script>
 </body>
 </html>

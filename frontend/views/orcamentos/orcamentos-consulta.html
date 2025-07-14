@@ -5,6 +5,60 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/consulta.css">
+	<style>
+		.modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.5);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 1000;
+		}
+		.modal-content {
+			background: white;
+			padding: 20px;
+			border-radius: 8px;
+			max-width: 500px;
+			width: 90%;
+			max-height: 80vh;
+			overflow-y: auto;
+			box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+		}
+		.modal-header {
+			border-bottom: 1px solid #eee;
+			margin-bottom: 20px;
+			padding-bottom: 10px;
+			position: relative;
+		}
+		.modal-header h3 {
+			margin: 0;
+			color: #333;
+		}
+		.modal-close {
+			position: absolute;
+			top: 0;
+			right: 0;
+			border: none;
+			background: none;
+			font-size: 24px;
+			cursor: pointer;
+			color: #666;
+		}
+		.modal-close:hover {
+			color: #333;
+		}
+		.modal-footer {
+			border-top: 1px solid #eee;
+			margin-top: 20px;
+			padding-top: 15px;
+			text-align: right;
+		}
+	</style>
 	<title>Sistema Campos Moto Peças - Orçamentos</title>
 </head>
 <body>
@@ -84,41 +138,35 @@
 						<table id="orcamentos-table">
 							<thead>
 								<tr>
-									<th>Código</th>
-									<th>Cliente</th>
-									<th>Placa</th>
-									<th>Data</th>
-									<th>Valor Total</th>
-									<th>Status</th>
+									<th class="sortable" data-column="id">
+										Código
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="cliente_nome">
+										Cliente
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="placa">
+										Placa
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="data" data-default-sort="desc">
+										Data
+										<i class='bx bx-sort-down sort-icon active'></i>
+									</th>
+									<th class="sortable" data-column="valor">
+										Valor Total
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="status">
+										Status
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
 									<th>Ações</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td><p>ORC-001</p></td>
-									<td><p>João Silva</p></td>
-									<td><p>ABC-1234</p></td>
-									<td>01/10/2023</td>
-									<td>R$ 350,00</td>
-									<td><span class="status-completed">Aprovado</span></td>
-									<td>
-										<a href="os-efetivar.html" class="action-icon" title="Efetivar Serviço"><i class='bx bx-check-shield'></i></a>
-										<a href="#" class="action-icon" title="Visualizar"><i class='bx bx-show'></i></a>
-										<a href="#" class="action-icon" title="Editar"><i class='bx bx-edit'></i></a>
-									</td>
-								</tr>
-								<tr>
-									<td><p>ORC-002</p></td>
-									<td><p>Maria Oliveira</p></td>
-									<td><p>XYZ-5678</p></td>
-									<td>02/10/2023</td>
-									<td>R$ 180,00</td>
-									<td><span class="status-pending">Pendente</span></td>
-									<td>
-										<a href="#" class="action-icon" title="Visualizar"><i class='bx bx-show'></i></a>
-										<a href="#" class="action-icon" title="Editar"><i class='bx bx-edit'></i></a>
-									</td>
-								</tr>
+								<!-- Os dados serão carregados dinamicamente via JavaScript -->
 							</tbody>
 						</table>
 					</div>
@@ -129,5 +177,15 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/BasePageController.js"></script>
+    <script src="../../src/components/OrcamentoController.js"></script>
+    <script>
+        // Inicializar controller de orçamentos
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.orcamentoController) {
+                window.orcamentoController = new OrcamentoController();
+            }
+        });
+    </script>
 </body>
 </html>

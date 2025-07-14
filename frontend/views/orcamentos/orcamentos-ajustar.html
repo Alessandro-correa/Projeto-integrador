@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/dashboard.css">
+	<link rel="stylesheet" href="../../assets/css/template.css">
+	<link rel="stylesheet" href="../../assets/css/forms.css">
+	<link rel="stylesheet" href="../../assets/css/ajuste.css">
+	<title>Sistema Campos Moto Peças - Ajustar Orçamento</title>
+</head>
+<body>
+	<section id="sidebar">
+		<a href="../dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<ul class="side-menu">
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="principal">Principal</li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="orcamentos-consulta.html" class="active"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestão">Gestão</li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+		</ul>
+	</section>
+
+	<section id="content">
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<div class="theme-toggle">
+				<input type="checkbox" id="theme-toggle-checkbox">
+				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+					<i class='bx bxs-sun'></i>
+					<i class='bx bxs-moon'></i>
+				</label>
+			</div>
+			<a href="#" class="nav-link" style="margin-left: auto;">
+				<i class='bx bxs-bell icon' ></i>
+			</a>
+			<span class="divider"></span>
+			<div class="profile">
+				<a href="#" class="nav-link">
+					<i class='bx bxs-cog icon' title="Configurações"></i>
+				</a>
+				<a href="../login/login.html" class="nav-link">
+					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
+				</a>
+			</div>
+		</nav>
+
+		<main>
+			<h1 class="title">Ajustar Orçamento</h1>
+			<ul class="breadcrumbs">
+				<li><a href="../dashboard/index.html">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="orcamentos-consulta.html">Orçamentos</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Ajustar</a></li>
+			</ul>
+
+			<!-- Alert Container -->
+			<div id="form-alert" class="alert" style="display: none;"></div>
+
+			<!-- Status Validation Message -->
+			<div id="status-validation" class="alert alert-error" style="display: none;">
+				<i class='bx bx-error'></i>
+				<span>Este orçamento não pode ser ajustado. Apenas orçamentos com status "Pendente" podem ser editados.</span>
+			</div>
+
+			<!-- Loading -->
+			<div id="loading" class="loading" style="display: none;">
+				<i class='bx bx-loader-alt bx-spin'></i>
+				<span>Carregando dados...</span>
+			</div>
+
+			<!-- Notification Container -->
+			<div id="notification-container" class="notification-container"></div>
+
+			<!-- Alert Container -->
+			<div id="alert-container"></div>
+
+			<!-- Adjustment Form Section -->
+			<div id="adjustment-form-section" style="display: none;">
+				<form id="ajusteForm" class="form-container">
+					<div class="page-title">
+						<h2><i class='bx bx-edit'></i> Formulário de Ajuste</h2>
+					</div>
+					<div class="form-section">
+						<h3>Informações Básicas</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="numero">Número do Orçamento</label>
+								<input type="number" id="numero" name="numero" readonly>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="cliente_id">Cliente</label>
+								<select id="cliente_id" name="cliente_id" disabled>
+									<option value="">Cliente selecionado...</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="ordem_servico_titulo">Ordem de Serviço</label>
+								<input type="text" id="ordem_servico_titulo" name="ordem_servico_titulo" readonly>
+							</div>
+						</div>
+					</div>
+					<div class="form-section">
+						<h3>Valores e Validade</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="valor">Valor do Orçamento <span class="required">*</span></label>
+								<input type="number" id="valor" name="valor" step="0.01" min="0" required placeholder="0.00">
+							</div>
+							<div class="form-group">
+								<label for="validade">Data de Validade <span class="required">*</span></label>
+								<input type="date" id="validade" name="validade" required>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="status">Status <span class="required">*</span></label>
+							<select id="status" name="status" required>
+								<option value="P">Pendente</option>
+								<option value="V">Validado</option>
+								<option value="R">Rejeitado</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-section">
+						<h3>Peças e Serviços</h3>
+						<div class="form-group">
+							<label>Itens do Orçamento</label>
+							<div id="itens-container" class="pecas-container">
+								<div class="pecas-header">
+									<span class="info-text">
+										<i class='bx bx-info-circle'></i>
+										Os itens são baseados na ordem de serviço relacionada
+									</span>
+								</div>
+								<div id="itens-list" class="pecas-list">
+									<!-- Itens serão carregados dinamicamente -->
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-actions">
+						<button type="button" id="cancelBtn" class="btn btn-secondary">
+							<i class='bx bx-x'></i> Cancelar
+						</button>
+						<button type="submit" id="saveBtn" class="btn btn-primary">
+							<i class='bx bx-check'></i> Salvar Alterações
+						</button>
+					</div>
+				</form>
+			</div>
+
+		</main>
+	</section>
+
+	<!-- Scripts -->
+	<script src="../../src/components/SidebarController.js"></script>
+	<script src="../../src/components/ThemeController.js"></script>
+	<script src="../../src/components/BasePageController.js"></script>
+	<script src="../../src/components/OrcamentoAjusteController.js"></script>
+	<script>
+		// Inicializar controller da página apenas se não existir
+		if (!window.orcamentoAjusteController) {
+			window.orcamentoAjusteController = new OrcamentoAjusteController();
+		}
+	</script>
+</body>
+</html>
+

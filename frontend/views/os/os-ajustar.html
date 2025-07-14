@@ -1,101 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-	<link rel="stylesheet" href="../../assets/css/style.css">
-	<title>Sistema Campos Moto Peças - Ajustar O.S.</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/template.css">
+    <link rel="stylesheet" href="../../assets/css/forms.css">
+    <link rel="stylesheet" href="../../assets/css/ajuste.css">
+    <title>Sistema Campos Moto Peças - Ajustar Ordem de Serviço</title>
 </head>
 <body>
-	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
-		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
-			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="os-consulta.html" class="active"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
-			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
-			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
-		</ul>
-	</section>
-	<section id="content">
-		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
-			<div class="theme-toggle">
-				<input type="checkbox" id="theme-toggle-checkbox">
-				<label for="theme-toggle-checkbox" class="theme-toggle-label">
-					<i class='bx bxs-sun'></i>
-					<i class='bx bxs-moon'></i>
-				</label>
-			</div>
-			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon' ></i>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<a href="#" class="nav-link">
-					<i class='bx bxs-cog icon' title="Configurações"></i>
-				</a>
-				<a href="#" class="nav-link">
-					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
-				</a>
-			</div>
-		</nav>
-		<main>
-			<h1 class="title">Ajustar Ordem de Serviço</h1>
-			<ul class="breadcrumbs">
-				<li><a href="../../index.html">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="os-consulta.html">Ordens de Serviço</a></li>
-				<li class="divider">/</li>
-				<li><a href="#" class="active">Ajustar O.S.</a></li>
-			</ul>
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Ajuste da O.S. - OS-0005</h3>
-					</div>
-					<form action="#" class="os-form">
-						<div class="form-group alert-warning">
-							<label>Observação da Secretária para Ajuste</label>
-							<p>Faltou adicionar na lista de peças o filtro de ar que foi trocado. Por favor, corrija.</p>
-						</div>
-						<h4 style="margin-top: 20px;">Peças e Serviços</h4>
-						<div class="orders">
-							<table id="itens-orcamento">
-								<thead>
-									<tr>
-										<th>Descrição</th>
-										<th>Valor (R$)</th>
-										<th>Ação</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td><input type="text" value="Troca de Óleo Mobil" required></td>
-										<td><input type="text" class="valor-item" value="120,00" required></td>
-										<td><button type="button" class="btn-remove-item"><i class='bx bx-trash'></i></button></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<button type="button" class="btn-secondary" id="add-item" style="margin-top: 10px;">Adicionar Item</button>
-						<div class="form-actions" style="margin-top: 20px;">
-							<button type="submit" class="btn-primary">Salvar Ajuste</button>
-							<a href="os-consulta.html" class="btn-secondary">Cancelar</a>
-						</div>
-					</form>
-				</div>
-			</div>
-		</main>
-	</section>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script type="module" src="../../assets/js/main.js"></script>
+    <!-- Sidebar -->
+    <section id="sidebar">
+        <a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+        <ul class="side-menu">
+            <li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+            <li class="divider" data-text="principal">Principal</li>
+            <li><a href="os-consulta.html" class="active"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+            <li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+            <li class="divider" data-text="gestão">Gestão</li>
+            <li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+            <li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+            <li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+            <li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+            <li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+            <li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+        </ul>
+    </section>
+
+    <!-- Main Content -->
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu toggle-sidebar' ></i>
+            <div class="theme-toggle">
+                <input type="checkbox" id="theme-toggle-checkbox">
+                <label for="theme-toggle-checkbox" class="theme-toggle-label">
+                    <i class='bx bxs-sun'></i>
+                    <i class='bx bxs-moon'></i>
+                </label>
+            </div>
+            <a href="#" class="nav-link" style="margin-left: auto;">
+                <i class='bx bxs-bell icon' ></i>
+            </a>
+            <span class="divider"></span>
+            <div class="profile">
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-cog icon' title="Configurações"></i>
+                </a>
+                <a href="../login/login.html" class="nav-link">
+                    <i class='bx bxs-log-out-circle icon' title="Sair"></i>
+                </a>
+            </div>
+        </nav>
+
+        <main>
+            <h1 class="title">Ajustar Ordem de Serviço</h1>
+            <ul class="breadcrumbs">
+                <li><a href="../dashboard/index.html">Home</a></li>
+                <li class="divider">/</li>
+                <li><a href="os-consulta.html">Ordens de Serviço</a></li>
+                <li class="divider">/</li>
+                <li><a href="#" class="active">Ajustar</a></li>
+            </ul>
+
+            <!-- Alert Container -->
+            <div id="form-alert" class="alert" style="display: none;"></div>
+
+            <!-- Status Validation Message -->
+            <div id="status-validation" class="alert alert-error" style="display: none;">
+                <i class='bx bx-error'></i>
+                <span>Esta ordem de serviço não pode ser ajustada. Apenas OS com status "Ajuste Pendente", "Validação Pendente" ou "Em Andamento" podem ser editadas.</span>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading" style="display: none;">
+                <i class='bx bx-loader-alt bx-spin'></i>
+                <span>Carregando dados...</span>
+            </div>
+
+            <!-- Notification Container -->
+            <div id="notification-container" class="notification-container"></div>
+
+            <!-- Alert Container -->
+            <div id="alert-container"></div>
+
+            <!-- Adjustment Form Section -->
+            <div id="adjustment-form-section" style="display: none;">
+                <form id="ajusteForm" class="form-container">
+                    <div class="page-title">
+                        <h2><i class='bx bx-edit'></i> Formulário de Ajuste</h2>
+                    </div>
+                    <div class="form-section">
+                        <h3>Informações Básicas</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="numero">Número da OS</label>
+                                <input type="number" id="numero" name="numero" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="data_abertura">Data de Abertura</label>
+                                <input type="date" id="data_abertura" name="data_abertura" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cliente_id">Cliente</label>
+                                <select id="cliente_id" name="cliente_id" disabled>
+                                    <option value="">Cliente selecionado...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="motocicleta_id">Motocicleta</label>
+                                <select id="motocicleta_id" name="motocicleta_id" disabled>
+                                    <option value="">Motocicleta selecionada...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="titulo">Título do Serviço</label>
+                            <input type="text" id="titulo" name="titulo" readonly>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3>Descrição e Status</h3>
+                        <div class="form-group">
+                            <label for="descricao">Descrição do Serviço <span class="required">*</span></label>
+                            <textarea id="descricao" name="descricao" rows="4" required placeholder="Descreva detalhadamente o serviço a ser realizado..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status <span class="required">*</span></label>
+                            <select id="status" name="status" required>
+                                <option value="Ajuste Pendente">Ajuste Pendente</option>
+                                <option value="Validação Pendente">Validação Pendente</option>
+                                <option value="Em Andamento">Em Andamento</option>
+                                <option value="Validada">Validada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="observacoes">Observações</label>
+                            <textarea id="observacoes" name="observacoes" rows="3" placeholder="Observações adicionais sobre o serviço..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3>Valor e Peças</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="valor_total">Valor Total <span class="required">*</span></label>
+                                <input type="number" id="valor_total" name="valor_total" step="0.01" min="0" required placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Peças Utilizadas</label>
+                            <div id="pecas-container" class="pecas-container">
+                                <div class="pecas-header">
+                                    <button type="button" id="addPecaBtn" class="btn btn-outline btn-sm">
+                                        <i class='bx bx-plus'></i> Adicionar Peça
+                                    </button>
+                                </div>
+                                <div id="pecas-list" class="pecas-list">
+                                    <!-- Peças serão carregadas dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn" class="btn btn-secondary">
+                            <i class='bx bx-x'></i> Cancelar
+                        </button>
+                        <button type="submit" id="saveBtn" class="btn btn-primary">
+                            <i class='bx bx-check'></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </main>
+    </section>
+
+    <!-- Scripts -->
+    <script src="../../src/components/SidebarController.js"></script>
+    <script src="../../src/components/ThemeController.js"></script>
+    <script src="../../src/components/OrdemAjusteController.js"></script>
+    <script>
+        // Inicializar controller da página apenas se não existir
+        if (!window.ordemAjusteController) {
+            window.ordemAjusteController = new OrdemAjusteController();
+        }
+    </script>
 </body>
 </html>
+

@@ -1,15 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
-	<title>Sistema Campos Moto Peças - Cadastro O.S.</title>
+	<link rel="stylesheet" href="../../assets/css/dashboard.css">
+	<link rel="stylesheet" href="../../assets/css/template.css">
+	<link rel="stylesheet" href="../../assets/css/forms.css">
+	<link rel="stylesheet" href="../../assets/css/ajuste.css">
+	<style>
+		/* Overlay para bloquear o formulário */
+		.form-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(255, 255, 255, 0.8);
+			z-index: 1000;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			border-radius: 8px;
+		}
+		
+		.form-overlay.active {
+			display: flex;
+		}
+		
+		.form-overlay-message {
+			background: white;
+			padding: 20px 30px;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+			text-align: center;
+			border-left: 4px solid #dc3545;
+		}
+		
+		.form-overlay-message h3 {
+			margin: 0 0 10px 0;
+			color: #dc3545;
+			font-size: 18px;
+		}
+		
+		.form-overlay-message p {
+			margin: 0;
+			color: #666;
+			font-size: 14px;
+		}
+		
+		/* Dark theme para overlay */
+		body.dark .form-overlay {
+			background: rgba(30, 30, 30, 0.8);
+		}
+		
+		body.dark .form-overlay-message {
+			background: var(--dark-surface);
+			color: var(--dark-text-primary);
+		}
+		
+		body.dark .form-overlay-message p {
+			color: var(--dark-text-secondary);
+		}
+		
+		/* Container precisa ser relativo para o overlay funcionar */
+		.data {
+			position: relative;
+		}
+	</style>
+	<title>Sistema Campos Moto Peças - Nova Ordem de Serviço</title>
 </head>
 <body>
 	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
 		<ul class="side-menu">
 			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
 			<li class="divider" data-text="principal">Principal</li>
@@ -50,97 +114,101 @@
 		<main>
 			<h1 class="title">Ordem de Serviço</h1>
 			<ul class="breadcrumbs">
-				<li><a href="../../index.html">Home</a></li>
+				<li><a href="../../views/dashboard/index.html">Home</a></li>
 				<li class="divider">/</li>
 				<li><a href="os-consulta.html">Ordens de Serviço</a></li>
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Nova O.S.</a></li>
 			</ul>
+
+			<!-- Notification Container -->
+			<div id="notification-container" class="notification-container"></div>
+
+			<!-- Alert Container -->
+			<div id="alert-container"></div>
+
+			<!-- Order Form Section -->
 			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Nova Ordem de Serviço</h3>
+				<!-- Overlay para bloquear formulário -->
+				<div id="form-overlay" class="form-overlay">
+					<div class="form-overlay-message">
+						<h3><i class='bx bx-lock-alt'></i> Formulário Bloqueado</h3>
+						<p>Não é possível criar ordem de serviço para data futura.<br>Selecione a data de hoje ou uma data anterior.</p>
 					</div>
-					<form action="#" class="os-form">
-						<div class="form-row">
-							<div class="form-group">
-								<label for="codigo">Código</label>
-								<input type="text" id="codigo" disabled>
-							</div>
-							<div class="form-group">
-								<label for="titulo">Título do Serviço</label>
-								<input type="text" id="titulo" required>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="cliente">Cliente</label>
-								<select id="cliente" required>
-									<option value="">Selecione...</option>
-									<option value="1">Maria da Silva</option>
-									<option value="2">João Santos</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label for="moto">Motocicleta</label>
-								<select id="moto" required>
-									<option value="">Selecione...</option>
-									<option value="1">Honda Biz (ABC-1234)</option>
-									<option value="2">Yamaha Fazer (XYZ-5678)</option>
-								</select>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="data">Data</label>
-							<input type="date" id="data" required>
-						</div>
-						<div class="form-group">
-							<label for="descricao">Descrição</label>
-							<input type="text" id="descricao" name="descricao" required>
-						</div>
-						<div class="form-group">
-							<label for="status">Status</label>
-							<select id="status" name="status" required>
-								<option value="">Selecione...</option>
-								<option value="aberta">Aberta</option>
-								<option value="em_andamento">Em andamento</option>
-								<option value="finalizada">Finalizada</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="usuarioCpf">Usuário Responsável</label>
-							<input type="text" id="usuarioCpf" name="usuarioCpf" required>
-						</div>
-						<h4 style="margin-top: 20px;">Peças e Serviços</h4>
-						<div class="orders">
-							<table id="itens-orcamento">
-								<thead>
-									<tr>
-										<th>Descrição</th>
-										<th>Valor (R$)</th>
-										<th>Ação</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td><input type="text" placeholder="Descrição do item" required></td>
-										<td><input type="text" class="valor-item" placeholder="0,00" required></td>
-										<td><button type="button" class="btn-remove-item"><i class='bx bx-trash'></i></button></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<button type="button" class="btn-secondary" id="add-item" style="margin-top: 10px;">Adicionar Item</button>
-						<div class="form-actions" style="margin-top: 20px;">
-							<button type="submit" class="btn-primary">Salvar O.S.</button>
-							<a href="os-consulta.html" class="btn-secondary">Cancelar</a>
-						</div>
-					</form>
 				</div>
+				
+				<form id="os-form" class="form-container">
+					<div class="page-title">
+						<h2><i class='bx bx-plus'></i> Nova Ordem de Serviço</h2>
+					</div>
+					
+					<div class="form-section">
+						<h3>Informações Básicas</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="titulo">Título do Serviço <span class="required">*</span></label>
+								<input type="text" id="titulo" name="titulo" required 
+									   placeholder="Ex: Troca de óleo, Revisão geral...">
+							</div>
+							<div class="form-group">
+								<label for="data">Data do Serviço <span class="required">*</span></label>
+								<input type="date" id="data" name="data" required>
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-group">
+								<label for="cliente">Cliente <span class="required">*</span></label>
+								<select id="cliente" name="cliente" required>
+									<option value="">Carregando clientes...</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="motocicleta">Motocicleta <span class="required">*</span></label>
+								<select id="motocicleta" name="motocicleta" required disabled>
+									<option value="">Selecione primeiro um cliente</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-section">
+						<h3>Descrição dos Serviços</h3>
+						<div class="form-group">
+							<label for="descricao">Descrição dos Serviços <span class="required">*</span></label>
+							<textarea id="descricao" name="descricao" rows="4" required
+									  placeholder="Descreva detalhadamente os serviços a serem realizados na motocicleta..."></textarea>
+						</div>
+
+						<div class="form-group">
+							<label for="observacao">Observações Adicionais</label>
+							<textarea id="observacao" name="observacao" rows="3"
+									  placeholder="Observações extras, detalhes específicos ou informações importantes (opcional)..."></textarea>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="button" onclick="window.location.href='os-consulta.html'" class="btn btn-secondary">
+							<i class='bx bx-x'></i> Cancelar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							<i class='bx bx-save'></i> Cadastrar Ordem de Serviço
+						</button>
+					</div>
+				</form>
 			</div>
 		</main>
 	</section>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script type="module" src="../../assets/js/main.js"></script>
+
+	<!-- Scripts -->
+	<script src="../../src/components/SidebarController.js"></script>
+	<script src="../../src/components/ThemeController.js"></script>
+	<script src="../../src/components/OrdemCadastroController.js"></script>
+	<script>
+		// Inicializar controller da página apenas se não existir
+		if (!window.ordemCadastroController) {
+			window.ordemCadastroController = new OrdemCadastroController();
+		}
+	</script>
 </body>
 </html>

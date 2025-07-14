@@ -1,0 +1,54 @@
+.btn-adjust {
+    background: var(--orange);
+    color: white;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-adjust:hover {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn-adjust i {
+    font-size: 16px;
+}
+
+.edit-form textarea {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    transition: all 0.2s ease;
+}
+
+.edit-form textarea:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+#editClienteModal .modal-content {
+    max-width: 700px;
+}
+
+@media (max-width: 768px) {
+    #editClienteModal .modal-content {
+        max-width: 95%;
+        margin: 10px;
+    }
+    
+    .edit-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}

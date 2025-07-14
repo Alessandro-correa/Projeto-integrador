@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/usuarios.css">
+	<link rel="stylesheet" href="../../assets/css/clientes.css">
+	<title>Sistema Campos Moto Peças - Ajustar Cliente</title>
+</head>
+<body>
+	<section id="sidebar">
+		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<ul class="side-menu">
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="principal">Principal</li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestão">Gestão</li>
+			<li><a href="clientes-consulta.html" class="active"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+		</ul>
+	</section>
+	<section id="content">
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<div class="theme-toggle">
+				<input type="checkbox" id="theme-toggle-checkbox">
+				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+					<i class='bx bxs-sun'></i>
+					<i class='bx bxs-moon'></i>
+				</label>
+			</div>
+			<a href="#" class="nav-link" style="margin-left: auto;">
+				<i class='bx bxs-bell icon' ></i>
+			</a>
+			<span class="divider"></span>
+			<div class="profile">
+				<a href="#" class="nav-link">
+					<i class='bx bxs-cog icon' title="Configurações"></i>
+				</a>
+				<a href="#" class="nav-link">
+					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
+				</a>
+			</div>
+		</nav>
+		<main>
+			<h1 class="title">Ajustar Cliente</h1>
+			<ul class="breadcrumbs">
+				<li><a href="../../index.html">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="clientes-consulta.html">Clientes</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Ajustar Cliente</a></li>
+			</ul>
+			<div class="data">
+				<div class="content-data">
+					<div class="head">
+						<h3><i class='bx bx-edit'></i> Ajustar Dados do Cliente</h3>
+						<div class="menu">
+							<a href="clientes-consulta.html" class="btn-secondary">
+								<i class='bx bx-arrow-back'></i> Voltar
+							</a>
+						</div>
+					</div>
+
+					<!-- Seção de busca do cliente -->
+					<div class="search-section" id="searchSection">
+						<div class="search-card">
+							<h4><i class='bx bx-search'></i> Buscar Cliente para Ajustar</h4>
+							<div class="search-form">
+								<div class="form-row">
+									<div class="form-group">
+										<label for="search-cpf">CPF do Cliente</label>
+										<input type="text" id="search-cpf" placeholder="XXX.XXX.XXX-XX" required>
+									</div>
+									<div class="form-group">
+										<button type="button" id="btn-search" class="btn-primary">
+											<i class='bx bx-search'></i> Buscar
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Seção de edição (oculta inicialmente) -->
+					<div class="edit-section" id="editSection" style="display: none;">
+						<div class="client-info">
+							<h4><i class='bx bx-user'></i> Dados Atuais do Cliente</h4>
+							<div id="current-client-data"></div>
+						</div>
+
+						<form id="adjust-form" class="adjust-form">
+							<h4><i class='bx bx-edit-alt'></i> Ajustar Informações</h4>
+							
+							<div class="form-row">
+								<div class="form-group">
+									<label for="adjust-nome">Nome Completo</label>
+									<input type="text" id="adjust-nome" name="nome" required>
+									<small>Nome completo do cliente</small>
+								</div>
+								<div class="form-group">
+									<label for="adjust-email">E-mail</label>
+									<input type="email" id="adjust-email" name="email" required>
+									<small>E-mail válido para contato</small>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="adjust-cpf">CPF</label>
+									<input type="text" id="adjust-cpf" name="cpf" readonly>
+									<small>CPF não pode ser alterado</small>
+								</div>
+								<div class="form-group">
+									<label for="adjust-telefone">Telefone</label>
+									<input type="text" id="adjust-telefone" name="telefone" required>
+									<small>Telefone para contato</small>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="adjust-sexo">Sexo</label>
+									<select id="adjust-sexo" name="sexo" required>
+										<option value="">Selecione...</option>
+										<option value="Masculino">Masculino</option>
+										<option value="Feminino">Feminino</option>
+									</select>
+									<small>Sexo do cliente</small>
+								</div>
+								<div class="form-group">
+									<label for="adjust-profissao">Profissão</label>
+									<input type="text" id="adjust-profissao" name="profissao" required>
+									<small>Profissão atual</small>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group full-width">
+									<label for="adjust-endereco">Endereço Completo</label>
+									<textarea id="adjust-endereco" name="endereco" rows="3" required placeholder="Rua, número, bairro, cidade, CEP"></textarea>
+									<small>Endereço completo para correspondência</small>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="adjust-data-nascimento">Data de Nascimento</label>
+									<input type="date" id="adjust-data-nascimento" name="dataDeNascimento" required>
+									<small>Data de nascimento</small>
+								</div>
+								<div class="form-group">
+									<label for="adjust-status">Status</label>
+									<select id="adjust-status" name="status">
+										<option value="Ativo">Ativo</option>
+										<option value="Inativo">Inativo</option>
+									</select>
+									<small>Status do cliente no sistema</small>
+								</div>
+							</div>
+
+							<!-- Seção de observações -->
+							<div class="form-row">
+								<div class="form-group full-width">
+									<label for="adjust-observacoes">Observações do Ajuste</label>
+									<textarea id="adjust-observacoes" name="observacoes" rows="3" placeholder="Digite as observações sobre este ajuste (opcional)"></textarea>
+									<small>Observações sobre as alterações realizadas</small>
+								</div>
+							</div>
+
+							<div class="form-actions">
+								<button type="submit" class="btn-primary">
+									<i class='bx bx-save'></i> Salvar Ajustes
+								</button>
+								<button type="button" id="btn-cancel" class="btn-secondary">
+									<i class='bx bx-x'></i> Cancelar
+								</button>
+								<button type="button" id="btn-reset" class="btn-warning">
+									<i class='bx bx-reset'></i> Restaurar Dados Originais
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</main>
+	</section>
+
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script type="module" src="../../assets/js/main.js"></script>
+	<script src="../../src/components/Controller.js"></script>
+	<script src="../../src/components/ClienteAjusteController.js"></script>
+</body>
+</html>
+
