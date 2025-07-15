@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="../../assets/css/forms.css">
 	<link rel="stylesheet" href="../../assets/css/ajuste.css">
 	<link rel="stylesheet" href="../../assets/css/orcamento-ajuste.css">
+	<link rel="stylesheet" href="../../assets/css/botoes-override.css">
 	<title>Sistema Campos Moto Peças - Ajustar Orçamento</title>
 </head>
 <body>
@@ -165,6 +166,38 @@
 	<script src="../../src/components/ThemeController.js"></script>
 	<script src="../../src/components/BasePageController.js"></script>
 	<script src="../../src/components/OrcamentoAjusteController.js"></script>
+	
+	<!-- Script para forçar cores dos botões -->
+	<script>
+		// Função para aplicar cores corretas aos botões
+		function aplicarCoresBotoes() {
+			// Aplicar a cada 100ms para garantir que pegue elementos criados dinamicamente
+			setInterval(() => {
+				const saveButtons = document.querySelectorAll('.save-item-btn');
+				const cancelButtons = document.querySelectorAll('.cancel-item-btn');
+				
+				saveButtons.forEach(btn => {
+					btn.style.backgroundColor = '#FC3B56'; // Vermelho igual ao Editar
+					btn.style.borderColor = '#FC3B56';
+					btn.style.color = '#ffffff';
+				});
+				
+				cancelButtons.forEach(btn => {
+					btn.style.backgroundColor = '#9ca3af'; // Cinza claro
+					btn.style.borderColor = '#9ca3af';
+					btn.style.color = '#ffffff';
+				});
+			}, 100);
+		}
+		
+		// Iniciar quando a página carregar
+		document.addEventListener('DOMContentLoaded', aplicarCoresBotoes);
+		
+		// Também executar imediatamente se o DOM já estiver carregado
+		if (document.readyState !== 'loading') {
+			aplicarCoresBotoes();
+		}
+	</script>
 </body>
 </html>
 

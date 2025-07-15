@@ -15,10 +15,14 @@ class OrcamentoApiController {
       valor_total: parseFloat((item.quantidade || 1) * parseFloat(item.valor_unitario || 0))
     }));
 
-    const servicos = itens.filter(item => item.tipo === 'servico').map(item => ({
-      descricao: item.descricao || item.nome,
-      valor: parseFloat(item.valor || 0)
-    }));
+    const servicos = itens.filter(item => item.tipo === 'servico').map(item => {
+      // Para serviços, verificar tanto 'valor' quanto 'valor_unitario' para compatibilidade
+      const valorServico = parseFloat(item.valor || item.valor_unitario || 0);
+      return {
+        descricao: item.descricao || item.nome,
+        valor: valorServico
+      };
+    });
 
     return { pecas, servicos };
   }
@@ -343,11 +347,17 @@ class OrcamentoApiController {
       const { id } = req.params;
       const { validade, status, valor, itens, observacoes, motocicletaPlaca } = req.body;
 
-      console.log('=== ORÇAMENTO UPDATE ===');
+      console.log('=== ORÇAMENTO UPDATE DEBUG ===');
       console.log('ID:', id);
       console.log('Body completo:', JSON.stringify(req.body, null, 2));
-      console.log('Valores extraídos:', { validade, status, valor, itens, observacoes, motocicletaPlaca });
-      console.log('Tipo do valor:', typeof valor);
+      console.log('Campos extraídos:', { 
+        validade, 
+        status, 
+        valor: { valor, tipo: typeof valor }, 
+        itens: { existe: !!itens, length: itens?.length, dados: itens }, 
+        observacoes, 
+        motocicletaPlaca 
+      });
 
       // Verificar se orçamento existe
       const orcamentoExistente = await db.oneOrNone('SELECT * FROM Orcamento WHERE id = $1', [id]);
@@ -370,13 +380,18 @@ class OrcamentoApiController {
         });
       }
 
-      // Processar itens se fornecidos
+      // Processar itens se fornecidos, caso contrário preservar os existentes
       let descricaoEstruturada = null;
       let valorCalculado = null;
 
       if (itens) {
+        console.log('🔧 Processando itens recebidos:', JSON.stringify(itens, null, 2));
         const { pecas, servicos } = OrcamentoApiController.processarItensOrcamento(itens);
+        console.log('🔧 Peças processadas:', JSON.stringify(pecas, null, 2));
+        console.log('🔧 Serviços processados:', JSON.stringify(servicos, null, 2));
+        
         valorCalculado = OrcamentoApiController.calcularValorTotal(pecas, servicos);
+        console.log('🔧 Valor calculado:', valorCalculado);
         
         descricaoEstruturada = {
           pecas,
@@ -384,6 +399,29 @@ class OrcamentoApiController {
           observacoes: observacoes || '',
           motocicleta_placa: motocicletaPlaca || null
         };
+        console.log('🔧 Descrição estruturada criada:', JSON.stringify(descricaoEstruturada, null, 2));
+      } else {
+        // Se não foram fornecidos itens, preservar os existentes (se houver)
+        console.log('🔧 Nenhum item fornecido, tentando preservar existentes...');
+        try {
+          if (orcamentoExistente.descricao) {
+            const itensExistentes = JSON.parse(orcamentoExistente.descricao);
+            if (itensExistentes.pecas || itensExistentes.servicos) {
+              // Se apenas observacoes ou motocicletaPlaca foram alterados, preservar itens
+              if (observacoes !== undefined || motocicletaPlaca !== undefined) {
+                descricaoEstruturada = {
+                  pecas: itensExistentes.pecas || [],
+                  servicos: itensExistentes.servicos || [],
+                  observacoes: observacoes !== undefined ? observacoes : (itensExistentes.observacoes || ''),
+                  motocicleta_placa: motocicletaPlaca !== undefined ? motocicletaPlaca : (itensExistentes.motocicleta_placa || null)
+                };
+                console.log('🔧 Preservando itens existentes com alterações:', JSON.stringify(descricaoEstruturada, null, 2));
+              }
+            }
+          }
+        } catch (parseError) {
+          console.log('🔧 Erro ao fazer parse dos itens existentes:', parseError.message);
+        }
       }
 
       // Construir query de atualização dinamicamente
@@ -405,16 +443,17 @@ class OrcamentoApiController {
         console.log('✅ Adicionando status:', status);
       }
 
-      // Usar valor direto se fornecido, ou valor calculado dos itens
+      // Usar valor direto se fornecido, ou valor calculado dos itens apenas se itens foram fornecidos
       if (valor !== undefined && valor !== null) {
         const valorNumerico = parseFloat(valor);
         updates.push(`valor = $${paramCount++}`);
         values.push(valorNumerico);
         console.log('✅ Adicionando valor direto:', { original: valor, convertido: valorNumerico });
-      } else if (valorCalculado !== null) {
+      } else if (valorCalculado !== null && itens) {
+        // Só usar valor calculado se itens foram explicitamente fornecidos
         updates.push(`valor = $${paramCount++}`);
         values.push(valorCalculado);
-        console.log('✅ Adicionando valor calculado:', valorCalculado);
+        console.log('✅ Adicionando valor calculado (com itens fornecidos):', valorCalculado);
       }
 
       if (descricaoEstruturada) {

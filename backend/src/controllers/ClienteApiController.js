@@ -78,7 +78,7 @@ class ClienteApiController {
       if (!/^\d{10,11}$/.test(telefone)) {
         return res.status(400).json({
           success: false,
-          message: 'Telefone inválido. Use o formato (99) 99999-9999'
+          message: 'Telefone inválido. Deve conter DDD + número: (99) 9999-9999 ou (99) 99999-9999'
         });
       }
 
@@ -200,7 +200,7 @@ class ClienteApiController {
   async update(req, res) {
     try {
       const { cpf } = req.params;
-      const { nome, sexo, endereco, telefone, email, profissao, dataDeNascimento } = req.body;
+      let { nome, sexo, endereco, telefone, email, profissao, dataDeNascimento } = req.body;
 
       // Verificar se cliente existe
       const existingCliente = await db.oneOrNone('SELECT * FROM Cliente WHERE cpf = $1', [cpf]);
@@ -260,7 +260,7 @@ class ClienteApiController {
       if (!/^\d{10,11}$/.test(telefone)) {
         return res.status(400).json({
           success: false,
-          message: 'Telefone inválido. Use o formato (99) 99999-9999'
+          message: 'Telefone inválido. Deve conter DDD + número: (99) 9999-9999 ou (99) 99999-9999'
         });
       }
 

@@ -41,6 +41,18 @@ class OrdemAjusteController {
         const cancelBtn = document.getElementById('cancelBtn');
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => this.handleCancel());
+            // Aplicar cores padrão ao botão cancelar
+            cancelBtn.style.backgroundColor = '#9ca3af';
+            cancelBtn.style.borderColor = '#9ca3af';
+            cancelBtn.style.color = '#ffffff';
+        }
+
+        const saveBtn = document.getElementById('saveBtn');
+        if (saveBtn) {
+            // Aplicar cores padrão ao botão principal de salvar
+            saveBtn.style.backgroundColor = '#FC3B56';
+            saveBtn.style.borderColor = '#FC3B56';
+            saveBtn.style.color = '#ffffff';
         }
 
         const refreshBtn = document.getElementById('refreshBtn');
@@ -657,6 +669,19 @@ class OrdemAjusteController {
         const quantidadeInput = pecaDiv.querySelector('.peca-quantidade');
         const valorInput = pecaDiv.querySelector('.peca-valor');
 
+        // Aplicar cores padrão aos botões para manter consistência
+        if (saveBtn) {
+            saveBtn.style.backgroundColor = '#FC3B56';
+            saveBtn.style.borderColor = '#FC3B56';
+            saveBtn.style.color = '#ffffff';
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.style.backgroundColor = '#9ca3af';
+            cancelBtn.style.borderColor = '#9ca3af';
+            cancelBtn.style.color = '#ffffff';
+        }
+
         let originalValues = {};
 
         // Botão Editar
@@ -677,6 +702,18 @@ class OrdemAjusteController {
             saveBtn.style.display = 'inline-block';
             cancelBtn.style.display = 'inline-block';
             removeBtn.style.display = 'none';
+            
+            // Garantir cores corretas dos botões
+            if (saveBtn) {
+                saveBtn.style.backgroundColor = '#FC3B56';
+                saveBtn.style.borderColor = '#FC3B56';
+                saveBtn.style.color = '#ffffff';
+            }
+            if (cancelBtn) {
+                cancelBtn.style.backgroundColor = '#9ca3af';
+                cancelBtn.style.borderColor = '#9ca3af';
+                cancelBtn.style.color = '#ffffff';
+            }
         });
 
         // Botão Salvar
@@ -731,6 +768,18 @@ class OrdemAjusteController {
             saveBtn.style.display = 'none';
             cancelBtn.style.display = 'none';
             removeBtn.style.display = 'inline-block';
+            
+            // Garantir cores corretas dos botões para próxima edição
+            if (saveBtn) {
+                saveBtn.style.backgroundColor = '#FC3B56';
+                saveBtn.style.borderColor = '#FC3B56';
+                saveBtn.style.color = '#ffffff';
+            }
+            if (cancelBtn) {
+                cancelBtn.style.backgroundColor = '#9ca3af';
+                cancelBtn.style.borderColor = '#9ca3af';
+                cancelBtn.style.color = '#ffffff';
+            }
 
             this.updateTotalGeral();
         });
@@ -920,7 +969,7 @@ class OrdemAjusteController {
     }
 
     redirectToList() {
-        window.location.href = '/frontend/views/os/os-consulta.html';
+        window.location.href = '/views/os/os-consulta.html';
     }
 
     showLoading(show) {

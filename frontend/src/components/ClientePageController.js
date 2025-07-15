@@ -8,6 +8,11 @@ const API_BASE_URL = 'http://localhost:3000/api';
 class ClienteController {
     constructor() {
         this.apiUrl = `${API_BASE_URL}/clientes`;
+        this.currentSort = {
+            column: 'nome',
+            direction: 'asc'
+        };
+        this.clientes = [];
         this.init();
     }
 
@@ -25,6 +30,7 @@ class ClienteController {
     initConsultaPage() {
         this.loadClientes();
         this.setupFilters();
+        this.initSortableHeaders();
     }
 
     async loadClientes() {
@@ -40,7 +46,8 @@ class ClienteController {
             const result = await response.json();
             
             if (result.success && result.data) {
-                this.renderClientes(result.data);
+                this.clientes = result.data;
+                this.renderClientes(this.clientes);
                 console.log(`✅ ${result.data.length} clientes carregados`);
             } else {
                 throw new Error(result.message || 'Erro ao carregar clientes');
@@ -63,7 +70,7 @@ class ClienteController {
         if (clientes.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px;">
+                    <td colspan="5" style="text-align: center; padding: 20px;">
                         <i class='bx bx-info-circle'></i>
                         Nenhum cliente encontrado
                     </td>
@@ -72,18 +79,15 @@ class ClienteController {
             return;
         }
 
-        tbody.innerHTML = clientes.map(cliente => `
+        // Aplicar ordenação
+        const sortedClientes = this.sortClientes(clientes);
+
+        tbody.innerHTML = sortedClientes.map(cliente => `
             <tr data-cpf="${cliente.cpf}">
                 <td>${cliente.nome}</td>
                 <td>${cliente.email}</td>
                 <td>${cliente.telefone}</td>
                 <td>${cliente.cpf}</td>
-                <td>
-                    <span class="badge ${this.getSexoBadgeClass(cliente.sexo)}">
-                        ${cliente.sexo}
-                    </span>
-                </td>
-                <td>${cliente.profissao}</td>
                 <td>
                     <div class="actions">
                         <button class="action-btn" onclick="clienteController.visualizarCliente('${cliente.cpf}')" title="Visualizar">
@@ -104,31 +108,17 @@ class ClienteController {
         `).join('');
     }
 
-    getSexoBadgeClass(sexo) {
-        const classes = {
-            'Masculino': 'male',
-            'Feminino': 'female'
-        };
-        return classes[sexo] || 'default';
-    }
-
     setupFilters() {
         const filterText = document.getElementById('filter-text');
-        const filterSexo = document.getElementById('filter-sexo');
         const clearFilters = document.getElementById('clear-filters');
 
         if (filterText) {
             filterText.addEventListener('input', () => this.applyFilters());
         }
 
-        if (filterSexo) {
-            filterSexo.addEventListener('change', () => this.applyFilters());
-        }
-
         if (clearFilters) {
             clearFilters.addEventListener('click', () => {
                 filterText.value = '';
-                filterSexo.value = '';
                 this.applyFilters();
             });
         }
@@ -136,18 +126,20 @@ class ClienteController {
 
     applyFilters() {
         const filterText = document.getElementById('filter-text')?.value.toLowerCase() || '';
-        const filterSexo = document.getElementById('filter-sexo')?.value || '';
         const rows = document.querySelectorAll('#clientes-table tbody tr');
 
         rows.forEach(row => {
             const nome = row.children[0]?.textContent.toLowerCase() || '';
             const email = row.children[1]?.textContent.toLowerCase() || '';
-            const sexo = row.children[4]?.textContent || '';
+            const telefone = row.children[2]?.textContent.toLowerCase() || '';
+            const cpf = row.children[3]?.textContent.toLowerCase() || '';
 
-            const matchText = nome.includes(filterText) || email.includes(filterText);
-            const matchSexo = !filterSexo || sexo.includes(filterSexo);
+            const matchText = nome.includes(filterText) || 
+                            email.includes(filterText) || 
+                            telefone.includes(filterText) || 
+                            cpf.includes(filterText);
 
-            row.style.display = (matchText && matchSexo) ? '' : 'none';
+            row.style.display = matchText ? '' : 'none';
         });
     }
 
@@ -621,6 +613,84 @@ class ClienteController {
         
         const cpfFormatted = cpf.replace(/\D/g, '');
         window.location.href = `clientes-ajustar.html?cpf=${cpfFormatted}`;
+    }
+
+    initSortableHeaders() {
+        const sortableHeaders = document.querySelectorAll('.sortable');
+        sortableHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.getAttribute('data-column');
+                this.sortBy(column);
+            });
+        });
+    }
+
+    sortBy(column) {
+        if (this.currentSort.column === column) {
+            this.currentSort.direction = this.currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            const header = document.querySelector(`[data-column="${column}"]`);
+            const defaultSort = header.getAttribute('data-default-sort') || 'asc';
+            this.currentSort.column = column;
+            this.currentSort.direction = defaultSort;
+        }
+
+        this.updateSortIcons();
+        this.renderClientes(this.clientes);
+    }
+
+    updateSortIcons() {
+        // Remove classes ativas de todos os ícones
+        document.querySelectorAll('.sort-icon').forEach(icon => {
+            icon.classList.remove('active');
+            icon.className = 'bx bx-sort-alt-2 sort-icon';
+        });
+        
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.classList.remove('sorted');
+        });
+
+        const currentHeader = document.querySelector(`[data-column="${this.currentSort.column}"]`);
+        if (currentHeader) {
+            const icon = currentHeader.querySelector('.sort-icon');
+            if (icon) {
+                icon.classList.add('active');
+                currentHeader.classList.add('sorted');
+
+                if (this.currentSort.direction === 'asc') {
+                    icon.className = 'bx bx-sort-up sort-icon active';
+                } else {
+                    icon.className = 'bx bx-sort-down sort-icon active';
+                }
+            }
+        }
+    }
+
+    sortClientes(clientes) {
+        return [...clientes].sort((a, b) => {
+            const column = this.currentSort.column;
+            const direction = this.currentSort.direction;
+            
+            let valueA = a[column] || '';
+            let valueB = b[column] || '';
+
+            // Normalizar strings para comparação
+            if (typeof valueA === 'string') {
+                valueA = valueA.toLowerCase();
+            }
+            if (typeof valueB === 'string') {
+                valueB = valueB.toLowerCase();
+            }
+
+            let comparison = 0;
+            if (valueA > valueB) {
+                comparison = 1;
+            } else if (valueA < valueB) {
+                comparison = -1;
+            }
+
+            return direction === 'desc' ? comparison * -1 : comparison;
+        });
     }
 }
 

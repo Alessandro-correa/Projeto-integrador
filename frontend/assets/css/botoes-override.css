@@ -1,0 +1,77 @@
+/* Sobrescrever estilos dos botões com máxima prioridade */
+
+/* Forçar cores dos botões - aplicação imediata */
+body #content .item-row .btn.save-item-btn.btn-success,
+html body #content .item-row .btn.save-item-btn.btn-success,
+body .item-row .btn.save-item-btn.btn-success {
+    background-color: #FC3B56 !important; /* Mesma cor vermelha do botão Editar */
+    background: #FC3B56 !important;
+    border-color: #FC3B56 !important;
+    border: 1px solid #FC3B56 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+body #content .item-row .btn.save-item-btn.btn-success:hover,
+body #content .item-row .btn.save-item-btn.btn-success:focus,
+body #content .item-row .btn.save-item-btn.btn-success:active,
+html body #content .item-row .btn.save-item-btn.btn-success:hover,
+html body #content .item-row .btn.save-item-btn.btn-success:focus,
+html body #content .item-row .btn.save-item-btn.btn-success:active,
+body .item-row .btn.save-item-btn.btn-success:hover,
+body .item-row .btn.save-item-btn.btn-success:focus,
+body .item-row .btn.save-item-btn.btn-success:active {
+    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    background: #D72D44 !important;
+    border-color: #D72D44 !important;
+    border: 1px solid #D72D44 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(252, 59, 86, 0.3) !important;
+}
+
+body #content .item-row .btn.cancel-item-btn.btn-secondary,
+html body #content .item-row .btn.cancel-item-btn.btn-secondary,
+body .item-row .btn.cancel-item-btn.btn-secondary {
+    background-color: #9ca3af !important; /* Cinza mais claro */
+    background: #9ca3af !important;
+    border-color: #9ca3af !important;
+    border: 1px solid #9ca3af !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+body #content .item-row .btn.cancel-item-btn.btn-secondary:hover,
+body #content .item-row .btn.cancel-item-btn.btn-secondary:focus,
+body #content .item-row .btn.cancel-item-btn.btn-secondary:active,
+html body #content .item-row .btn.cancel-item-btn.btn-secondary:hover,
+html body #content .item-row .btn.cancel-item-btn.btn-secondary:focus,
+html body #content .item-row .btn.cancel-item-btn.btn-secondary:active,
+body .item-row .btn.cancel-item-btn.btn-secondary:hover,
+body .item-row .btn.cancel-item-btn.btn-secondary:focus,
+body .item-row .btn.cancel-item-btn.btn-secondary:active {
+    background-color: #6b7280 !important;
+    background: #6b7280 !important;
+    border-color: #6b7280 !important;
+    border: 1px solid #6b7280 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3) !important;
+}
+
+/* Garantir que elementos específicos recebam as cores */
+.save-item-btn {
+    background-color: #FC3B56 !important; /* Vermelho igual ao Editar */
+    background: #FC3B56 !important;
+    border-color: #FC3B56 !important;
+    border: 1px solid #FC3B56 !important;
+    color: #ffffff !important;
+}
+
+.cancel-item-btn {
+    background-color: #9ca3af !important;
+    background: #9ca3af !important;
+    border-color: #9ca3af !important;
+    border: 1px solid #9ca3af !important;
+    color: #ffffff !important;
+}

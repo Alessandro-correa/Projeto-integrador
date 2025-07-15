@@ -4,6 +4,7 @@ class OrcamentoAjusteController {
         this.allowedStatuses = ['P']; 
         this.currentItem = null;
         this.originalData = null;
+        this.itemsModified = false; // Flag para detectar modificações em itens
         console.log('OrcamentoAjusteController inicializado');
         this.init();
     }
@@ -110,6 +111,7 @@ class OrcamentoAjusteController {
 
             this.currentItem = orcamento;
             this.originalData = { ...orcamento };
+            this.itemsModified = false; // Resetar flag ao carregar orçamento
             
             await this.populateOrcamentoData(orcamento);
             this.showForm();
@@ -365,8 +367,8 @@ class OrcamentoAjusteController {
             const itemData = {
                 id: `servico_${index}`,
                 nome: servico.descricao || 'Serviço',
-                quantidade: 1,
-                valor: servico.valor || 0,
+                quantidade: 1, // Serviços sempre têm quantidade 1
+                valor: servico.valor || 0, // Usar valor diretamente para serviços
                 tipo: 'servico'
             };
             this.addItemRowReadonly(itemData);
@@ -378,7 +380,7 @@ class OrcamentoAjusteController {
                 id: `peca_${index}`,
                 nome: peca.nome || 'Peça',
                 quantidade: peca.quantidade || 1,
-                valor: peca.valor_unitario || 0,
+                valor: peca.valor_unitario || 0, // Usar valor_unitario para peças
                 tipo: 'peca'
             };
             this.addItemRowReadonly(itemData);
@@ -447,10 +449,10 @@ class OrcamentoAjusteController {
                 </button>
             </div>
             <div class="item-actions mt-3" style="display: none;">
-                <button type="button" class="btn btn-success btn-sm save-item-btn me-2">
+                <button type="button" class="btn btn-success btn-sm save-item-btn me-2" style="background-color: #FC3B56 !important; border-color: #FC3B56 !important; color: #ffffff !important;">
                     <i class='bx bx-check'></i> Salvar
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm cancel-item-btn">
+                <button type="button" class="btn btn-secondary btn-sm cancel-item-btn" style="background-color: #9ca3af !important; border-color: #9ca3af !important; color: #ffffff !important;">
                     <i class='bx bx-x'></i> Cancelar
                 </button>
             </div>
@@ -539,6 +541,11 @@ class OrcamentoAjusteController {
                     return;
                 }
 
+                // Marcar que item foi editado
+                itemDiv.dataset.wasEdited = 'true';
+                this.itemsModified = true;
+                console.log('🔄 Item marcado como editado');
+
                 // Atualizar dataset com o novo tipo
                 itemDiv.dataset.tipo = tipo;
 
@@ -608,6 +615,8 @@ class OrcamentoAjusteController {
         if (removeBtn) {
             removeBtn.addEventListener('click', () => {
                 if (confirm('Deseja remover este item do orçamento?')) {
+                    this.itemsModified = true;
+                    console.log('🗑️ Item removido, itens marcados como modificados');
                     itemDiv.remove();
                     this.updateTotalGeral();
                 }
@@ -646,6 +655,44 @@ class OrcamentoAjusteController {
                 this.updateTotalGeral();
             }
         });
+        
+        // Aplicar estilos corretos aos botões após criação
+        const saveBtnStyle = itemDiv.querySelector('.save-item-btn');
+        const cancelBtnStyle = itemDiv.querySelector('.cancel-item-btn');
+        
+        if (saveBtnStyle) {
+            // Aplicar estilo vermelho ao botão salvar (igual ao editar)
+            saveBtnStyle.style.backgroundColor = '#FC3B56';
+            saveBtnStyle.style.borderColor = '#FC3B56';
+            saveBtnStyle.style.color = '#ffffff';
+            
+            saveBtnStyle.addEventListener('mouseenter', () => {
+                saveBtnStyle.style.backgroundColor = '#D72D44'; // Vermelho escuro no hover
+                saveBtnStyle.style.borderColor = '#D72D44';
+            });
+            
+            saveBtnStyle.addEventListener('mouseleave', () => {
+                saveBtnStyle.style.backgroundColor = '#FC3B56'; // Volta para vermelho normal
+                saveBtnStyle.style.borderColor = '#FC3B56';
+            });
+        }
+        
+        if (cancelBtnStyle) {
+            // Aplicar estilo cinza claro ao botão cancelar
+            cancelBtnStyle.style.backgroundColor = '#9ca3af';
+            cancelBtnStyle.style.borderColor = '#9ca3af';
+            cancelBtnStyle.style.color = '#ffffff';
+            
+            cancelBtnStyle.addEventListener('mouseenter', () => {
+                cancelBtnStyle.style.backgroundColor = '#6b7280';
+                cancelBtnStyle.style.borderColor = '#6b7280';
+            });
+            
+            cancelBtnStyle.addEventListener('mouseleave', () => {
+                cancelBtnStyle.style.backgroundColor = '#9ca3af';
+                cancelBtnStyle.style.borderColor = '#9ca3af';
+            });
+        }
     }
 
     updateItemTotal(itemDiv) {
@@ -782,16 +829,29 @@ class OrcamentoAjusteController {
             status: formData.get('status')
         };
 
-        // Coletar itens (peças e serviços) da interface
-        const itens = this.collectItensFromInterface();
+        // Só coletar itens se houver itens editáveis na interface
+        const itensContainer = document.getElementById('items-container');
+        let itens = null;
+        
+        if (itensContainer && itensContainer.querySelectorAll('.item-row').length > 0) {
+            // Verificar se algum item foi realmente editado/modificado
+            if (this.hasItemChanges()) {
+                itens = this.collectItensFromInterface();
+                console.log('📋 Itens foram modificados, coletando:', itens);
+            } else {
+                console.log('📋 Itens não foram modificados, não enviando');
+            }
+        }
         
         console.log('📋 Dados básicos extraídos:', basicData);
-        console.log('📋 Itens coletados:', itens);
+        console.log('📋 Enviando itens?', !!itens);
 
-        return {
-            ...basicData,
-            itens: itens
-        };
+        const result = { ...basicData };
+        if (itens && itens.length > 0) {
+            result.itens = itens;
+        }
+        
+        return result;
     }
 
     collectItensFromInterface() {
@@ -809,15 +869,23 @@ class OrcamentoAjusteController {
                 const tipo = itemElement.querySelector('.item-tipo')?.value;
                 const nome = itemElement.querySelector('.item-nome')?.value;
                 const quantidade = itemElement.querySelector('.item-quantidade')?.value;
-                const valorUnitario = itemElement.querySelector('.item-valor')?.value;
+                const valorInput = itemElement.querySelector('.item-valor')?.value;
 
-                if (tipo && nome && quantidade && valorUnitario) {
+                if (tipo && nome && quantidade && valorInput) {
                     const item = {
                         tipo: tipo,
                         nome: nome,
-                        quantidade: parseFloat(quantidade) || 1,
-                        valor_unitario: parseFloat(valorUnitario) || 0
+                        quantidade: parseFloat(quantidade) || 1
                     };
+                    
+                    // Para serviços, usar 'valor' (valor total)
+                    // Para peças, usar 'valor_unitario' (valor por unidade)
+                    if (tipo === 'servico') {
+                        item.valor = parseFloat(valorInput) || 0;
+                        item.descricao = nome; // Para compatibilidade com backend
+                    } else {
+                        item.valor_unitario = parseFloat(valorInput) || 0;
+                    }
                     
                     itens.push(item);
                     console.log(`📦 Item ${index + 1} coletado:`, item);
@@ -838,19 +906,26 @@ class OrcamentoAjusteController {
         const validadeChanged = newData.validade !== this.originalData.validade;
         const statusChanged = newData.status !== this.originalData.status;
         
+        // Verificar se há itens sendo enviados E se foram realmente modificados
+        const itensChanged = newData.itens && this.hasItemChanges();
+        
         console.log('🔍 Verificação de mudanças:', {
             valorChanged,
             validadeChanged, 
             statusChanged,
+            itensChanged,
             novoValor: newData.valor,
             valorOriginal: parseFloat(this.originalData.valor),
             novaValidade: newData.validade,
             validadeOriginal: this.originalData.validade,
             novoStatus: newData.status,
-            statusOriginal: this.originalData.status
+            statusOriginal: this.originalData.status,
+            temItens: !!newData.itens,
+            quantidadeItens: newData.itens?.length || 0,
+            itemsModifiedFlag: this.itemsModified
         });
         
-        return valorChanged || validadeChanged || statusChanged;
+        return valorChanged || validadeChanged || statusChanged || itensChanged;
     }
 
     validateData(data) {
@@ -1135,6 +1210,36 @@ class OrcamentoAjusteController {
                 this.removeNotification(notification.id);
             });
         }
+    }
+
+    hasItemChanges() {
+        // Verificar se há alguma flag indicando que itens foram modificados
+        if (this.itemsModified) {
+            console.log('🔍 Itens foram explicitamente modificados');
+            return true;
+        }
+        
+        // Verificar se há itens novos (com ID contendo '_new')
+        const itemsContainer = document.getElementById('items-container');
+        if (itemsContainer) {
+            const newItems = itemsContainer.querySelectorAll('[data-item-id*="_new"]');
+            if (newItems.length > 0) {
+                console.log('🔍 Encontrados itens novos:', newItems.length);
+                return true;
+            }
+            
+            // Verificar se algum item foi editado (tem valores diferentes dos originais)
+            const allItems = itemsContainer.querySelectorAll('.item-row');
+            for (let item of allItems) {
+                if (item.dataset.wasEdited === 'true') {
+                    console.log('🔍 Item foi marcado como editado');
+                    return true;
+                }
+            }
+        }
+        
+        console.log('🔍 Nenhuma mudança detectada nos itens');
+        return false;
     }
 
 }

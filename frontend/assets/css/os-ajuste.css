@@ -1,0 +1,325 @@
+/* Estilos padronizados para o ajuste de ordens de serviço */
+/* Baseado no padrão estabelecido em orcamento-ajuste.css */
+
+/* Container das peças */
+.peca-row,
+.pecas-container .row {
+    background-color: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.peca-row:hover,
+.pecas-container .row:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #007bff;
+}
+
+/* Estilização dos campos */
+.peca-row .form-control,
+.pecas-container .form-control {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.15s ease-in-out;
+    background-color: #ffffff;
+}
+
+.peca-row .form-control:focus,
+.pecas-container .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+.peca-row .form-control[readonly],
+.pecas-container .form-control[readonly] {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+/* Labels */
+.peca-row .form-label,
+.pecas-container .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilização geral dos botões */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+    justify-content: center;
+}
+
+/* Botão Editar (azul) */
+.btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Botão Salvar (vermelho para manter consistência) */
+.btn-success {
+    background-color: #FC3B56; /* Mesma cor vermelha do botão editar */
+    border-color: #FC3B56;
+    color: #ffffff;
+}
+
+.btn-success:hover {
+    background-color: #D72D44; /* Vermelho escuro no hover */
+    border-color: #D72D44;
+    transform: translateY(-1px);
+}
+
+/* Botão Cancelar (cinza claro) */
+.btn-secondary {
+    background-color: #9ca3af;
+    border-color: #9ca3af;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background-color: #6b7280;
+    border-color: #6b7280;
+    transform: translateY(-1px);
+}
+
+/* Botão Remover (vermelho escuro) */
+.btn-danger {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+    transform: translateY(-1px);
+}
+
+/* Estilos específicos para botões dentro das peças */
+.pecas-container .save-peca-btn,
+.peca-row .save-peca-btn {
+    background-color: #FC3B56 !important; /* Mesma cor vermelha do botão editar */
+    border-color: #FC3B56 !important;
+    color: #ffffff !important;
+}
+
+.pecas-container .save-peca-btn:hover,
+.peca-row .save-peca-btn:hover {
+    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    border-color: #D72D44 !important;
+    transform: translateY(-1px);
+}
+
+.pecas-container .cancel-peca-btn,
+.peca-row .cancel-peca-btn {
+    background-color: #9ca3af !important; /* Cinza mais claro */
+    border-color: #9ca3af !important;
+    color: #ffffff !important;
+}
+
+.pecas-container .cancel-peca-btn:hover,
+.peca-row .cancel-peca-btn:hover {
+    background-color: #6b7280 !important;
+    border-color: #6b7280 !important;
+    transform: translateY(-1px);
+}
+
+.pecas-container .edit-peca-btn,
+.peca-row .edit-peca-btn {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: #ffffff;
+}
+
+.pecas-container .edit-peca-btn:hover,
+.peca-row .edit-peca-btn:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.pecas-container .remove-peca-btn,
+.peca-row .remove-peca-btn {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+.pecas-container .remove-peca-btn:hover,
+.peca-row .remove-peca-btn:hover {
+    background-color: #b91c1c;
+    border-color: #b91c1c;
+    transform: translateY(-1px);
+}
+
+/* Garantir aplicação das cores personalizadas com alta especificidade */
+.pecas-container .btn.save-peca-btn.btn-success,
+.pecas-container .btn.btn-success.save-peca-btn,
+.peca-row .btn.save-peca-btn.btn-success,
+.peca-row .btn.btn-success.save-peca-btn,
+#content .pecas-container .btn.save-peca-btn.btn-success,
+#content .peca-row .btn.save-peca-btn.btn-success {
+    background-color: #FC3B56 !important; /* Vermelho igual ao Editar */
+    border-color: #FC3B56 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.pecas-container .btn.save-peca-btn.btn-success:hover,
+.pecas-container .btn.save-peca-btn.btn-success:focus,
+.pecas-container .btn.save-peca-btn.btn-success:active,
+.peca-row .btn.save-peca-btn.btn-success:hover,
+.peca-row .btn.save-peca-btn.btn-success:focus,
+.peca-row .btn.save-peca-btn.btn-success:active,
+.pecas-container .btn.btn-success.save-peca-btn:hover,
+.pecas-container .btn.btn-success.save-peca-btn:focus,
+.pecas-container .btn.btn-success.save-peca-btn:active,
+.peca-row .btn.btn-success.save-peca-btn:hover,
+.peca-row .btn.btn-success.save-peca-btn:focus,
+.peca-row .btn.btn-success.save-peca-btn:active,
+#content .pecas-container .btn.save-peca-btn.btn-success:hover,
+#content .pecas-container .btn.save-peca-btn.btn-success:focus,
+#content .pecas-container .btn.save-peca-btn.btn-success:active,
+#content .peca-row .btn.save-peca-btn.btn-success:hover,
+#content .peca_row .btn.save-peca-btn.btn-success:focus,
+#content .peca-row .btn.save-peca-btn.btn-success:active {
+    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    border-color: #D72D44 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(252, 59, 86, 0.3) !important;
+}
+
+.pecas-container .btn.cancel-peca-btn.btn-secondary,
+.pecas-container .btn.btn-secondary.cancel-peca-btn,
+.peca-row .btn.cancel-peca-btn.btn-secondary,
+.peca-row .btn.btn-secondary.cancel-peca-btn,
+#content .pecas-container .btn.cancel-peca-btn.btn-secondary,
+#content .peca-row .btn.cancel-peca-btn.btn-secondary {
+    background-color: #9ca3af !important; /* Cinza mais claro */
+    border-color: #9ca3af !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.pecas-container .btn.cancel-peca-btn.btn-secondary:hover,
+.pecas-container .btn.cancel-peca-btn.btn-secondary:focus,
+.pecas-container .btn.cancel-peca-btn.btn-secondary:active,
+.peca-row .btn.cancel-peca-btn.btn-secondary:hover,
+.peca_row .btn.cancel-peca-btn.btn-secondary:focus,
+.peca-row .btn.cancel-peca-btn.btn-secondary:active,
+.pecas-container .btn.btn-secondary.cancel-peca-btn:hover,
+.pecas-container .btn.btn-secondary.cancel-peca-btn:focus,
+.pecas-container .btn.btn-secondary.cancel-peca-btn:active,
+.peca-row .btn.btn-secondary.cancel-peca-btn:hover,
+.peca-row .btn.btn-secondary.cancel-peca-btn:focus,
+.peca-row .btn.btn-secondary.cancel-peca-btn:active,
+#content .pecas-container .btn.cancel-peca-btn.btn-secondary:hover,
+#content .pecas-container .btn.cancel-peca-btn.btn-secondary:focus,
+#content .pecas-container .btn.cancel-peca-btn.btn-secondary:active,
+#content .peca-row .btn.cancel-peca-btn.btn-secondary:hover,
+#content .peca_row .btn.cancel-peca-btn.btn-secondary:focus,
+#content .peca-row .btn.cancel-peca-btn.btn-secondary:active {
+    background-color: #6b7280 !important;
+    border-color: #6b7280 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3) !important;
+}
+
+/* Botões principais da ordem de serviço */
+#saveBtn.btn.btn-primary,
+.form-actions .btn.btn-primary {
+    background-color: #FC3B56 !important; /* Vermelho padrão para salvar */
+    border-color: #FC3B56 !important;
+    color: #ffffff !important;
+}
+
+#saveBtn.btn.btn-primary:hover,
+.form-actions .btn.btn-primary:hover {
+    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    border-color: #D72D44 !important;
+    transform: translateY(-1px);
+}
+
+#cancelBtn.btn.btn-secondary,
+.form-actions .btn.btn-secondary {
+    background-color: #9ca3af !important; /* Cinza claro para cancelar */
+    border-color: #9ca3af !important;
+    color: #ffffff !important;
+}
+
+#cancelBtn.btn.btn-secondary:hover,
+.form-actions .btn.btn-secondary:hover {
+    background-color: #6b7280 !important; /* Cinza escuro no hover */
+    border-color: #6b7280 !important;
+    transform: translateY(-1px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .peca-row,
+    .pecas-container .row {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 12px;
+        min-width: 70px;
+    }
+}
+
+/* Tema escuro */
+body.dark .peca-row,
+body.dark .pecas-container .row {
+    background-color: var(--dark-surface);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+body.dark .peca-row .form-control,
+body.dark .pecas-container .form-control {
+    background-color: var(--dark-surface);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+body.dark .peca-row .form-control[readonly],
+body.dark .pecas-container .form-control[readonly] {
+    background-color: var(--dark-border);
+    color: var(--dark-text-secondary);
+}
+
+body.dark .peca-row .form-label,
+body.dark .pecas-container .form-label {
+    color: var(--dark-text-primary);
+}
