@@ -1001,7 +1001,6 @@ class OrcamentoController {
         
         notification.innerHTML = `
             <div class="d-flex align-items-start">
-                <i class='bx ${this.getIconClass(type)} me-2' style="font-size: 1.2em;"></i>
                 <div class="flex-grow-1">
                     ${message.replace(/\n/g, '<br>')}
                 </div>

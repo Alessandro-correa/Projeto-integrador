@@ -190,11 +190,12 @@ class FilterController {
                 ];
             case 'motocicletas':
                 return [
-                    item.placa || '',
                     item.modelo || '',
-                    item.marca || '',
+                    item.placa || '',
+                    item.marca_nome || '',
                     item.ano || '',
-                    item.cliente || ''
+                    item.cor || '',
+                    item.cliente_nome || ''
                 ];
             case 'pecas':
                 return [

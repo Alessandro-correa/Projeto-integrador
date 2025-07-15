@@ -1,31 +1,32 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
-	<link rel="stylesheet" href="../../assets/css/usuarios.css">
 	<link rel="stylesheet" href="../../assets/css/consulta.css">
 	<title>Sistema Campos Moto Peças - Motocicletas</title>
 </head>
 <body>
+	
 	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
 		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li><a href="../../views/dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
 			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li><a href="../../views/os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../../views/orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
 			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="../../views/clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
 			<li><a href="motos-consulta.html" class="active"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
-			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
-			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+			<li><a href="../../views/marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../../views/fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+			<li><a href="../../views/pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../../views/usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
 		</ul>
 	</section>
+
 	<section id="content">
 		<nav>
 			<i class='bx bx-menu toggle-sidebar' ></i>
@@ -49,6 +50,7 @@
 				</a>
 			</div>
 		</nav>
+
 		<main>
 			<h1 class="title">Motocicletas</h1>
 			<ul class="breadcrumbs">
@@ -56,50 +58,59 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Motocicletas</a></li>
 			</ul>
+
+			<div class="filter-container">
+				<div class="filter-group">
+					<input type="text" id="filter-text" placeholder="Buscar por modelo, placa ou cor...">
+				</div>
+				<div class="filter-group">
+					<select id="filter-marca">
+						<option value="">Todas as marcas</option>
+						<!-- Marcas serão carregadas dinamicamente -->
+					</select>
+				</div>
+				<div class="filter-group">
+					<input type="number" id="filter-ano" placeholder="Filtrar por ano" min="1950" max="2030">
+				</div>
+				<div class="filter-group">
+					<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
+				</div>
+			</div>
+			
 			<div class="data">
 				<div class="content-data">
 					<div class="head">
-						<h3><i class='bx bxs-motorcycle'></i> Consulta de Motocicletas</h3>
-						<div class="menu">
-							<a href="motos-cadastro.html" class="btn-primary">
-								<i class='bx bx-plus'></i> Nova Motocicleta
-							</a>
-						</div>
+						<h3>Lista de Motocicletas</h3>
+						<a href="motos-cadastro.html" class="btn-primary">Nova Motocicleta</a>
 					</div>
-					<div class="filters">
-						<div class="filter-group">
-							<input type="text" id="filter-modelo" placeholder="Filtrar por modelo...">
-						</div>
-						<div class="filter-group">
-							<select id="filter-marca">
-								<option value="">Todas as marcas</option>
-							</select>
-						</div>
-						<div class="filter-group">
-							<input type="text" id="filter-ano" placeholder="Filtrar por ano...">
-						</div>
-						<div class="filter-group">
-							<select id="filter-status">
-								<option value="">Todos os status</option>
-								<option value="Ativo">Ativo</option>
-								<option value="Inativo">Inativo</option>
-								<option value="Manutenção">Em Manutenção</option>
-							</select>
-						</div>
-						<div class="filter-group">
-							<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
-						</div>
-					</div>
-					<div class="table-container">
+					<div class="orders">
 						<table id="motocicletas-table">
 							<thead>
 								<tr>
-									<th>Modelo</th>
-									<th>Placa</th>
-									<th>Marca</th>
-									<th>Cor</th>
-									<th>Ano</th>
-									<th>Status</th>
+									<th class="sortable" data-column="modelo" data-default-sort="asc">
+										Modelo
+										<i class='bx bx-sort-up sort-icon active'></i>
+									</th>
+									<th class="sortable" data-column="placa">
+										Placa
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="marca_nome">
+										Marca
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="ano">
+										Ano
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="cor">
+										Cor
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable" data-column="cliente_nome">
+										Cliente
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
 									<th>Ações</th>
 								</tr>
 							</thead>
@@ -113,73 +124,23 @@
 		</main>
 	</section>
 
-	<!-- Modal de Edição -->
-	<div id="editMotocicletaModal" class="modal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2><i class='bx bx-edit'></i> Editar Motocicleta</h2>
-				<span class="close" id="close-modal">&times;</span>
-			</div>
-			<div class="modal-body">
-				<form class="edit-form">
-					<div class="form-row">
-						<div class="form-group">
-							<label for="edit-modelo">Modelo</label>
-							<input type="text" id="edit-modelo" required>
-						</div>
-						<div class="form-group">
-							<label for="edit-placa">Placa</label>
-							<input type="text" id="edit-placa" required>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="form-group">
-							<label for="edit-marca">Marca</label>
-							<select id="edit-marca" required>
-								<option value="">Selecione...</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="edit-cor">Cor</label>
-							<input type="text" id="edit-cor" required>
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="form-group">
-							<label for="edit-ano">Ano</label>
-							<input type="number" id="edit-ano" min="1900" max="2030" required>
-						</div>
-						<div class="form-group">
-							<label for="edit-quilometragem">Quilometragem</label>
-							<input type="number" id="edit-quilometragem" min="0">
-						</div>
-					</div>
-					<div class="form-row">
-						<div class="form-group">
-							<label for="edit-status">Status</label>
-							<select id="edit-status" required>
-								<option value="Ativo">Ativo</option>
-								<option value="Inativo">Inativo</option>
-								<option value="Manutenção">Em Manutenção</option>
-							</select>
-						</div>
-						<div class="form-group">
-							<!-- Espaço vazio -->
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" id="cancel-edit" class="btn-secondary">Cancelar</button>
-				<button type="button" id="save-motocicleta" class="btn-primary">Salvar</button>
-			</div>
-		</div>
-	</div>
-
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-	<script type="module" src="../../assets/js/main.js"></script>
-	<script src="../../src/components/Controller.js"></script>
-	<script src="../../src/components/MotocicletaController.js"></script>
+    <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/BasePageController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
+    <script src="../../src/components/ThemeController.js"></script>
+    <script src="../../src/components/MotocicletaController.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.motocicletaController = new MotocicletaController();
+        });
+    </script>
+	<!-- Bootstrap JavaScript -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+    <script>
+        // O controller será inicializado automaticamente pelo script MotocicletaPageController.js
+        console.log('📄 Página motos-consulta.html carregada');
+    </script>
 </body>
 </html>
-

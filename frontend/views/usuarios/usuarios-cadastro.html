@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,60 +60,108 @@
 			<div class="data">
 				<div class="content-data">
 					<div class="head">
-						<h3>Novo Usuário</h3>
+						<h3><i class='bx bx-user-plus'></i> Cadastrar Novo Usuário</h3>
+						<div class="menu">
+							<a href="usuarios-consulta.html" class="btn-secondary">
+								<i class='bx bx-arrow-back'></i> Voltar
+							</a>
+						</div>
 					</div>
-					<form action="#" class="os-form">
-						<div class="form-row">
-							<div class="form-group">
-								<label for="nome">Nome Completo</label>
-								<input type="text" id="nome" name="nome" required>
+
+					<!-- Seção de cadastro -->
+					<div class="register-section">
+						<form id="register-form" class="register-form">
+							<h4><i class='bx bx-edit-alt'></i> Informações do Usuário</h4>
+							
+							<div class="form-row">
+								<div class="form-group">
+									<label for="register-nome">Nome Completo</label>
+									<input type="text" id="register-nome" name="nome" required>
+									<small>Nome completo do usuário</small>
+								</div>
+								<div class="form-group">
+									<label for="register-email">E-mail</label>
+									<input type="email" id="register-email" name="email" required>
+									<small>E-mail válido para login</small>
+								</div>
 							</div>
-							<div class="form-group">
-								<label for="email">E-mail</label>
-								<input type="email" id="email" name="email" required>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="register-cpf">CPF</label>
+									<input type="text" id="register-cpf" name="cpf" placeholder="XXX.XXX.XXX-XX" required>
+									<small>CPF do usuário</small>
+								</div>
+								<div class="form-group">
+									<label for="register-telefone">Telefone</label>
+									<input type="text" id="register-telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required>
+									<small>Telefone para contato</small>
+								</div>
 							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="cpf">CPF</label>
-								<input type="text" id="cpf" name="cpf" placeholder="XXX.XXX.XXX-XX" required>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="register-funcao">Função</label>
+									<select id="register-funcao" name="funcao" required>
+										<option value="">Selecione a função...</option>
+										<option value="Administrador">Administrador</option>
+										<option value="Mecânico">Mecânico</option>
+										<option value="Atendente">Atendente</option>
+										<option value="Secretaria">Secretaria</option>
+									</select>
+									<small>Função do usuário no sistema</small>
+								</div>
+								<div class="form-group">
+									<label for="register-codigo">Código do Usuário</label>
+									<input type="text" id="register-codigo" name="codigo" placeholder="Será gerado automaticamente" readonly>
+									<small>Código único gerado automaticamente</small>
+								</div>
 							</div>
-							<div class="form-group">
-								<label for="telefone">Telefone</label>
-								<input type="text" id="telefone" name="telefone" required>
-								<div class="error-message" id="telefoneError" style="font-size:12px;margin-top:5px;font-weight:bold;"></div>
+
+							<!-- Seção de senha -->
+							<div class="form-row">
+								<div class="form-group">
+									<label for="register-senha">Senha</label>
+									<input type="password" id="register-senha" name="senha" required minlength="6">
+									<small>Senha de acesso. Mínimo 6 caracteres.</small>
+								</div>
+								<div class="form-group">
+									<label for="register-confirm-senha">Confirmar Senha</label>
+									<input type="password" id="register-confirm-senha" name="confirmSenha" required minlength="6">
+									<small>Digite a senha novamente para confirmação</small>
+								</div>
 							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="funcao">Função</label>
-								<select id="funcao" name="funcao" required>
-									<option value="">Selecione...</option>
-									<option value="Administrador">Administrador</option>
-									<option value="Mecânico">Mecânico</option>
-									<option value="Atendente">Atendente</option>
-								</select>
+
+							<!-- Seção de observações -->
+							<div class="form-row">
+								<div class="form-group full-width">
+									<label for="register-observacoes">Observações do Cadastro</label>
+									<textarea id="register-observacoes" name="observacoes" rows="3" placeholder="Digite observações sobre este usuário (opcional)"></textarea>
+									<small>Observações adicionais sobre o usuário</small>
+								</div>
 							</div>
-							<div class="form-group">
-								<label for="senha">Senha</label>
-								<input type="password" id="senha" name="senha" required>
+
+							<div class="form-actions">
+								<button type="submit" class="btn-primary">
+									<i class='bx bx-save'></i> Cadastrar Usuário
+								</button>
+								<button type="button" id="btn-clear" class="btn-secondary">
+									<i class='bx bx-x'></i> Limpar Formulário
+								</button>
+								<button type="button" id="btn-generate-code" class="btn-warning">
+									<i class='bx bx-refresh'></i> Gerar Novo Código
+								</button>
 							</div>
-						</div>
-						<div class="form-group">
-							<label for="codigo">Código</label>
-							<input type="text" id="codigo" name="codigo" readonly>
-						</div>
-						<div class="form-actions">
-							<button type="submit" class="btn-primary">Cadastrar Usuário</button>
-							<a href="usuarios-consulta.html" class="btn-secondary">Cancelar</a>
-						</div>
-					</form>
+						</form>
+					</div>
 				</div>
 			</div>
 		</main>
 	</section>
+
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
-	<script src="../../src/components/UsuarioController.js"></script>
+	<script src="../../src/components/BasePageController.js"></script>
+	<script src="../../src/components/UsuarioCadastroController.js"></script>
 </body>
 </html>

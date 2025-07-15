@@ -1,47 +1,97 @@
 class MotocicletaController {
     constructor() {
+        console.log('[MotocicletaController] Controller carregado');
         this.baseURL = 'http://localhost:3000/api/motocicletas';
         this.marcasURL = 'http://localhost:3000/api/marcas';
         this.motocicletas = [];
         this.marcas = [];
         this.init();
+        this.sortColumn = 'modelo';
+        this.sortDirection = 'asc';
     }
 
     init() {
         this.bindEvents();
         this.loadMotocicletas();
         this.loadMarcas();
+        this.setupSortEvents();
+    }
+
+    setupSortEvents() {
+        const table = document.getElementById('motocicletas-table');
+        if (!table) return;
+        const headers = table.querySelectorAll('th.sortable');
+        headers.forEach(th => {
+            th.addEventListener('click', () => {
+                const column = th.getAttribute('data-column');
+                if (this.sortColumn === column) {
+                    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    this.sortColumn = column;
+                    this.sortDirection = 'asc';
+                }
+                this.renderTable();
+                this.updateSortIcons();
+            });
+        });
+    }
+
+    updateSortIcons() {
+        const table = document.getElementById('motocicletas-table');
+        if (!table) return;
+        const headers = table.querySelectorAll('th.sortable');
+        headers.forEach(th => {
+            const icon = th.querySelector('.sort-icon');
+            const column = th.getAttribute('data-column');
+            if (!icon) return;
+            icon.classList.remove('active');
+            icon.classList.remove('bx-sort-up', 'bx-sort-down', 'bx-sort-alt-2');
+            if (this.sortColumn === column) {
+                icon.classList.add('active');
+                icon.classList.add(this.sortDirection === 'asc' ? 'bx-sort-up' : 'bx-sort-down');
+            } else {
+                icon.classList.add('bx-sort-alt-2');
+            }
+        });
     }
 
     bindEvents() {
-        
-        document.getElementById('filter-modelo').addEventListener('input', () => this.aplicarFiltros());
-        document.getElementById('filter-marca').addEventListener('change', () => this.aplicarFiltros());
-        document.getElementById('filter-ano').addEventListener('input', () => this.aplicarFiltros());
-        document.getElementById('filter-status').addEventListener('change', () => this.aplicarFiltros());
-        document.getElementById('clear-filters').addEventListener('click', () => this.limparFiltros());
-
-        document.getElementById('editMotocicletaModal').addEventListener('click', (e) => {
-            if (e.target.id === 'editMotocicletaModal') {
-                this.fecharModal();
-            }
-        });
-
-        document.getElementById('close-modal').addEventListener('click', () => this.fecharModal());
-        document.getElementById('cancel-edit').addEventListener('click', () => this.fecharModal());
-        document.getElementById('save-motocicleta').addEventListener('click', () => this.salvarEdicao());
+        const filterText = document.getElementById('filter-text');
+        if (filterText) filterText.addEventListener('input', () => this.aplicarFiltros());
+        const filterMarca = document.getElementById('filter-marca');
+        if (filterMarca) filterMarca.addEventListener('change', () => this.aplicarFiltros());
+        const filterAno = document.getElementById('filter-ano');
+        if (filterAno) filterAno.addEventListener('input', () => this.aplicarFiltros());
+        const clearFilters = document.getElementById('clear-filters');
+        if (clearFilters) clearFilters.addEventListener('click', () => this.limparFiltros());
+        // Só adiciona eventos de edição se os elementos existirem (para evitar erro na página de consulta)
+        const editModal = document.getElementById('editMotocicletaModal');
+        if (editModal) {
+            editModal.addEventListener('click', (e) => {
+                if (e.target.id === 'editMotocicletaModal') {
+                    this.fecharModal();
+                }
+            });
+        }
+        const closeModal = document.getElementById('close-modal');
+        if (closeModal) closeModal.addEventListener('click', () => this.fecharModal());
+        const cancelEdit = document.getElementById('cancel-edit');
+        if (cancelEdit) cancelEdit.addEventListener('click', () => this.fecharModal());
+        const saveMotocicleta = document.getElementById('save-motocicleta');
+        if (saveMotocicleta) saveMotocicleta.addEventListener('click', () => this.salvarEdicao());
     }
 
     async loadMotocicletas() {
         try {
             const response = await fetch(this.baseURL);
             if (!response.ok) throw new Error('Erro ao carregar motocicletas');
-            
-            this.motocicletas = await response.json();
+            const result = await response.json();
+            console.log('[MotocicletaController] Dados recebidos da API:', result);
+            this.motocicletas = result.data || [];
             this.renderTable();
             this.showNotification('Motocicletas carregadas com sucesso!', 'success');
         } catch (error) {
-            console.error('Erro ao carregar motocicletas:', error);
+            console.error('[MotocicletaController] Erro ao carregar motocicletas:', error);
             this.showNotification('Erro ao carregar motocicletas', 'error');
         }
     }
@@ -77,12 +127,10 @@ class MotocicletaController {
 
     renderTable() {
         const tbody = document.querySelector('#motocicletas-table tbody');
-        
         if (!tbody) {
-            console.error('Tabela de motocicletas não encontrada');
+            console.error('[MotocicletaController] Tabela de motocicletas não encontrada');
             return;
         }
-
         if (this.motocicletas.length === 0) {
             tbody.innerHTML = `
                 <tr>
@@ -94,37 +142,46 @@ class MotocicletaController {
             `;
             return;
         }
-
-        tbody.innerHTML = this.motocicletas.map(moto => `
-            <tr data-id="${moto.id}">
+        // Ordenação dinâmica
+        const motosOrdenadas = [...this.motocicletas].sort((a, b) => {
+            let valA = a[this.sortColumn] || '';
+            let valB = b[this.sortColumn] || '';
+            // Para ano, ordenar como número
+            if (this.sortColumn === 'ano') {
+                valA = parseInt(valA) || 0;
+                valB = parseInt(valB) || 0;
+            } else {
+                valA = valA.toString().toLowerCase();
+                valB = valB.toString().toLowerCase();
+            }
+            if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+            if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+        tbody.innerHTML = motosOrdenadas.map(moto => `
+            <tr data-id="${moto.placa}">
                 <td>${moto.modelo}</td>
                 <td>${moto.placa}</td>
-                <td>${this.getMarcaNome(moto.marca_id)}</td>
-                <td>${moto.cor}</td>
+                <td>${moto.marca_nome || 'Não informado'}</td>
                 <td>${moto.ano}</td>
-                <td>
-                    <span class="badge ${this.getStatusBadgeClass(moto.status)}">
-                        ${moto.status || 'Ativo'}
-                    </span>
-                </td>
+                <td>${moto.cor}</td>
+                <td>${moto.cliente_nome || ''}</td>
                 <td>
                     <div class="actions">
-                        <button class="btn-edit" onclick="motocicletaController.editarMotocicleta(${moto.id})" title="Editar">
+                        <button class="action-btn" title="Visualizar" onclick="motocicletaController.visualizarMotocicleta('${moto.placa}')">
+                            <i class='bx bx-show'></i>
+                        </button>
+                        <button class="action-btn" title="Editar" onclick="motocicletaController.ajustarMotocicleta('${moto.placa}')">
                             <i class='bx bx-edit'></i>
                         </button>
-                        <button class="btn-adjust" onclick="motocicletaController.ajustarMotocicleta('${moto.placa}')" title="Ajustar">
-                            <i class='bx bx-cog'></i>
-                        </button>
-                        <button class="btn-delete" onclick="motocicletaController.confirmarExclusao(${moto.id}, '${moto.modelo}')" title="Excluir">
+                        <button class="action-btn" title="Excluir" onclick="motocicletaController.confirmarExclusao('${moto.placa}', '${moto.modelo}')">
                             <i class='bx bx-trash'></i>
-                        </button>
-                        <button class="btn-view" onclick="motocicletaController.visualizarMotocicleta(${moto.id})" title="Visualizar">
-                            <i class='bx bx-show'></i>
                         </button>
                     </div>
                 </td>
             </tr>
         `).join('');
+        this.updateSortIcons();
     }
 
     getMarcaNome(marcaId) {
@@ -142,30 +199,28 @@ class MotocicletaController {
     }
 
     aplicarFiltros() {
-        const filtros = {
-            modelo: document.getElementById('filter-modelo').value.toLowerCase(),
-            marca: document.getElementById('filter-marca').value,
-            ano: document.getElementById('filter-ano').value,
-            status: document.getElementById('filter-status').value
-        };
-
+        const texto = document.getElementById('filter-text').value.toLowerCase();
+        const marca = document.getElementById('filter-marca').value;
+        const ano = document.getElementById('filter-ano').value;
+        // Filtro único de texto: modelo, placa ou cor
         const motocicletasFiltradas = this.motocicletas.filter(moto => {
-            return (!filtros.modelo || moto.modelo.toLowerCase().includes(filtros.modelo)) &&
-                   (!filtros.marca || moto.marca_id.toString() === filtros.marca) &&
-                   (!filtros.ano || moto.ano.toString().includes(filtros.ano)) &&
-                   (!filtros.status || (moto.status || 'Ativo') === filtros.status);
+            const textoMatch = !texto ||
+                (moto.modelo && moto.modelo.toLowerCase().includes(texto)) ||
+                (moto.placa && moto.placa.toLowerCase().includes(texto)) ||
+                (moto.cor && moto.cor.toLowerCase().includes(texto));
+            const marcaMatch = !marca || (moto.marca_nome && moto.marca_nome === marca);
+            const anoMatch = !ano || (moto.ano && moto.ano.toString().includes(ano));
+            return textoMatch && marcaMatch && anoMatch;
         });
-
         this.renderFilteredTable(motocicletasFiltradas);
     }
 
     renderFilteredTable(motocicletas) {
         const tbody = document.querySelector('#motocicletas-table tbody');
-        
         if (motocicletas.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px;">
+                    <td colspan="8" style="text-align: center; padding: 20px;">
                         <i class='bx bx-search'></i>
                         Nenhuma motocicleta encontrada com os filtros aplicados
                     </td>
@@ -173,32 +228,25 @@ class MotocicletaController {
             `;
             return;
         }
-
         tbody.innerHTML = motocicletas.map(moto => `
-            <tr data-id="${moto.id}">
+            <tr data-id="${moto.placa}">
                 <td>${moto.modelo}</td>
                 <td>${moto.placa}</td>
-                <td>${this.getMarcaNome(moto.marca_id)}</td>
-                <td>${moto.cor}</td>
+                <td>${moto.marca_nome || 'Não informado'}</td>
                 <td>${moto.ano}</td>
-                <td>
-                    <span class="badge ${this.getStatusBadgeClass(moto.status)}">
-                        ${moto.status || 'Ativo'}
-                    </span>
-                </td>
+                <td>${moto.cor}</td>
+                <td>${moto.cilindrada || ''}</td>
+                <td>${moto.cliente_cpf || ''}</td>
                 <td>
                     <div class="actions">
-                        <button class="btn-edit" onclick="motocicletaController.editarMotocicleta(${moto.id})" title="Editar">
+                        <button class="action-btn" title="Visualizar" onclick="motocicletaController.visualizarMotocicleta('${moto.placa}')">
+                            <i class='bx bx-show'></i>
+                        </button>
+                        <button class="action-btn" title="Editar" onclick="motocicletaController.ajustarMotocicleta('${moto.placa}')">
                             <i class='bx bx-edit'></i>
                         </button>
-                        <button class="btn-adjust" onclick="motocicletaController.ajustarMotocicleta('${moto.placa}')" title="Ajustar">
-                            <i class='bx bx-cog'></i>
-                        </button>
-                        <button class="btn-delete" onclick="motocicletaController.confirmarExclusao(${moto.id}, '${moto.modelo}')" title="Excluir">
+                        <button class="action-btn" title="Excluir" onclick="motocicletaController.confirmarExclusao('${moto.placa}', '${moto.modelo}')">
                             <i class='bx bx-trash'></i>
-                        </button>
-                        <button class="btn-view" onclick="motocicletaController.visualizarMotocicleta(${moto.id})" title="Visualizar">
-                            <i class='bx bx-show'></i>
                         </button>
                     </div>
                 </td>
@@ -283,39 +331,110 @@ class MotocicletaController {
             const response = await fetch(`${this.baseURL}/${id}`, {
                 method: 'DELETE'
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Erro ao excluir motocicleta');
+            const result = await response.json();
+            if (result.success) {
+                this.showNotification('Motocicleta excluída com sucesso!', 'success');
+                this.loadMotocicletas();
+            } else {
+                // Verifica se é erro de FK
+                if (result.error && result.error.includes('ordem_de_servico_motocicleta_placa_fkey')) {
+                    this.showNotification('Não é possível excluir uma motocicleta vinculada a uma ordem de serviço.', 'error');
+                } else {
+                    this.showNotification(result.message || 'Erro ao excluir motocicleta', 'error');
+                }
             }
-
-            this.showNotification('Motocicleta excluída com sucesso!', 'success');
-            this.loadMotocicletas();
-
         } catch (error) {
-            console.error('Erro ao excluir motocicleta:', error);
-            this.showNotification(error.message || 'Erro ao excluir motocicleta', 'error');
+            if (error.message && error.message.includes('ordem_de_servico_motocicleta_placa_fkey')) {
+                this.showNotification('Não é possível excluir uma motocicleta vinculada a uma ordem de serviço.', 'error');
+            } else {
+                this.showNotification('Erro ao excluir motocicleta', 'error');
+            }
         }
     }
 
-    visualizarMotocicleta(id) {
-        const motocicleta = this.motocicletas.find(m => m.id === id);
+    visualizarMotocicleta(placa) {
+        const motocicleta = this.motocicletas.find(m => m.placa === placa);
         if (!motocicleta) {
             this.showNotification('Motocicleta não encontrada', 'error');
             return;
         }
+        this.mostrarModalVisualizacao(motocicleta);
+    }
 
-        const detalhes = `
-            Modelo: ${motocicleta.modelo}
-            Placa: ${motocicleta.placa}
-            Marca: ${this.getMarcaNome(motocicleta.marca_id)}
-            Cor: ${motocicleta.cor}
-            Ano: ${motocicleta.ano}
-            Quilometragem: ${motocicleta.quilometragem || 'Não informado'} km
-            Status: ${motocicleta.status || 'Ativo'}
+    mostrarModalVisualizacao(motocicleta) {
+        // Remove modal anterior se existir
+        const modalExistente = document.getElementById('modal-visualizar-moto');
+        if (modalExistente) modalExistente.remove();
+
+        const modalHtml = `
+            <div id="modal-visualizar-moto" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Detalhes da Motocicleta</h3>
+                        <button class="modal-close" onclick="document.getElementById('modal-visualizar-moto').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="basic-info">
+                            <p><strong>Modelo:</strong> ${motocicleta.modelo || 'N/A'}</p>
+                            <p><strong>Placa:</strong> ${motocicleta.placa || 'N/A'}</p>
+                            <p><strong>Marca:</strong> ${motocicleta.marca_nome || this.getMarcaNome(motocicleta.marca_id) || 'N/A'}</p>
+                            <p><strong>Ano:</strong> ${motocicleta.ano || 'N/A'}</p>
+                            <p><strong>Cor:</strong> ${motocicleta.cor || 'N/A'}</p>
+                            <p><strong>Cilindrada:</strong> ${motocicleta.cilindrada || 'N/A'}</p>
+                            <p><strong>Cliente:</strong> ${motocicleta.cliente_nome || 'N/A'}</p>
+                            <p><strong>CPF do Cliente:</strong> ${motocicleta.cliente_cpf || 'N/A'}</p>
+                        </div>
+                        <style>
+                            #modal-visualizar-moto .modal-content {
+                                max-width: 400px;
+                                margin: 40px auto;
+                                background: #fff;
+                                border-radius: 10px;
+                                box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+                                padding: 0;
+                                overflow: hidden;
+                            }
+                            #modal-visualizar-moto .modal-header {
+                                background: #22223b;
+                                color: #fff;
+                                padding: 16px 24px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                            }
+                            #modal-visualizar-moto .modal-body {
+                                padding: 24px;
+                            }
+                            #modal-visualizar-moto .basic-info p {
+                                margin: 8px 0;
+                                font-size: 16px;
+                            }
+                            #modal-visualizar-moto .modal-close {
+                                background: none;
+                                border: none;
+                                color: #fff;
+                                font-size: 28px;
+                                cursor: pointer;
+                            }
+                            #modal-visualizar-moto .modal-overlay {
+                                position: fixed;
+                                top: 0; left: 0; right: 0; bottom: 0;
+                                background: rgba(0,0,0,0.3);
+                                z-index: 9999;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                            }
+                        </style>
+                    </div>
+                </div>
+            </div>
         `;
-
-        alert(detalhes);
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // Fechar ao clicar fora do modal
+        document.getElementById('modal-visualizar-moto').addEventListener('click', function(e) {
+            if (e.target === this) this.remove();
+        });
     }
 
     ajustarMotocicleta(placa) {

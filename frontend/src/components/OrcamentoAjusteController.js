@@ -1131,20 +1131,13 @@ class OrcamentoAjusteController {
 
         if (!title) {
             const titles = {
-                success: 'Sucesso!',
-                error: 'Erro!',
-                warning: 'Atenção!',
+                success: 'Sucesso',
+                error: 'Erro',
+                warning: 'Atenção',
                 info: 'Informação'
             };
             title = titles[type] || 'Notificação';
         }
-
-        const icons = {
-            success: 'bx-check-circle',
-            error: 'bx-error-circle',
-            warning: 'bx-error',
-            info: 'bx-info-circle'
-        };
 
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
@@ -1153,14 +1146,11 @@ class OrcamentoAjusteController {
         notification.id = notificationId;
 
         notification.innerHTML = `
-            <i class='bx ${icons[type]} notification-icon'></i>
             <div class="notification-content">
                 <div class="notification-title">${title}</div>
                 <div class="notification-message">${message}</div>
             </div>
-            <button class="notification-close" onclick="window.closeNotification('${notificationId}')">
-                <i class='bx bx-x'></i>
-            </button>
+            <button class="notification-close" onclick="window.closeNotification('${notificationId}')">X</button>
             <div class="notification-progress" style="width: 100%;"></div>
         `;
 

@@ -1,47 +1,41 @@
 /**
- * MOTOCICLETA AJUSTE CONTROLLER
- * Responsável pela edição de motocicletas
- * Baseado no padrão OrdemAjusteController para padronização
+ * MOTOCICLETA CADASTRO CONTROLLER
+ * Responsável pelo cadastro de novas motocicletas
+ * Baseado no padrão OrdemCadastroController
  */
 
-console.log('[MotocicletaAjusteController.js] Script carregado!');
-
-class MotocicletaAjusteController extends BasePageController {
+class MotocicletaCadastroController extends BasePageController {
     constructor() {
         super();
-        this.baseURL = 'http://localhost:3000/api';
         this.apiUrl = `${this.baseURL}/motocicletas`;
         this.clientesApiUrl = `${this.baseURL}/clientes`;
         this.marcasApiUrl = `${this.baseURL}/marcas`;
-        this.currentItem = null;
-        this.originalData = null;
         this.blockFurtherProcessing = false;
-        this.form = document.getElementById('ajusteForm');
+        this.form = document.getElementById('cadastroMotoForm');
         this.clienteSelect = document.getElementById('cliente_cpf');
         this.marcaSelect = document.getElementById('marca_id');
-        // Flags de carregamento
-        this._clientesLoaded = false;
-        this._marcasLoaded = false;
-        this._motoLoaded = false;
         this.init();
     }
 
     init() {
-        this.setupEventListeners();
+        // Sobrescrever init do BasePageController para evitar conflitos
+        this.setupFormSubmission();
         this.setupFormValidation();
         this.setupFieldMasks();
         this.loadClientes();
         this.loadMarcas();
+        
+        // Garantir que o método de notificação correto seja usado
         this.ensureCorrectNotificationMethod();
         
-        // Carregar dados da motocicleta da URL
-        setTimeout(() => this.loadMotocicletaFromURL(), 100);
+        // Configurações específicas do formulário
+        this.addFormEnhancements();
         
-        console.log('✅ MotocicletaAjusteController inicializado');
+        console.log('✅ MotocicletaCadastroController inicializado');
     }
 
     ensureCorrectNotificationMethod() {
-        // Garantir que usamos o método de notificação avançado
+        // Garantir que usamos o método de notificação avançado, não o do BasePageController
         this.originalShowAdvancedNotification = this.showAdvancedNotification.bind(this);
         this.showNotification = (message, type, title, duration) => {
             if (this.blockFurtherProcessing && (type === 'error' || type === 'warning')) {
@@ -52,10 +46,12 @@ class MotocicletaAjusteController extends BasePageController {
             return this.originalShowAdvancedNotification(message, type, title, duration);
         };
         
+        // Verificar se o CSS de notificações está carregado
         this.ensureNotificationStyles();
     }
 
     ensureNotificationStyles() {
+        // Verificar se o CSS de ajuste está carregado
         const ajusteCss = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
             .find(link => link.href.includes('ajuste.css'));
         
@@ -67,154 +63,80 @@ class MotocicletaAjusteController extends BasePageController {
             document.head.appendChild(link);
         }
         
+        // Limpar qualquer notificação do BasePageController que possa estar presente
         const oldNotifications = document.querySelectorAll('.notification:not([id^="notification-"])');
         oldNotifications.forEach(notification => notification.remove());
     }
 
-    setupEventListeners() {
-        if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        }
-
-        const cancelBtn = document.getElementById('cancelBtn');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => this.handleCancel());
-            cancelBtn.style.backgroundColor = '#9ca3af';
-            cancelBtn.style.borderColor = '#9ca3af';
-            cancelBtn.style.color = '#ffffff';
-        }
-
-        const saveBtn = document.getElementById('saveBtn');
-        if (saveBtn) {
-            saveBtn.style.backgroundColor = '#10b981';
-            saveBtn.style.borderColor = '#10b981';
-            saveBtn.style.color = '#ffffff';
-        }
-    }
-
-    async loadMotocicletaFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const placa = urlParams.get('placa');
+    addFormEnhancements() {
+        // Adicionar validação em tempo real aos campos obrigatórios
+        const requiredFields = this.form?.querySelectorAll('input[required], select[required], textarea[required]');
         
-        if (!placa) {
-            this.showNotification('Parâmetro placa não encontrado na URL', 'error', 'Erro!', 8000);
-            setTimeout(() => {
-                window.location.href = 'motos-consulta.html';
-            }, 2000);
-            return;
-        }
-
-        await this.loadMotocicleta(placa);
-    }
-
-    async loadMotocicleta(placa) {
-        try {
-            console.log('[MotocicletaAjusteController] Iniciando carregamento da motocicleta:', placa);
-            this.showLoading('Carregando dados da motocicleta...');
-
-            const response = await fetch(`${this.apiUrl}/${placa}`);
+        requiredFields?.forEach(field => {
+            field.addEventListener('blur', () => {
+                this.validateField(field);
+            });
             
-            if (!response.ok) {
-                if (response.status === 404) {
-                    throw new Error('Motocicleta não encontrada');
+            field.addEventListener('input', () => {
+                if (field.style.borderColor === 'rgb(244, 67, 54)') {
+                    field.style.borderColor = '';
                 }
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.success && result.data) {
-                this.currentItem = result.data;
-                this.originalData = { ...result.data };
-                this._motoLoaded = true;
-                // Se já carregou os clientes, setar o cliente no select
-                if (this._clientesLoaded && this.clienteSelect && result.data.cliente_cpf) {
-                    this.clienteSelect.value = result.data.cliente_cpf;
-                }
-                console.log('[MotocicletaAjusteController] Motocicleta carregada:', result.data);
-                this.tryShowForm();
-                this.showNotification('Dados carregados com sucesso', 'success', 'Sucesso!', 3000);
-            } else {
-                throw new Error(result.message || 'Falha ao carregar motocicleta');
-            }
-
-        } catch (error) {
-            console.error('❌ Erro ao carregar motocicleta:', error);
-            this.showNotification(error.message || 'Erro ao carregar motocicleta', 'error', 'Erro!', 8000);
-            
-            setTimeout(() => {
-                window.location.href = 'motos-consulta.html';
-            }, 2000);
-        } finally {
-            this.hideLoading();
-        }
-    }
-
-    populateForm(data) {
-        // Preencher campos do formulário
-        const fields = ['placa', 'ano', 'cor', 'cilindrada'];
-        fields.forEach(field => {
-            const element = document.getElementById(field);
-            if (element) {
-                element.value = data[field] || '';
-            }
+            });
         });
-        // Preencher modelo apenas com o modelo puro (remover marca se vier junto)
-        const modeloInput = document.getElementById('modelo');
-        if (modeloInput) {
-            let modelo = data.modelo || '';
-            // Se modelo vier no formato 'Marca Modelo', remover a marca se possível
-            if (data.marca_nome && modelo.toLowerCase().startsWith(data.marca_nome.toLowerCase())) {
-                modelo = modelo.substring(data.marca_nome.length).trim();
-            }
-            modeloInput.value = modelo;
+
+        // Configurar ano (apenas anos válidos)
+        const anoInput = document.getElementById('ano');
+        if (anoInput) {
+            const anoAtual = new Date().getFullYear();
+            anoInput.setAttribute('min', '1950');
+            anoInput.setAttribute('max', anoAtual.toString());
         }
 
-        // Aguardar carregamento dos selects
-        setTimeout(() => {
-            if (this.clienteSelect && data.cliente_cpf) {
-                this.clienteSelect.value = data.cliente_cpf;
-            }
-            // Selecionar marca pelo id
-            if (this.marcaSelect && data.marca_id) {
-                this.marcaSelect.value = data.marca_id;
-            }
-        }, 500);
-
-        // Campo placa deve ser readonly para edição
-        const placaInput = document.getElementById('placa');
-        if (placaInput) {
-            placaInput.readOnly = true;
-            placaInput.style.backgroundColor = '#f3f4f6';
+        // Configurar quilometragem (apenas números)
+        const kmInput = document.getElementById('quilometragem');
+        if (kmInput) {
+            kmInput.addEventListener('input', (e) => {
+                // Remove caracteres não numéricos
+                let value = e.target.value.replace(/\D/g, '');
+                // Limita a 7 dígitos (9999999 km)
+                if (value.length > 7) value = value.slice(0, 7);
+                e.target.value = value;
+            });
         }
     }
 
-    async handleSubmit(event) {
-        event.preventDefault();
-        
+    setupFormSubmission() {
+        if (this.form) {
+            this.form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleFormSubmit();
+            });
+        }
+    }
+
+    async handleFormSubmit() {
         try {
-            console.log('🚀 INICIANDO PROCESSO DE ATUALIZAÇÃO');
+            console.log('🚀 INICIANDO PROCESSO DE CADASTRO DE MOTOCICLETA');
+            console.log('🧹 Limpando notificações anteriores...');
+            
+            // Limpar TODAS as notificações antes de começar
             this.clearAllNotifications();
             this.removeOldNotifications();
             
             const formData = this.getFormData();
             
+            // Validação básica
             if (!this.validateFormBasic(formData)) {
                 return;
             }
 
-            // Verificar se houve mudanças
-            if (!this.hasChanges(formData)) {
-                this.showNotification('Nenhuma alteração foi feita', 'warning', 'Aviso!', 5000);
-                return;
-            }
+            // Mostrar loading
+            this.showLoading('Cadastrando motocicleta...');
 
-            this.showLoading('Atualizando motocicleta...');
+            console.log('📤 Enviando dados da motocicleta:', formData);
 
-            console.log('📤 Enviando dados atualizados:', formData);
-
-            const response = await fetch(`${this.apiUrl}/${this.currentItem.placa}`, {
-                method: 'PUT',
+            const response = await fetch(this.apiUrl, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -223,19 +145,24 @@ class MotocicletaAjusteController extends BasePageController {
 
             const result = await response.json();
             
+            // Limpar todas as notificações anteriores antes de processar a resposta
             this.clearAllNotifications();
             this.removeOldNotifications();
             
             console.log('📡 Resposta da API:');
             console.log('Status:', response.status);
+            console.log('OK:', response.ok);
             console.log('Result:', result);
 
+            // Processar resultado
             if (response.ok && result.success) {
-                console.log('✅ SUCESSO: Motocicleta atualizada!');
-                this.showNotification('Motocicleta atualizada com sucesso!', 'success', 'Sucesso!', 8000);
+                console.log('✅ SUCESSO: Motocicleta cadastrada corretamente!');
+                this.showNotification('Motocicleta cadastrada com sucesso!', 'success', 'Sucesso!', 8000);
                 
+                // Bloquear qualquer processamento adicional
                 this.blockFurtherProcessing = true;
                 
+                this.clearForm();
                 setTimeout(() => {
                     window.location.href = 'motos-consulta.html';
                 }, 2000);
@@ -243,20 +170,32 @@ class MotocicletaAjusteController extends BasePageController {
                 return;
                 
             } else {
-                console.log('❌ ERRO: Falha na atualização');
+                console.log('❌ ERRO: Falha no cadastro');
                 
-                const errorMessage = result.message || 'Erro ao atualizar motocicleta';
+                // Tratar erros específicos do servidor
+                const errorMessage = result.message || 'Erro ao cadastrar motocicleta';
                 console.log('❌ Mensagem processada:', errorMessage);
                 
-                this.showNotification(errorMessage, 'error', 'Erro!', 8000);
+                if (errorMessage.toLowerCase().includes('placa') && errorMessage.toLowerCase().includes('já')) {
+                    console.log('❌ DETECTADO: Erro de placa duplicada');
+                    this.showNotification('Esta placa já está cadastrada no sistema', 'error', 'Placa Duplicada!', 8000);
+                    this.focusField('placa');
+                } else if (errorMessage.toLowerCase().includes('placa') && errorMessage.toLowerCase().includes('inválida')) {
+                    console.log('❌ DETECTADO: Erro de placa inválida');
+                    this.showNotification('Placa inválida. Use o formato ABC-1234 ou ABC1234', 'error', 'Placa Inválida!', 8000);
+                    this.focusField('placa');
+                } else {
+                    console.log('❌ DETECTADO: Erro genérico');
+                    this.showNotification(errorMessage, 'error', 'Erro!', 8000);
+                }
             }
 
         } catch (error) {
-            console.error('Erro ao atualizar motocicleta:', error);
+            console.error('Erro ao cadastrar motocicleta:', error);
             if (error.message.includes('Failed to fetch')) {
                 this.showNotification('Erro de conexão. Verifique se o servidor está funcionando.', 'error', 'Conexão Falhou!', 8000);
             } else {
-                this.showNotification(`${error.message || 'Erro inesperado ao atualizar motocicleta'}`, 'error', 'Erro!', 8000);
+                this.showNotification(`${error.message || 'Erro inesperado ao cadastrar motocicleta'}`, 'error', 'Erro!', 8000);
             }
         } finally {
             this.hideLoading();
@@ -266,7 +205,7 @@ class MotocicletaAjusteController extends BasePageController {
     getFormData() {
         return {
             placa: document.getElementById('placa')?.value.trim().toUpperCase() || '',
-            modelo: document.getElementById('modelo')?.value.trim() || '', // modelo puro
+            modelo: document.getElementById('modelo')?.value.trim() || '',
             marca_id: document.getElementById('marca_id')?.value || '',
             ano: document.getElementById('ano')?.value || '',
             cor: document.getElementById('cor')?.value.trim() || '',
@@ -275,51 +214,54 @@ class MotocicletaAjusteController extends BasePageController {
         };
     }
 
-    hasChanges(formData) {
-        if (!this.originalData) return true;
-        
-        const fieldsToCheck = ['modelo', 'marca_id', 'ano', 'cor', 'cilindrada', 'cliente_cpf'];
-        
-        return fieldsToCheck.some(field => {
-            const originalValue = this.originalData[field]?.toString() || '';
-            const currentValue = formData[field]?.toString() || '';
-            return originalValue !== currentValue;
-        });
-    }
-
     validateFormBasic(data) {
         console.log('🔍 Validação básica de formulário de motocicleta');
         
-        const requiredFields = ['placa', 'modelo', 'marca_id', 'ano', 'cor', 'cilindrada', 'clienteCpf'];
+        // Validar campos obrigatórios
+        const requiredFields = ['placa', 'modelo', 'marca_id', 'ano', 'cor', 'clienteCpf'];
         
         for (const field of requiredFields) {
             if (!data[field]) {
                 this.showNotification(`O campo ${this.getFieldLabel(field)} é obrigatório`, 'warning', 'Campo Obrigatório!', 8000);
-                this.focusField(field === 'clienteCpf' ? 'cliente_cpf' : field);
+                this.focusField(field);
                 return false;
             }
         }
-        // Verificação extra para clienteCpf
-        if (!data.clienteCpf) {
-            this.showNotification('Selecione um cliente válido.', 'error', 'Cliente obrigatório!', 8000);
-            this.focusField('cliente_cpf');
+
+        // Validar placa
+        if (!this.validatePlaca(data.placa)) {
+            this.showNotification('Placa inválida. Use o formato ABC-1234 ou ABC1234', 'error', 'Placa Inválida!', 8000);
+            this.focusField('placa');
             return false;
         }
 
+        // Validar ano
         if (!this.validateAno(data.ano)) {
             this.showNotification('Ano inválido. Use um ano entre 1950 e o ano atual', 'error', 'Ano Inválido!', 8000);
             this.focusField('ano');
             return false;
         }
 
-        if (!this.validateCilindrada(data.cilindrada)) {
-            this.showNotification('Cilindrada inválida. Deve ser um número maior que zero', 'error', 'Cilindrada Inválida!', 8000);
-            this.focusField('cilindrada');
+        // Validar quilometragem
+        if (!this.validateQuilometragem(data.quilometragem)) {
+            this.showNotification('Quilometragem inválida. Deve ser um número', 'error', 'Quilometragem Inválida!', 8000);
+            this.focusField('quilometragem');
             return false;
         }
 
         console.log('✅ Validação básica concluída com sucesso');
         return true;
+    }
+
+    validatePlaca(placa) {
+        if (!placa) return false;
+        
+        // Remove espaços e converte para maiúsculo
+        const cleanPlaca = placa.replace(/\s/g, '').toUpperCase();
+        
+        // Formatos aceitos: ABC1234 ou ABC-1234
+        const placaRegex = /^[A-Z]{3}-?\d{4}$/;
+        return placaRegex.test(cleanPlaca);
     }
 
     validateAno(ano) {
@@ -331,14 +273,8 @@ class MotocicletaAjusteController extends BasePageController {
         return anoNum >= 1950 && anoNum <= anoAtual;
     }
 
-    validateCilindrada(cilindrada) {
-        if (cilindrada === '' || cilindrada === null || cilindrada === undefined) return false;
-        const cilNum = parseInt(cilindrada);
-        return !isNaN(cilNum) && cilNum > 0;
-    }
-
     validateQuilometragem(km) {
-        if (km === '' || km === null || km === undefined) return true;
+        if (km === '' || km === null || km === undefined) return true; // Campo opcional
         
         const kmNum = parseInt(km);
         return !isNaN(kmNum) && kmNum >= 0;
@@ -351,7 +287,7 @@ class MotocicletaAjusteController extends BasePageController {
             marca_id: 'Marca',
             ano: 'Ano',
             cor: 'Cor',
-            cilindrada: 'Cilindrada',
+            quilometragem: 'Quilometragem',
             clienteCpf: 'Cliente'
         };
         return labels[field] || field;
@@ -365,42 +301,6 @@ class MotocicletaAjusteController extends BasePageController {
         }
     }
 
-    setupFieldMasks() {
-        // Configurar ano (apenas anos válidos)
-        const anoInput = document.getElementById('ano');
-        if (anoInput) {
-            const anoAtual = new Date().getFullYear();
-            anoInput.setAttribute('min', '1950');
-            anoInput.setAttribute('max', anoAtual.toString());
-        }
-
-        // Configurar quilometragem (apenas números)
-        const kmInput = document.getElementById('quilometragem');
-        if (kmInput) {
-            kmInput.addEventListener('input', (e) => {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length > 7) value = value.slice(0, 7);
-                e.target.value = value;
-            });
-        }
-    }
-
-    setupFormValidation() {
-        const inputs = document.querySelectorAll('#ajusteForm input, #ajusteForm select');
-        
-        inputs.forEach(input => {
-            input.addEventListener('blur', () => {
-                this.validateField(input);
-            });
-            
-            input.addEventListener('input', () => {
-                if (input.style.borderColor === 'rgb(244, 67, 54)') {
-                    input.style.borderColor = '';
-                }
-            });
-        });
-    }
-
     validateField(field) {
         const value = field.value.trim();
         const isRequired = field.hasAttribute('required');
@@ -410,15 +310,16 @@ class MotocicletaAjusteController extends BasePageController {
             return false;
         }
         
+        // Validações específicas
         switch (field.id) {
-            case 'ano':
-                if (value && !this.validateAno(value)) {
+            case 'placa':
+                if (value && !this.validatePlaca(value)) {
                     field.style.borderColor = '#f44336';
                     return false;
                 }
                 break;
-            case 'cilindrada':
-                if (value && !this.validateCilindrada(value)) {
+            case 'ano':
+                if (value && !this.validateAno(value)) {
                     field.style.borderColor = '#f44336';
                     return false;
                 }
@@ -435,47 +336,92 @@ class MotocicletaAjusteController extends BasePageController {
         return true;
     }
 
+    setupFieldMasks() {
+        // Máscara para placa
+        const placaInput = document.getElementById('placa');
+        if (placaInput) {
+            placaInput.addEventListener('input', (e) => {
+                let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                
+                // Limita a 7 caracteres (3 letras + 4 números)
+                if (value.length > 7) value = value.slice(0, 7);
+                
+                // Aplica formatação ABC-1234
+                if (value.length > 3) {
+                    value = value.replace(/^([A-Z]{3})(\d{1,4})/, '$1-$2');
+                }
+                
+                e.target.value = value;
+            });
+        }
+    }
+
+    setupFormValidation() {
+        // Validação em tempo real
+        const inputs = document.querySelectorAll('#motocicletaForm input, #motocicletaForm select');
+        
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => {
+                this.validateField(input);
+            });
+            
+            input.addEventListener('input', () => {
+                if (input.style.borderColor === 'rgb(244, 67, 54)') {
+                    input.style.borderColor = '';
+                }
+            });
+        });
+    }
+
     async loadClientes() {
+        this._clientesRequestId = (this._clientesRequestId || 0) + 1;
+        const currentRequestId = this._clientesRequestId;
         try {
-            console.log('[MotocicletaAjusteController] Carregando clientes...');
+            console.log('🔄 Carregando clientes...');
             const response = await fetch(this.clientesApiUrl);
             const result = await response.json();
-            
-            if (result.success && result.data) {
+            console.log('🔎 Resultado clientes:', result);
+            if (currentRequestId !== this._clientesRequestId) return; // Ignora respostas antigas
+            if (result.success && Array.isArray(result.data)) {
                 this.populateClienteSelect(result.data);
-                this._clientesLoaded = true;
-                // Se já carregou a moto, setar o cliente no select
-                if (this._motoLoaded && this.currentItem && this.currentItem.cliente_cpf) {
-                    this.clienteSelect.value = this.currentItem.cliente_cpf;
+                if (result.data.length === 0) {
+                    this.showNotification('Nenhum cliente cadastrado.', 'warning', 'Atenção!', 8000);
+                } else {
+                console.log('✅ Clientes carregados com sucesso');
                 }
-                console.log('[MotocicletaAjusteController] Clientes carregados:', result.data.length);
-                this.tryShowForm();
+            } else {
+                throw new Error('Falha ao carregar clientes');
             }
         } catch (error) {
-            console.error('[MotocicletaAjusteController] Erro ao carregar clientes:', error);
+            if (currentRequestId !== this._clientesRequestId) return; // Ignora respostas antigas
+            console.error('❌ Erro ao carregar clientes:', error);
+            this.showNotification('Erro ao carregar lista de clientes', 'error', 'Erro!', 8000);
         }
     }
 
     async loadMarcas() {
+        this._marcasRequestId = (this._marcasRequestId || 0) + 1;
+        const currentRequestId = this._marcasRequestId;
         try {
-            console.log('[MotocicletaAjusteController] Carregando marcas...');
+            console.log('🔄 Carregando marcas...');
             const response = await fetch(this.marcasApiUrl);
             const result = await response.json();
-            
-            if (result.success && result.data) {
+            console.log('🔎 Resultado marcas:', result);
+            if (currentRequestId !== this._marcasRequestId) return; // Ignora respostas antigas
+            if (result.success && Array.isArray(result.data)) {
                 this.populateMarcaSelect(result.data);
-                this._marcasLoaded = true;
-                // Se já carregou a moto, setar a marca no select
-                if (this._motoLoaded && this.currentItem && this.currentItem.marca_id) {
-                    const marcaIdStr = String(this.currentItem.marca_id);
-                    console.log('[MotocicletaAjusteController] Tentando selecionar marca_id:', marcaIdStr, 'Options:', Array.from(this.marcaSelect.options).map(o => o.value));
-                    this.marcaSelect.value = marcaIdStr;
+                if (result.data.length === 0) {
+                    this.showNotification('Nenhuma marca cadastrada.', 'warning', 'Atenção!', 8000);
+                } else {
+                console.log('✅ Marcas carregadas com sucesso');
                 }
-                console.log('[MotocicletaAjusteController] Marcas carregadas:', result.data.length);
-                this.tryShowForm();
+            } else {
+                throw new Error('Falha ao carregar marcas');
             }
         } catch (error) {
-            console.error('[MotocicletaAjusteController] Erro ao carregar marcas:', error);
+            if (currentRequestId !== this._marcasRequestId) return; // Ignora respostas antigas
+            console.error('❌ Erro ao carregar marcas:', error);
+            this.showNotification('Erro ao carregar lista de marcas', 'error', 'Erro!', 8000);
         }
     }
 
@@ -493,39 +439,26 @@ class MotocicletaAjusteController extends BasePageController {
     }
 
     populateMarcaSelect(marcas) {
-        console.log('[MotocicletaAjusteController] populateMarcaSelect - currentItem:', this.currentItem, 'marca_id:', this.currentItem ? this.currentItem.marca_id : undefined);
         if (this.marcaSelect) {
             this.marcaSelect.innerHTML = '<option value="">Selecione uma marca</option>';
-            // Filtrar marcas únicas pelo nome, mantendo o menor id
-            const marcasUnicasMap = {};
+            
             marcas.forEach(marca => {
-                if (!marcasUnicasMap[marca.nome] || marca.id < marcasUnicasMap[marca.nome].id) {
-                    marcasUnicasMap[marca.nome] = marca;
-                }
-            });
-            const marcasUnicas = Object.values(marcasUnicasMap);
-            marcasUnicas.forEach(marca => {
                 const option = document.createElement('option');
                 option.value = marca.id;
                 option.textContent = marca.nome;
                 this.marcaSelect.appendChild(option);
             });
-            // Selecionar marca automaticamente se já houver currentItem
-            if (this.currentItem && this.currentItem.marca_id) {
-                const marcaIdStr = String(this.currentItem.marca_id);
-                console.log('[MotocicletaAjusteController] Tentando selecionar marca_id:', marcaIdStr, 'Options:', Array.from(this.marcaSelect.options).map(o => o.value));
-                this.marcaSelect.value = marcaIdStr;
-            }
         }
     }
 
-    handleCancel() {
-        if (this.hasChanges(this.getFormData())) {
-            if (confirm('Existem alterações não salvas. Deseja realmente cancelar?')) {
-                window.location.href = 'motos-consulta.html';
-            }
-        } else {
-            window.location.href = 'motos-consulta.html';
+    clearForm() {
+        if (this.form) {
+            this.form.reset();
+            // Remover estilos de erro
+            const inputs = this.form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.style.borderColor = '';
+            });
         }
     }
 
@@ -580,6 +513,15 @@ class MotocicletaAjusteController extends BasePageController {
             container.id = 'notification-container';
             container.className = 'notification-container';
             document.body.appendChild(container);
+        }
+
+        const existingNotifications = container.querySelectorAll('.notification');
+        for (let existing of existingNotifications) {
+            const existingMessage = existing.querySelector('.notification-message')?.textContent;
+            const existingType = existing.classList.contains(`notification-${type}`);
+            if (existingMessage === message && existingType) {
+                return existing.id;
+            }
         }
 
         if (!title) {
@@ -670,25 +612,30 @@ class MotocicletaAjusteController extends BasePageController {
         oldNotifications.forEach(notification => notification.remove());
     }
 
-    tryShowForm() {
-        console.log('[MotocicletaAjusteController] Flags:', {
-            clientes: this._clientesLoaded,
-            marcas: this._marcasLoaded,
-            moto: this._motoLoaded
-        });
-        if (this._clientesLoaded && this._marcasLoaded && this._motoLoaded) {
-            this.populateForm(this.currentItem);
-            const section = document.getElementById('adjustment-form-section');
-            if (section) section.style.display = 'block';
-            console.log('[MotocicletaAjusteController] Formulário exibido!');
-        }
+    showSuccess(message) {
+        return this.showAdvancedNotification(message, 'success');
+    }
+
+    showError(message) {
+        return this.showAdvancedNotification(message, 'error');
+    }
+
+    showInfo(message) {
+        return this.showAdvancedNotification(message, 'info');
     }
 }
 
 // Inicializar controller quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof BasePageController !== 'undefined') {
-        window.motocicletaAjusteController = new MotocicletaAjusteController();
+        if (window.motocicletaCadastroControllerInstance) {
+            // Já existe uma instância, não crie outra
+            console.warn('MotocicletaCadastroController já instanciado, abortando nova criação.');
+            return;
+        }
+        window.motocicletaCadastroControllerInstance = true;
+        console.log('MotocicletaCadastroController carregando...');
+        window.motocicletaCadastroController = new MotocicletaCadastroController();
     } else {
         console.error('❌ BasePageController não encontrado');
     }

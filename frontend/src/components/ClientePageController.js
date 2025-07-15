@@ -90,14 +90,8 @@ class ClienteController {
                 <td>${cliente.cpf}</td>
                 <td>
                     <div class="actions">
-                        <button class="action-btn" onclick="clienteController.visualizarCliente('${cliente.cpf}')" title="Visualizar">
-                            <i class='bx bx-show'></i>
-                        </button>
                         <button class="action-btn" onclick="clienteController.editarCliente('${cliente.cpf}')" title="Editar">
                             <i class='bx bx-edit'></i>
-                        </button>
-                        <button class="action-btn" onclick="clienteController.ajustarCliente('${cliente.cpf}')" title="Ajustar">
-                            <i class='bx bx-cog'></i>
                         </button>
                         <button class="action-btn" onclick="clienteController.confirmarExclusao('${cliente.cpf}', '${cliente.nome}')" title="Excluir">
                             <i class='bx bx-trash'></i>
@@ -144,6 +138,13 @@ class ClienteController {
     }
 
     initCadastroPage() {
+        // Verificar se ClienteCadastroController já está ativo
+        if (window.clienteCadastroController) {
+            console.log('✅ ClienteCadastroController já está ativo');
+            return;
+        }
+        
+        // Fallback para funcionalidade básica
         this.setupFormSubmission();
         this.setupFormValidation();
     }
@@ -298,185 +299,10 @@ class ClienteController {
         }
     }
 
-    async editarCliente(cpf) {
-        try {
-            console.log(`✏️ Editando cliente: ${cpf}`);
-
-            const response = await fetch(`${this.apiUrl}/${cpf}`);
-            
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-
-            const result = await response.json();
-
-            if (result.success && result.data) {
-                this.showEditModal(result.data);
-            } else {
-                throw new Error(result.message || 'Cliente não encontrado');
-            }
-
-        } catch (error) {
-            console.error('❌ Erro ao buscar dados do cliente para edição:', error);
-            this.showError(error.message || 'Erro ao carregar dados do cliente');
-        }
-    }
-
-    showEditModal(cliente) {
-        const modalHtml = `
-            <div class="modal-overlay" id="editClienteModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Editar Cliente</h3>
-                        <button class="modal-close" onclick="clienteController.closeEditModal()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editClienteForm" class="edit-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="edit-nome">Nome Completo</label>
-                                    <input type="text" id="edit-nome" name="nome" value="${cliente.nome}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="edit-email">E-mail</label>
-                                    <input type="email" id="edit-email" name="email" value="${cliente.email}" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="edit-cpf">CPF</label>
-                                    <input type="text" id="edit-cpf" name="cpf" value="${cliente.cpf}" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label for="edit-telefone">Telefone</label>
-                                    <input type="text" id="edit-telefone" name="telefone" value="${cliente.telefone}" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="edit-sexo">Sexo</label>
-                                    <select id="edit-sexo" name="sexo" required>
-                                        <option value="">Selecione...</option>
-                                        <option value="Masculino" ${cliente.sexo === 'Masculino' ? 'selected' : ''}>Masculino</option>
-                                        <option value="Feminino" ${cliente.sexo === 'Feminino' ? 'selected' : ''}>Feminino</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="edit-profissao">Profissão</label>
-                                    <input type="text" id="edit-profissao" name="profissao" value="${cliente.profissao}" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="edit-endereco">Endereço</label>
-                                    <textarea id="edit-endereco" name="endereco" rows="2" required>${cliente.endereco}</textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="edit-data-nascimento">Data de Nascimento</label>
-                                    <input type="date" id="edit-data-nascimento" name="dataDeNascimento" value="${cliente.data_de_nascimento}" required>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn-secondary" onclick="clienteController.closeEditModal()">Cancelar</button>
-                        <button class="btn-primary" onclick="clienteController.salvarEdicao('${cliente.cpf}')">Salvar Alterações</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        this.setupEditFormMasks();
-    }
-
-    setupEditFormMasks() {
-        
-        const telefoneInput = document.getElementById('edit-telefone');
-        if (telefoneInput) {
-            telefoneInput.addEventListener('input', (e) => {
-                let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/(\d{2})(\d)/, '($1) $2');
-                value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
-                e.target.value = value;
-            });
-        }
-    }
-
-    async salvarEdicao(cpf) {
-        try {
-            const formData = this.getEditFormData();
-            
-            if (!this.validateEditForm(formData)) {
-                return;
-            }
-
-            console.log('📤 Atualizando cliente:', cpf, formData);
-
-            const response = await fetch(`${this.apiUrl}/${cpf}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                this.showSuccess('Cliente atualizado com sucesso!');
-                this.closeEditModal();
-                this.loadClientes();
-            } else {
-                throw new Error(result.message || 'Erro ao atualizar cliente');
-            }
-
-        } catch (error) {
-            console.error('❌ Erro ao atualizar cliente:', error);
-            this.showError(error.message || 'Erro ao atualizar cliente');
-        }
-    }
-
-    getEditFormData() {
-        return {
-            nome: document.getElementById('edit-nome')?.value.trim() || '',
-            email: document.getElementById('edit-email')?.value.trim() || '',
-            telefone: document.getElementById('edit-telefone')?.value.trim() || '',
-            sexo: document.getElementById('edit-sexo')?.value || '',
-            profissao: document.getElementById('edit-profissao')?.value.trim() || '',
-            endereco: document.getElementById('edit-endereco')?.value.trim() || '',
-            dataDeNascimento: document.getElementById('edit-data-nascimento')?.value || ''
-        };
-    }
-
-    validateEditForm(data) {
-        const requiredFields = ['nome', 'email', 'telefone', 'sexo', 'profissao', 'endereco', 'dataDeNascimento'];
-        
-        for (const field of requiredFields) {
-            if (!data[field]) {
-                this.showError(`O campo ${this.getFieldLabel(field)} é obrigatório`);
-                return false;
-            }
-        }
-
-        if (!this.validateEmail(data.email)) {
-            this.showError('Email inválido');
-            return false;
-        }
-
-        if (!this.validateDataNascimento(data.dataDeNascimento)) {
-            this.showError('Data de nascimento inválida');
-            return false;
-        }
-
-        return true;
-    }
-
-    closeEditModal() {
-        const modal = document.getElementById('editClienteModal');
-        if (modal) {
-            modal.remove();
-        }
+    editarCliente(cpf) {
+        // Redirecionar para a página de ajuste de cliente
+        const cpfFormatted = cpf.replace(/\D/g, '');
+        window.location.href = `clientes-ajustar.html?cpf=${cpfFormatted}`;
     }
 
     async confirmarExclusao(cpf, nome) {
@@ -505,30 +331,6 @@ class ClienteController {
         } catch (error) {
             console.error('❌ Erro ao excluir cliente:', error);
             this.showError(error.message || 'Erro ao excluir cliente');
-        }
-    }
-
-    async visualizarCliente(cpf) {
-        try {
-            console.log(`👁️ Visualizando cliente: ${cpf}`);
-
-            const response = await fetch(`${this.apiUrl}/${cpf}`);
-            
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-
-            const result = await response.json();
-
-            if (result.success && result.data) {
-                this.showClienteModal(result.data);
-            } else {
-                throw new Error(result.message || 'Cliente não encontrado');
-            }
-
-        } catch (error) {
-            console.error('❌ Erro ao visualizar cliente:', error);
-            this.showError(error.message || 'Erro ao carregar dados do cliente');
         }
     }
 
@@ -586,6 +388,17 @@ class ClienteController {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     }
 
+    getSexoBadgeClass(sexo) {
+        switch (sexo) {
+            case 'Masculino':
+                return 'badge-primary';
+            case 'Feminino':
+                return 'badge-secondary';
+            default:
+                return 'badge-info';
+        }
+    }
+
     closeModal() {
         const modal = document.getElementById('clienteModal');
         if (modal) {
@@ -594,15 +407,15 @@ class ClienteController {
     }
 
     showSuccess(message) {
-        Controller.showNotification(message, 'success');
+        BasePageController.showNotification(message, 'success');
     }
 
     showError(message) {
-        Controller.showNotification(message, 'error');
+        BasePageController.showNotification(message, 'error');
     }
 
     showInfo(message) {
-        Controller.showNotification(message, 'info');
+        BasePageController.showNotification(message, 'info');
     }
 
     showNotification(message, type = 'info') {

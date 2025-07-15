@@ -1,10 +1,7 @@
-/* Sobrescrever estilos dos botões com máxima prioridade */
-
-/* Forçar cores dos botões - aplicação imediata */
 body #content .item-row .btn.save-item-btn.btn-success,
 html body #content .item-row .btn.save-item-btn.btn-success,
 body .item-row .btn.save-item-btn.btn-success {
-    background-color: #FC3B56 !important; /* Mesma cor vermelha do botão Editar */
+    background-color: #FC3B56 !important;
     background: #FC3B56 !important;
     border-color: #FC3B56 !important;
     border: 1px solid #FC3B56 !important;
@@ -21,7 +18,7 @@ html body #content .item-row .btn.save-item-btn.btn-success:active,
 body .item-row .btn.save-item-btn.btn-success:hover,
 body .item-row .btn.save-item-btn.btn-success:focus,
 body .item-row .btn.save-item-btn.btn-success:active {
-    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    background-color: #D72D44 !important;
     background: #D72D44 !important;
     border-color: #D72D44 !important;
     border: 1px solid #D72D44 !important;
@@ -33,7 +30,7 @@ body .item-row .btn.save-item-btn.btn-success:active {
 body #content .item-row .btn.cancel-item-btn.btn-secondary,
 html body #content .item-row .btn.cancel-item-btn.btn-secondary,
 body .item-row .btn.cancel-item-btn.btn-secondary {
-    background-color: #9ca3af !important; /* Cinza mais claro */
+    background-color: #9ca3af !important;
     background: #9ca3af !important;
     border-color: #9ca3af !important;
     border: 1px solid #9ca3af !important;
@@ -59,9 +56,8 @@ body .item-row .btn.cancel-item-btn.btn-secondary:active {
     box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3) !important;
 }
 
-/* Garantir que elementos específicos recebam as cores */
 .save-item-btn {
-    background-color: #FC3B56 !important; /* Vermelho igual ao Editar */
+    background-color: #FC3B56 !important;
     background: #FC3B56 !important;
     border-color: #FC3B56 !important;
     border: 1px solid #FC3B56 !important;

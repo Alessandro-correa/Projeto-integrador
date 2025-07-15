@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS Cliente (
     Data_de_nascimento DATE         NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS Marca (
+    Id SERIAL PRIMARY KEY,
+    Nome VARCHAR(50) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS Motocicleta (
     Placa       VARCHAR(8)  PRIMARY KEY,
     Ano         INT         NOT NULL,
@@ -36,7 +41,9 @@ CREATE TABLE IF NOT EXISTS Motocicleta (
     Modelo      VARCHAR(50) NOT NULL,
     Cilindrada  INT         NOT NULL,
     Cliente_CPF VARCHAR(14) NOT NULL,
-    FOREIGN KEY (Cliente_CPF) REFERENCES Cliente(Cpf)
+    marca_id    INT         NOT NULL,
+    FOREIGN KEY (Cliente_CPF) REFERENCES Cliente(Cpf),
+    FOREIGN KEY (marca_id) REFERENCES Marca(Id)
 );
 
 CREATE TABLE IF NOT EXISTS Ordem_de_servico (
@@ -69,12 +76,6 @@ CREATE TABLE IF NOT EXISTS Orcamento (
     FOREIGN KEY (Cliente_CPF)         REFERENCES Cliente(Cpf)
 );
 
-CREATE TABLE IF NOT EXISTS Marca (
-    Id                 SERIAL      PRIMARY KEY,
-    Nome               VARCHAR(50) NOT NULL,
-    Motocicleta_placa  VARCHAR(8)  UNIQUE,
-    FOREIGN KEY (Motocicleta_placa) REFERENCES Motocicleta(Placa)
-);
 
 CREATE TABLE IF NOT EXISTS Possui (
     Cliente_Cpf        VARCHAR(14),
@@ -134,14 +135,14 @@ CREATE TABLE IF NOT EXISTS Possui_peca (
 
 -- Inserts de dados
 
--- 👨‍💼 USUÁRIOS (3 tipos: Secretária, Mecânico, Administrador)
+-- USUÁRIOS (3 tipos: Secretária, Mecânico, Administrador)
 INSERT INTO Usuario (Cpf, Nome, Funcao, Senha, Email, Telefone, Codigo) 
 VALUES
   ('111.111.111-11', 'Maria Fernanda', 'Secretária', 'senha123', 'maria.secretaria@oficina.com', '11999-0001', 'SEC001'),
   ('222.222.222-22', 'João Carlos', 'Mecânico', 'senha456', 'joao.mecanico@oficina.com', '11999-0002', 'MEC001'),
   ('333.333.333-33', 'Roberto Silva', 'Administrador', 'senha789', 'roberto.admin@oficina.com', '11999-0003', 'ADM001');
 
--- 👥 CLIENTES (10 exemplos)
+-- CLIENTES (10 exemplos)
 INSERT INTO Cliente (Cpf, Nome, Sexo, Endereco, Telefone, Email, Profissao, Data_de_nascimento)
 VALUES
   ('100.200.300-01', 'Ana Paula Santos', 'Feminino', 'Rua das Flores, 123 - Centro', '11998-1001', 'ana.santos@email.com', 'Engenheira', '1990-04-15'),
@@ -153,23 +154,39 @@ VALUES
   ('100.200.300-07', 'Gabriela Rocha', 'Feminino', 'Rua Azul, 567 - Bairro Novo', '11998-1007', 'gabriela.rocha@email.com', 'Designer', '1993-09-14'),
   ('100.200.300-08', 'Henrique Alves', 'Masculino', 'Av. Industrial, 890 - Zona Sul', '11998-1008', 'henrique.alves@email.com', 'Engenheiro', '1987-07-08'),
   ('100.200.300-09', 'Isabela Nunes', 'Feminino', 'Rua Solar, 445 - Residencial', '11998-1009', 'isabela.nunes@email.com', 'Psicóloga', '1991-03-30'),
-  ('100.200.300-10', 'João Pedro Silva', 'Masculino', 'Av. Liberdade, 678 - Centro', '11998-1010', 'joao.silva@email.com', 'Contador', '1989-05-12');
+  ('100.200.300-10', 'João Pedro Silva', 'Masculino', 'Av. Liberdade, 678 - Centro', '11998-1010', 'joao.silva@email.com', 'Contador', '1989-05-12'),
+  ('128.764.959-32', 'Rhuan Lehmen de Souza Leite', 'Masculino', 'Av. Liberdade, 678 - Centro', '11998-1010', 'rhuan.lehmen@email.com', 'Programador', '2004-04-08');
 
--- 🏍️ MOTOCICLETAS (10 exemplos)
-INSERT INTO Motocicleta (Placa, Ano, Cor, Modelo, Cilindrada, Cliente_CPF) 
+-- MARCAS (10 exemplos)
+INSERT INTO Marca (Nome) 
 VALUES
-  ('ABC1234', 2022, 'Preta', 'Honda CB 500X', 500, '100.200.300-01'),
-  ('DEF5678', 2021, 'Vermelha', 'Yamaha MT-03', 300, '100.200.300-02'),
-  ('GHI9012', 2023, 'Azul', 'Honda CG 160 Titan', 160, '100.200.300-03'),
-  ('JKL3456', 2020, 'Branca', 'Kawasaki Ninja 400', 400, '100.200.300-04'),
-  ('MNO7890', 2022, 'Verde', 'Yamaha Fazer 250', 250, '100.200.300-05'),
-  ('PQR1234', 2021, 'Prata', 'Honda PCX 150', 150, '100.200.300-06'),
-  ('STU5678', 2023, 'Amarela', 'Suzuki GSX-S750', 750, '100.200.300-07'),
-  ('VWX9012', 2020, 'Roxa', 'BMW G 310 R', 310, '100.200.300-08'),
-  ('YZA3456', 2022, 'Laranja', 'KTM Duke 390', 390, '100.200.300-09'),
-  ('BCD7890', 2021, 'Cinza', 'Triumph Street Triple', 675, '100.200.300-10');
+  ('Honda'),
+  ('Yamaha'),
+  ('Kawasaki'),
+  ('Suzuki'),
+  ('BMW'),
+  ('KTM'),
+  ('Triumph'),
+  ('Ducati'),
+  ('Harley-Davidson'),
+  ('Kasinski');
 
--- 🔧 ORDENS DE SERVIÇO (10 exemplos - distribuídos ao longo do ano)
+-- MOTOCICLETAS (10 exemplos)
+INSERT INTO Motocicleta (Placa, Ano, Cor, Modelo, Cilindrada, Cliente_CPF, marca_id) 
+VALUES
+  ('ABC1234', 2022, 'Preta', 'CB 500X', 500, '100.200.300-01', 1),
+  ('DEF5678', 2021, 'Vermelha', 'MT-03', 300, '100.200.300-02', 2),
+  ('GHI9012', 2023, 'Azul', 'CG 160 Titan', 160, '100.200.300-03', 1),
+  ('JKL3456', 2020, 'Branca', 'Ninja 400', 400, '100.200.300-04', 4),
+  ('MNO7890', 2022, 'Verde', 'Fazer 250', 250, '100.200.300-05', 2),
+  ('PQR1234', 2021, 'Prata', 'PCX 150', 150, '100.200.300-06', 1),
+  ('STU5678', 2023, 'Amarela', 'GSX-S750', 750, '100.200.300-07', 6),
+  ('VWX9012', 2020, 'Roxa', 'G 310 R', 310, '100.200.300-08', 7),
+  ('YZA3456', 2022, 'Laranja', 'Duke 390', 390, '100.200.300-09', 8),
+  ('BCD7890', 2021, 'Cinza', 'Street Triple', 675, '100.200.300-10', 9),
+  ('BCD7845', 2021, 'Preta', 'CB 250 Twister', 250, '128.764.959-32', 1);
+
+-- ORDENS DE SERVIÇO (10 exemplos - distribuídos ao longo do ano)
 INSERT INTO Ordem_de_servico (Titulo, Data, Descricao, Status, Observacao, Valor, Valor_mao_de_obra, Validada, Usuario_CPF, Cliente_CPF, Motocicleta_placa)
 VALUES
   ('Revisão Completa', '2025-01-15', 'Troca de óleo, filtros, velas e revisão geral', 'Validada', 'Cliente solicitou urgência', 850.00, 350.00, TRUE, '222.222.222-22', '100.200.300-01', 'ABC1234'),
@@ -183,7 +200,7 @@ VALUES
   ('Revisão de Motor', '2025-05-14', 'Análise completa do motor e ajustes', 'Ajuste Pendente', 'Motor com ruído anormal - ajustes necessários', 1200.00, 600.00, FALSE, '222.222.222-22', '100.200.300-09', 'YZA3456'),
   ('Instalação de Acessórios', '2025-06-30', 'Instalação de baú, protetor de motor e farol auxiliar', 'Rejeitada', 'Cliente cancelou o serviço', 380.00, 180.00, FALSE, '222.222.222-22', '100.200.300-10', 'BCD7890');
 
--- 💰 ORÇAMENTOS (10 exemplos - com descrições detalhadas)
+-- ORÇAMENTOS (10 exemplos - com descrições detalhadas)
 INSERT INTO Orcamento (Valor, Validade, Status, Descricao, Ordem_servico_COD, Cliente_CPF) 
 VALUES
   (850.00, '2025-01-30', 'A', 'SERVIÇO: Troca de óleo do motor - R$ 150,00;SERVIÇO: Substituição de filtros (ar, óleo, combustível) - R$ 100,00;SERVIÇO: Troca de velas de ignição - R$ 100,00;PEÇA: Óleo motor 20W50 - Qtd: 4 - Valor unit: R$ 25,00;PEÇA: Filtro de óleo - Qtd: 1 - Valor unit: R$ 35,00;PEÇA: Filtro de ar - Qtd: 1 - Valor unit: R$ 45,00;PEÇA: Velas NGK - Qtd: 2 - Valor unit: R$ 95,00', 1, '100.200.300-01'),  -- Janeiro
@@ -202,21 +219,8 @@ VALUES
   
   (380.00, '2025-11-15', 'P', 'SERVIÇO: Instalação de baú traseiro - R$ 60,00;SERVIÇO: Instalação de protetor de motor - R$ 60,00;SERVIÇO: Instalação de farol auxiliar - R$ 60,00;PEÇA: Baú traseiro 35L - Qtd: 1 - Valor unit: R$ 120,00;PEÇA: Protetor de motor - Qtd: 1 - Valor unit: R$ 80,00', NULL, '100.200.300-10'); -- Outubro (pendente, sem OS)
 
--- 🏷️ MARCAS (10 exemplos)
-INSERT INTO Marca (Nome, Motocicleta_placa) 
-VALUES
-  ('Honda', 'ABC1234'),
-  ('Yamaha', 'DEF5678'),
-  ('Honda', 'GHI9012'),
-  ('Kawasaki', 'JKL3456'),
-  ('Yamaha', 'MNO7890'),
-  ('Honda', 'PQR1234'),
-  ('Suzuki', 'STU5678'),
-  ('BMW', 'VWX9012'),
-  ('KTM', 'YZA3456'),
-  ('Triumph', 'BCD7890');
 
--- 🔗 RELACIONAMENTO CLIENTE-MOTOCICLETA (10 exemplos)
+-- RELACIONAMENTO CLIENTE-MOTOCICLETA (10 exemplos)
 INSERT INTO Possui (Cliente_Cpf, Motocicleta_placa) 
 VALUES
   ('100.200.300-01', 'ABC1234'),
@@ -230,7 +234,7 @@ VALUES
   ('100.200.300-09', 'YZA3456'),
   ('100.200.300-10', 'BCD7890');
 
--- 📦 AQUISIÇÕES (10 exemplos - distribuídas ao longo do ano)
+-- AQUISIÇÕES (10 exemplos - distribuídas ao longo do ano)
 INSERT INTO Aquisicao (Dia_da_compra) 
 VALUES
   ('2024-12-15'),  -- Dezembro anterior
@@ -244,7 +248,7 @@ VALUES
   ('2025-08-18'),  -- Agosto
   ('2025-09-22');  -- Setembro
 
--- 🔧 PEÇAS (10 exemplos)
+-- PEÇAS (10 exemplos)
 INSERT INTO Peca (Descricao, Nome, Valor) 
 VALUES
   ('Filtro de óleo original Honda para CB500', 'Filtro de Óleo Honda', 45.00),
@@ -258,7 +262,7 @@ VALUES
   ('Pneu dianteiro Pirelli Diablo 120/70', 'Pneu Dianteiro Pirelli', 320.00),
   ('Kit relação completo Vaz', 'Kit Relação Vaz', 450.00);
 
--- 🛒 AQUISIÇÃO DE PRODUTOS (10 exemplos)
+-- AQUISIÇÃO DE PRODUTOS (10 exemplos)
 INSERT INTO Aquisicao_Produto (Aquisicao_ID, Peca_ID, Preco_da_compra, Vencimento, Quantidade)
 VALUES
   (1, 1, 35.00, '2025-12-01', 50),
@@ -272,7 +276,7 @@ VALUES
   (9, 9, 250.00, NULL, 18),
   (10, 10, 380.00, NULL, 12);
 
--- 🏭 FORNECEDORES (10 exemplos)
+-- FORNECEDORES (10 exemplos)
 INSERT INTO Fornecedor (CNPJ, Email, Endereco, Nome) 
 VALUES
   ('11.111.111/0001-11', 'vendas@hondapecas.com', 'Av. Honda, 1000 - São Paulo', 'Honda Peças Originais'),
@@ -286,7 +290,7 @@ VALUES
   ('99.999.999/0009-99', 'pedidos@moura.com.br', 'Av. Moura, 600 - Belo Horizonte', 'Moura Baterias'),
   ('10.101.010/0010-10', 'vendas@vaz.com.br', 'Rua Vaz, 350 - Curitiba', 'Vaz Transmissões');
 
--- 🤝 RELACIONAMENTO FORNECEDOR-PEÇA (10 exemplos)
+-- RELACIONAMENTO FORNECEDOR-PEÇA (10 exemplos)
 INSERT INTO Fornece (Peca_ID, Fornecedor_ID) 
 VALUES
   (1, 1),
@@ -300,7 +304,7 @@ VALUES
   (9, 7),
   (10, 10);
 
--- 🔧 PEÇAS UTILIZADAS NAS ORDENS (10 exemplos)
+-- PEÇAS UTILIZADAS NAS ORDENS (10 exemplos)
 INSERT INTO Possui_peca (Ordem_de_servico_COD, Peca_ID, Qtd_pecas) 
 VALUES
   (1, 1, 1),  -- Revisão completa usa filtro de óleo

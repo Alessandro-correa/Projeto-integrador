@@ -336,7 +336,7 @@
 }
 
 .alert.alert-success::before {
-    content: "✅";
+    content: "";
     font-size: 16px;
 }
 
@@ -349,7 +349,7 @@
 
 .alert.alert-error::before,
 .alert.alert-danger::before {
-    content: "❌";
+    content: "";
     font-size: 16px;
 }
 
@@ -360,7 +360,7 @@
 }
 
 .alert.alert-warning::before {
-    content: "⚠️";
+    content: "";
     font-size: 16px;
 }
 
@@ -371,7 +371,7 @@
 }
 
 .alert.alert-info::before {
-    content: "ℹ️";
+    content: "";
     font-size: 16px;
 }
 

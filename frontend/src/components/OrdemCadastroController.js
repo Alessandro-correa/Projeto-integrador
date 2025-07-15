@@ -317,14 +317,11 @@ class OrdemCadastroController {
         notification.id = notificationId;
 
         notification.innerHTML = `
-            <i class='bx ${icons[type]} notification-icon'></i>
             <div class="notification-content">
                 <div class="notification-title">${this.getNotificationTitle(type)}</div>
                 <div class="notification-message">${message}</div>
             </div>
-            <button class="notification-close" onclick="window.closeNotification('${notificationId}')">
-                <i class='bx bx-x'></i>
-            </button>
+            <button class="notification-close" onclick="window.closeNotification('${notificationId}')">X</button>
             <div class="notification-progress" style="width: 100%;"></div>
         `;
 

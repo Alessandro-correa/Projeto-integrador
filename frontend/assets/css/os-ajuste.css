@@ -1,7 +1,3 @@
-/* Estilos padronizados para o ajuste de ordens de serviço */
-/* Baseado no padrão estabelecido em orcamento-ajuste.css */
-
-/* Container das peças */
 .peca-row,
 .pecas-container .row {
     background-color: #ffffff;
@@ -19,7 +15,6 @@
     border-color: #007bff;
 }
 
-/* Estilização dos campos */
 .peca-row .form-control,
 .pecas-container .form-control {
     border-radius: 6px;
@@ -43,7 +38,6 @@
     color: #6c757d;
 }
 
-/* Labels */
 .peca-row .form-label,
 .pecas-container .form-label {
     font-weight: 600;
@@ -54,7 +48,6 @@
     letter-spacing: 0.5px;
 }
 
-/* Estilização geral dos botões */
 .btn-sm {
     padding: 6px 12px;
     font-size: 13px;
@@ -70,7 +63,6 @@
     justify-content: center;
 }
 
-/* Botão Editar (azul) */
 .btn-primary {
     background-color: #3b82f6;
     border-color: #3b82f6;
@@ -83,20 +75,18 @@
     transform: translateY(-1px);
 }
 
-/* Botão Salvar (vermelho para manter consistência) */
 .btn-success {
-    background-color: #FC3B56; /* Mesma cor vermelha do botão editar */
+    background-color: #FC3B56;
     border-color: #FC3B56;
     color: #ffffff;
 }
 
 .btn-success:hover {
-    background-color: #D72D44; /* Vermelho escuro no hover */
+    background-color: #D72D44;
     border-color: #D72D44;
     transform: translateY(-1px);
 }
 
-/* Botão Cancelar (cinza claro) */
 .btn-secondary {
     background-color: #9ca3af;
     border-color: #9ca3af;
@@ -109,7 +99,6 @@
     transform: translateY(-1px);
 }
 
-/* Botão Remover (vermelho escuro) */
 .btn-danger {
     background-color: #dc2626;
     border-color: #dc2626;
@@ -122,24 +111,23 @@
     transform: translateY(-1px);
 }
 
-/* Estilos específicos para botões dentro das peças */
 .pecas-container .save-peca-btn,
 .peca-row .save-peca-btn {
-    background-color: #FC3B56 !important; /* Mesma cor vermelha do botão editar */
+    background-color: #FC3B56 !important;
     border-color: #FC3B56 !important;
     color: #ffffff !important;
 }
 
 .pecas-container .save-peca-btn:hover,
 .peca-row .save-peca-btn:hover {
-    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    background-color: #D72D44 !important;
     border-color: #D72D44 !important;
     transform: translateY(-1px);
 }
 
 .pecas-container .cancel-peca-btn,
 .peca-row .cancel-peca-btn {
-    background-color: #9ca3af !important; /* Cinza mais claro */
+    background-color: #9ca3af !important;
     border-color: #9ca3af !important;
     color: #ffffff !important;
 }
@@ -179,14 +167,13 @@
     transform: translateY(-1px);
 }
 
-/* Garantir aplicação das cores personalizadas com alta especificidade */
 .pecas-container .btn.save-peca-btn.btn-success,
 .pecas-container .btn.btn-success.save-peca-btn,
 .peca-row .btn.save-peca-btn.btn-success,
 .peca-row .btn.btn-success.save-peca-btn,
 #content .pecas-container .btn.save-peca-btn.btn-success,
 #content .peca-row .btn.save-peca-btn.btn-success {
-    background-color: #FC3B56 !important; /* Vermelho igual ao Editar */
+    background-color: #FC3B56 !important;
     border-color: #FC3B56 !important;
     color: #ffffff !important;
     box-shadow: none !important;
@@ -210,7 +197,7 @@
 #content .peca-row .btn.save-peca-btn.btn-success:hover,
 #content .peca_row .btn.save-peca-btn.btn-success:focus,
 #content .peca-row .btn.save-peca-btn.btn-success:active {
-    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    background-color: #D72D44 !important;
     border-color: #D72D44 !important;
     color: #ffffff !important;
     transform: translateY(-1px);
@@ -223,7 +210,7 @@
 .peca-row .btn.btn-secondary.cancel-peca-btn,
 #content .pecas-container .btn.cancel-peca-btn.btn-secondary,
 #content .peca-row .btn.cancel-peca-btn.btn-secondary {
-    background-color: #9ca3af !important; /* Cinza mais claro */
+    background-color: #9ca3af !important;
     border-color: #9ca3af !important;
     color: #ffffff !important;
     box-shadow: none !important;
@@ -254,36 +241,34 @@
     box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3) !important;
 }
 
-/* Botões principais da ordem de serviço */
 #saveBtn.btn.btn-primary,
 .form-actions .btn.btn-primary {
-    background-color: #FC3B56 !important; /* Vermelho padrão para salvar */
+    background-color: #FC3B56 !important;
     border-color: #FC3B56 !important;
     color: #ffffff !important;
 }
 
 #saveBtn.btn.btn-primary:hover,
 .form-actions .btn.btn-primary:hover {
-    background-color: #D72D44 !important; /* Vermelho escuro no hover */
+    background-color: #D72D44 !important;
     border-color: #D72D44 !important;
     transform: translateY(-1px);
 }
 
 #cancelBtn.btn.btn-secondary,
 .form-actions .btn.btn-secondary {
-    background-color: #9ca3af !important; /* Cinza claro para cancelar */
+    background-color: #9ca3af !important;
     border-color: #9ca3af !important;
     color: #ffffff !important;
 }
 
 #cancelBtn.btn.btn-secondary:hover,
 .form-actions .btn.btn-secondary:hover {
-    background-color: #6b7280 !important; /* Cinza escuro no hover */
+    background-color: #6b7280 !important;
     border-color: #6b7280 !important;
     transform: translateY(-1px);
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
     .peca-row,
     .pecas-container .row {
@@ -298,7 +283,6 @@
     }
 }
 
-/* Tema escuro */
 body.dark .peca-row,
 body.dark .pecas-container .row {
     background-color: var(--dark-surface);

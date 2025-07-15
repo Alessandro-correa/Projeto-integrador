@@ -1,261 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-	<link rel="stylesheet" href="../../assets/css/style.css">
-	<title>Sistema Campos Moto Peças - Cadastro de Motocicleta</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/template.css">
+    <link rel="stylesheet" href="../../assets/css/forms.css">
+    <link rel="stylesheet" href="../../assets/css/ajuste.css">
+    <title>Sistema Campos Moto Peças - Cadastro de Motocicleta</title>
 </head>
 <body>
-	
-	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
-		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
-			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="motos-consulta.html" class="active"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
-			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
-			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
-		</ul>
-	</section>
+    <!-- Sidebar -->
+    <section id="sidebar">
+        <a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+        <ul class="side-menu">
+            <li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+            <li class="divider" data-text="principal">Principal</li>
+            <li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+            <li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+            <li class="divider" data-text="gestão">Gestão</li>
+            <li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+            <li><a href="motos-consulta.html" class="active"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+            <li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+            <li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+            <li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+            <li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+        </ul>
+    </section>
 
-	<section id="content">
-		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
-			<div class="theme-toggle">
-				<input type="checkbox" id="theme-toggle-checkbox">
-				<label for="theme-toggle-checkbox" class="theme-toggle-label">
-					<i class='bx bxs-sun'></i>
-					<i class='bx bxs-moon'></i>
-				</label>
-			</div>
-			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon' ></i>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<a href="#" class="nav-link">
-					<i class='bx bxs-cog icon' title="Configurações"></i>
-				</a>
-				<a href="#" class="nav-link">
-					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
-				</a>
-			</div>
-		</nav>
+    <!-- Main Content -->
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu toggle-sidebar' ></i>
+            <div class="theme-toggle">
+                <input type="checkbox" id="theme-toggle-checkbox">
+                <label for="theme-toggle-checkbox" class="theme-toggle-label">
+                    <i class='bx bxs-sun'></i>
+                    <i class='bx bxs-moon'></i>
+                </label>
+            </div>
+            <a href="#" class="nav-link" style="margin-left: auto;">
+                <i class='bx bxs-bell icon' ></i>
+            </a>
+            <span class="divider"></span>
+            <div class="profile">
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-cog icon' title="Configurações"></i>
+                </a>
+                <a href="../login/login.html" class="nav-link">
+                    <i class='bx bxs-log-out-circle icon' title="Sair"></i>
+                </a>
+            </div>
+        </nav>
 
-		<main>
-			<h1 class="title">Motocicletas</h1>
-			<ul class="breadcrumbs">
-				<li><a href="../../index.html">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="motos-consulta.html">Motocicletas</a></li>
-				<li class="divider">/</li>
-				<li><a href="#" class="active">Nova Motocicleta</a></li>
-			</ul>
-			<div id="cpf-orientacao" style="color: #b00; margin-bottom: 10px;">Preencha um CPF de cliente já cadastrado para liberar o cadastro da motocicleta.</div>
-			
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Nova Motocicleta</h3>
-					</div>
-					<form action="#" class="os-form">
-						<div class="form-row">
-							<div class="form-group">
-								<label for="cliente">Cliente</label>
-								<input type="text" id="cliente" placeholder="Nome do proprietário" required>
-							</div>
-							<div class="form-group">
-								<label for="clienteCpf">CPF do Cliente</label>
-								<input type="text" id="clienteCpf" name="clienteCpf" required>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="placa">Placa</label>
-								<input type="text" id="placa" name="placa" required>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="marca">Marca</label>
-								<select id="marca" name="marca" required>
-									<option value="">Selecione...</option>
-									<option value="honda">Honda</option>
-									<option value="yamaha">Yamaha</option>
-									<option value="suzuki">Suzuki</option>
-									<option value="kawasaki">Kawasaki</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label for="modelo">Modelo</label>
-								<input type="text" id="modelo" name="modelo" required>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="ano">Ano</label>
-								<input type="number" id="ano" name="ano" required>
-							</div>
-							<div class="form-group">
-								<label for="cor">Cor</label>
-								<input type="text" id="cor" name="cor" required>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="cilindrada">Cilindrada (CC)</label>
-								<input type="number" id="cilindrada" name="cilindrada" required>
-							</div>
-						</div>
-						<div class="form-actions">
-							<button type="submit" class="btn-primary">Cadastrar Motocicleta</button>
-							<a href="motos-consulta.html" class="btn-secondary">Cancelar</a>
-						</div>
-					</form>
-				</div>
-			</div>
-		</main>
-	</section>
+        <main>
+            <h1 class="title">Cadastro de Motocicleta</h1>
+            <ul class="breadcrumbs">
+                <li><a href="../dashboard/index.html">Home</a></li>
+                <li class="divider">/</li>
+                <li><a href="motos-consulta.html">Motocicletas</a></li>
+                <li class="divider">/</li>
+                <li><a href="#" class="active">Nova Motocicleta</a></li>
+            </ul>
 
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script type="module" src="../../assets/js/main.js"></script>
-    <script>
-function setMotoFieldsReadOnly(readOnly) {
-    const inputIds = ['cliente', 'placa', 'modelo', 'ano', 'cor', 'cilindrada'];
-    const selectIds = ['marca'];
-    inputIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.readOnly = readOnly;
-            if (readOnly) {
-                el.value = '';
-                el.classList.add('input-bloqueado');
-            } else {
-                el.classList.remove('input-bloqueado');
-            }
-        }
-    });
-    selectIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.disabled = readOnly;
-            if (readOnly) {
-                el.selectedIndex = 0;
-                el.classList.add('input-bloqueado');
-            } else {
-                el.classList.remove('input-bloqueado');
-            }
-        }
-    });
-    // O campo 'cliente' (nome) deve SEMPRE ser readonly
-    const clienteInput = document.getElementById('cliente');
-    if (clienteInput) clienteInput.readOnly = true;
-    // Mostra/esconde a mensagem de orientação
-    const orientacao = document.getElementById('cpf-orientacao');
-    if (orientacao) orientacao.style.display = readOnly ? 'block' : 'none';
-}
+            <!-- Alert Container -->
+            <div id="form-alert" class="alert" style="display: none;"></div>
 
-// Inicialmente bloqueia todos os campos exceto CPF
-document.addEventListener('DOMContentLoaded', function() {
-    setMotoFieldsReadOnly(true);
-    document.getElementById('clienteCpf').readOnly = false;
-    
-    // Adicionar elemento para mensagem do ano
-    const anoField = document.getElementById('ano');
-    const mensagemElement = document.createElement('div');
-    mensagemElement.id = 'ano-mensagem';
-    mensagemElement.style.fontSize = '12px';
-    mensagemElement.style.marginTop = '5px';
-    mensagemElement.style.fontWeight = 'bold';
-    anoField.parentNode.appendChild(mensagemElement);
-});
+            <!-- Notification Container -->
+            <div id="notification-container" class="notification-container"></div>
 
-document.getElementById('clienteCpf').addEventListener('input', async function(e) {
-    let v = e.target.value.replace(/\D/g, '');
-    if (v.length > 11) v = v.slice(0, 11);
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-    e.target.value = v;
+            <!-- Alert Container -->
+            <div id="alert-container"></div>
 
-    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-    const clienteInput = document.getElementById('cliente');
-    if (cpfRegex.test(e.target.value)) {
-        // Buscar nome do cliente no backend
-        try {
-            const response = await fetch(`http://localhost:3000/api/clientes/${e.target.value}`);
-            const data = await response.json();
-            if (response.ok && data && data.success && data.data && data.data.nome) {
-                clienteInput.value = data.data.nome;
-                clienteInput.readOnly = true;
-                setMotoFieldsReadOnly(false);
-                clienteInput.readOnly = true; 
-            } else {
-                clienteInput.value = '';
-                clienteInput.readOnly = false;
-                setMotoFieldsReadOnly(true);
-                document.getElementById('clienteCpf').readOnly = false;
-                alert('Cliente não encontrado para este CPF.');
-            }
-        } catch (err) {
-            clienteInput.value = '';
-            clienteInput.readOnly = false;
-            setMotoFieldsReadOnly(true);
-            document.getElementById('clienteCpf').readOnly = false;
-            alert('Erro ao buscar cliente.');
-        }
-    } else {
-        clienteInput.value = '';
-        clienteInput.readOnly = false;
-        setMotoFieldsReadOnly(true);
-        document.getElementById('clienteCpf').readOnly = false;
-    }
-});
+            <!-- Registration Form Section -->
+            <div class="register-section">
+                <form id="cadastroMotoForm" class="form-container">
+                    <div class="page-title">
+                        <h2><i class='bx bxs-motorcycle'></i> Formulário de Cadastro da Motocicleta</h2>
+                    </div>
+                    <div class="form-section">
+                        <h3>Informações da Motocicleta</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="placa">Placa <span class="required">*</span></label>
+                                <input type="text" id="placa" name="placa" required placeholder="Placa da motocicleta">
+                            </div>
+                            <div class="form-group">
+                                <label for="modelo">Modelo <span class="required">*</span></label>
+                                <input type="text" id="modelo" name="modelo" required placeholder="Modelo da motocicleta">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ano">Ano <span class="required">*</span></label>
+                                <input type="number" id="ano" name="ano" required placeholder="Ano da motocicleta">
+                            </div>
+                            <div class="form-group">
+                                <label for="cor">Cor <span class="required">*</span></label>
+                                <input type="text" id="cor" name="cor" required placeholder="Cor da motocicleta">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cilindrada">Cilindrada <span class="required">*</span></label>
+                                <input type="number" id="cilindrada" name="cilindrada" required placeholder="Cilindrada da motocicleta">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cliente_cpf">Cliente <span class="required">*</span></label>
+                                <select id="cliente_cpf" name="cliente_cpf" required>
+                                    <option value="">Selecione o cliente</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="marca_id">Marca <span class="required">*</span></label>
+                                <select id="marca_id" name="marca_id" required>
+                                    <option value="">Selecione a marca</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <a href="motos-consulta.html" class="btn btn-secondary">
+                            <i class='bx bx-x'></i> Cancelar
+                        </a>
+                        <button type="submit" id="saveBtn" class="btn btn-primary">
+                            <i class='bx bx-check'></i> Cadastrar Motocicleta
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </section>
 
-document.getElementById('placa').addEventListener('input', function(e) {
-    let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (v.length > 7) v = v.slice(0, 7);
-    e.target.value = v;
-});
-
-document.getElementById('ano').addEventListener('input', function(e) {
-    let v = e.target.value.replace(/\D/g, '');
-    if (v.length > 4) v = v.slice(0, 4);
-    
-    const mensagemElement = document.getElementById('ano-mensagem');
-    
-    // Se tem 4 dígitos, valida imediatamente
-    if (v.length === 4) {
-        const ano = parseInt(v);
-        if (ano < 1900 || ano > 2026) {
-            // Remove o último dígito se for inválido
-            v = v.slice(0, 3);
-            e.target.style.borderColor = 'red';
-            e.target.title = 'Ano inválido. Use um ano entre 1900 e 2026';
-            mensagemElement.textContent = '❌ Ano inválido';
-            mensagemElement.style.color = 'red';
-        } else {
-            e.target.style.borderColor = 'green';
-            e.target.title = '';
-            mensagemElement.textContent = '✅ Ano válido';
-            mensagemElement.style.color = 'green';
-        }
-    } else {
-        e.target.style.borderColor = '';
-        e.target.title = '';
-        mensagemElement.textContent = '';
-    }
-    
-    e.target.value = v;
-});
-    </script>
+    <!-- Scripts -->
+    <script src="../../src/components/BasePageController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
+    <script src="../../src/components/ThemeController.js"></script>
+    <script src="../../src/components/MotocicletaCadastroController.js"></script>
 </body>
 </html>

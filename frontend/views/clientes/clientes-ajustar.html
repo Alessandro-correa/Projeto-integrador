@@ -1,202 +1,171 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-	<link rel="stylesheet" href="../../assets/css/style.css">
-	<link rel="stylesheet" href="../../assets/css/usuarios.css">
-	<link rel="stylesheet" href="../../assets/css/clientes.css">
-	<title>Sistema Campos Moto Peças - Ajustar Cliente</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/template.css">
+    <link rel="stylesheet" href="../../assets/css/forms.css">
+    <link rel="stylesheet" href="../../assets/css/ajuste.css">
+    <title>Sistema Campos Moto Peças - Ajustar Cliente</title>
 </head>
 <body>
-	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
-		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
-			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="clientes-consulta.html" class="active"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
-			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
-			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
-		</ul>
-	</section>
-	<section id="content">
-		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
-			<div class="theme-toggle">
-				<input type="checkbox" id="theme-toggle-checkbox">
-				<label for="theme-toggle-checkbox" class="theme-toggle-label">
-					<i class='bx bxs-sun'></i>
-					<i class='bx bxs-moon'></i>
-				</label>
-			</div>
-			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon' ></i>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<a href="#" class="nav-link">
-					<i class='bx bxs-cog icon' title="Configurações"></i>
-				</a>
-				<a href="#" class="nav-link">
-					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
-				</a>
-			</div>
-		</nav>
-		<main>
-			<h1 class="title">Ajustar Cliente</h1>
-			<ul class="breadcrumbs">
-				<li><a href="../../index.html">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="clientes-consulta.html">Clientes</a></li>
-				<li class="divider">/</li>
-				<li><a href="#" class="active">Ajustar Cliente</a></li>
-			</ul>
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3><i class='bx bx-edit'></i> Ajustar Dados do Cliente</h3>
-						<div class="menu">
-							<a href="clientes-consulta.html" class="btn-secondary">
-								<i class='bx bx-arrow-back'></i> Voltar
-							</a>
-						</div>
-					</div>
+    <!-- Sidebar -->
+    <section id="sidebar">
+        <a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+        <ul class="side-menu">
+            <li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+            <li class="divider" data-text="principal">Principal</li>
+            <li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+            <li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+            <li class="divider" data-text="gestão">Gestão</li>
+            <li><a href="clientes-consulta.html" class="active"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+            <li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+            <li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+            <li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+            <li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+            <li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+        </ul>
+    </section>
 
-					<!-- Seção de busca do cliente -->
-					<div class="search-section" id="searchSection">
-						<div class="search-card">
-							<h4><i class='bx bx-search'></i> Buscar Cliente para Ajustar</h4>
-							<div class="search-form">
-								<div class="form-row">
-									<div class="form-group">
-										<label for="search-cpf">CPF do Cliente</label>
-										<input type="text" id="search-cpf" placeholder="XXX.XXX.XXX-XX" required>
-									</div>
-									<div class="form-group">
-										<button type="button" id="btn-search" class="btn-primary">
-											<i class='bx bx-search'></i> Buscar
-										</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+    <!-- Main Content -->
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu toggle-sidebar' ></i>
+            <div class="theme-toggle">
+                <input type="checkbox" id="theme-toggle-checkbox">
+                <label for="theme-toggle-checkbox" class="theme-toggle-label">
+                    <i class='bx bxs-sun'></i>
+                    <i class='bx bxs-moon'></i>
+                </label>
+            </div>
+            <a href="#" class="nav-link" style="margin-left: auto;">
+                <i class='bx bxs-bell icon' ></i>
+            </a>
+            <span class="divider"></span>
+            <div class="profile">
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-cog icon' title="Configurações"></i>
+                </a>
+                <a href="../login/login.html" class="nav-link">
+                    <i class='bx bxs-log-out-circle icon' title="Sair"></i>
+                </a>
+            </div>
+        </nav>
 
-					<!-- Seção de edição (oculta inicialmente) -->
-					<div class="edit-section" id="editSection" style="display: none;">
-						<div class="client-info">
-							<h4><i class='bx bx-user'></i> Dados Atuais do Cliente</h4>
-							<div id="current-client-data"></div>
-						</div>
+        <main>
+            <h1 class="title">Ajustar Cliente</h1>
+            <ul class="breadcrumbs">
+                <li><a href="../dashboard/index.html">Home</a></li>
+                <li class="divider">/</li>
+                <li><a href="clientes-consulta.html">Clientes</a></li>
+                <li class="divider">/</li>
+                <li><a href="#" class="active">Ajustar</a></li>
+            </ul>
 
-						<form id="adjust-form" class="adjust-form">
-							<h4><i class='bx bx-edit-alt'></i> Ajustar Informações</h4>
-							
-							<div class="form-row">
-								<div class="form-group">
-									<label for="adjust-nome">Nome Completo</label>
-									<input type="text" id="adjust-nome" name="nome" required>
-									<small>Nome completo do cliente</small>
-								</div>
-								<div class="form-group">
-									<label for="adjust-email">E-mail</label>
-									<input type="email" id="adjust-email" name="email" required>
-									<small>E-mail válido para contato</small>
-								</div>
-							</div>
+            <!-- Alert Container -->
+            <div id="form-alert" class="alert" style="display: none;"></div>
 
-							<div class="form-row">
-								<div class="form-group">
-									<label for="adjust-cpf">CPF</label>
-									<input type="text" id="adjust-cpf" name="cpf" readonly>
-									<small>CPF não pode ser alterado</small>
-								</div>
-								<div class="form-group">
-									<label for="adjust-telefone">Telefone</label>
-									<input type="text" id="adjust-telefone" name="telefone" required>
-									<small>Telefone para contato</small>
-								</div>
-							</div>
+            <!-- Loading -->
+            <div id="loading" class="loading" style="display: none;">
+                <i class='bx bx-loader-alt bx-spin'></i>
+                <span>Carregando dados...</span>
+            </div>
 
-							<div class="form-row">
-								<div class="form-group">
-									<label for="adjust-sexo">Sexo</label>
-									<select id="adjust-sexo" name="sexo" required>
-										<option value="">Selecione...</option>
-										<option value="Masculino">Masculino</option>
-										<option value="Feminino">Feminino</option>
-									</select>
-									<small>Sexo do cliente</small>
-								</div>
-								<div class="form-group">
-									<label for="adjust-profissao">Profissão</label>
-									<input type="text" id="adjust-profissao" name="profissao" required>
-									<small>Profissão atual</small>
-								</div>
-							</div>
+            <!-- Notification Container -->
+            <div id="notification-container" class="notification-container"></div>
 
-							<div class="form-row">
-								<div class="form-group full-width">
-									<label for="adjust-endereco">Endereço Completo</label>
-									<textarea id="adjust-endereco" name="endereco" rows="3" required placeholder="Rua, número, bairro, cidade, CEP"></textarea>
-									<small>Endereço completo para correspondência</small>
-								</div>
-							</div>
+            <!-- Alert Container -->
+            <div id="alert-container"></div>
 
-							<div class="form-row">
-								<div class="form-group">
-									<label for="adjust-data-nascimento">Data de Nascimento</label>
-									<input type="date" id="adjust-data-nascimento" name="dataDeNascimento" required>
-									<small>Data de nascimento</small>
-								</div>
-								<div class="form-group">
-									<label for="adjust-status">Status</label>
-									<select id="adjust-status" name="status">
-										<option value="Ativo">Ativo</option>
-										<option value="Inativo">Inativo</option>
-									</select>
-									<small>Status do cliente no sistema</small>
-								</div>
-							</div>
+            <!-- Adjustment Form Section -->
+            <div id="adjustment-form-section" style="display: none;">
+                <form id="ajusteForm" class="form-container">
+                    <div class="page-title">
+                        <h2><i class='bx bx-edit'></i> Formulário de Ajuste do Cliente</h2>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Informações Básicas</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cpf">CPF</label>
+                                <input type="text" id="cpf" name="cpf" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="nome">Nome Completo <span class="required">*</span></label>
+                                <input type="text" id="nome" name="nome" required placeholder="Nome completo do cliente">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">E-mail <span class="required">*</span></label>
+                                <input type="email" id="email" name="email" required placeholder="email@exemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefone">Telefone <span class="required">*</span></label>
+                                <input type="text" id="telefone" name="telefone" required placeholder="(11) 99999-9999">
+                            </div>
+                        </div>
+                    </div>
 
-							<!-- Seção de observações -->
-							<div class="form-row">
-								<div class="form-group full-width">
-									<label for="adjust-observacoes">Observações do Ajuste</label>
-									<textarea id="adjust-observacoes" name="observacoes" rows="3" placeholder="Digite as observações sobre este ajuste (opcional)"></textarea>
-									<small>Observações sobre as alterações realizadas</small>
-								</div>
-							</div>
+                    <div class="form-section">
+                        <h3>Informações Pessoais</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sexo">Sexo <span class="required">*</span></label>
+                                <select id="sexo" name="sexo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Feminino">Feminino</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="profissao">Profissão <span class="required">*</span></label>
+                                <input type="text" id="profissao" name="profissao" required placeholder="Profissão do cliente">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="data_nascimento">Data de Nascimento <span class="required">*</span></label>
+                                <input type="date" id="data_nascimento" name="data_nascimento" required>
+                            </div>
+                            <div class="form-group">
+                                <!-- Campo vazio para manter layout -->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="endereco">Endereço Completo <span class="required">*</span></label>
+                            <textarea id="endereco" name="endereco" rows="3" required placeholder="Rua, número, bairro, cidade, CEP..."></textarea>
+                        </div>
+                    </div>
 
-							<div class="form-actions">
-								<button type="submit" class="btn-primary">
-									<i class='bx bx-save'></i> Salvar Ajustes
-								</button>
-								<button type="button" id="btn-cancel" class="btn-secondary">
-									<i class='bx bx-x'></i> Cancelar
-								</button>
-								<button type="button" id="btn-reset" class="btn-warning">
-									<i class='bx bx-reset'></i> Restaurar Dados Originais
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</main>
-	</section>
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn" class="btn btn-secondary">
+                            <i class='bx bx-x'></i> Cancelar
+                        </button>
+                        <button type="submit" id="saveBtn" class="btn btn-primary">
+                            <i class='bx bx-check'></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-	<script type="module" src="../../assets/js/main.js"></script>
-	<script src="../../src/components/Controller.js"></script>
-	<script src="../../src/components/ClienteAjusteController.js"></script>
+        </main>
+    </section>
+
+    <!-- Scripts -->
+    <script src="../../src/components/SidebarController.js"></script>
+    <script src="../../src/components/ThemeController.js"></script>
+    <script src="../../src/components/ClienteAjusteController.js"></script>
+    <script>
+        // Inicializar controller da página apenas se não existir
+        if (!window.clienteAjusteController) {
+            window.clienteAjusteController = new ClienteAjusteController();
+        }
+    </script>
 </body>
 </html>
 
