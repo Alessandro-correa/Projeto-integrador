@@ -1,5 +1,4 @@
 # 📚 Projeto Integrador — 2025.1
-Equipe responsável pelo projeto:
 
 ## 👥 Equipe Responsável pelo Projeto
 
