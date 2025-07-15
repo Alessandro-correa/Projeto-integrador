@@ -151,10 +151,10 @@ async function getServicosPorMotoChart(req, res) {
         COUNT(os.*) as total
       FROM Ordem_de_servico os
       JOIN Motocicleta moto ON os.motocicleta_placa = moto.placa
-      JOIN Marca m ON moto.placa = m.motocicleta_placa
+      JOIN Marca m ON moto.marca_id = m.id
       WHERE os.data >= CURRENT_DATE - INTERVAL '12 months'
       GROUP BY m.nome
-      ORDER BY COUNT(os.*) DESC
+      ORDER BY total DESC
       LIMIT 10
     `);
 
@@ -258,7 +258,7 @@ async function getAllChartData(req, res) {
         COUNT(os.*) as total
       FROM Ordem_de_servico os
       JOIN Motocicleta moto ON os.motocicleta_placa = moto.placa
-      JOIN Marca m ON moto.placa = m.motocicleta_placa
+      JOIN Marca m ON moto.marca_id = m.id
       WHERE os.data >= CURRENT_DATE - INTERVAL '12 months'
       GROUP BY m.nome
       ORDER BY COUNT(os.*) DESC

@@ -5,10 +5,10 @@ class MotocicletaApiController {
   // Criar motocicleta
   async create(req, res) {
     try {
-      let { placa, ano, cor, modelo, cilindrada, clienteCpf, ordemDeServicoCod } = req.body;
+      let { placa, ano, cor, modelo, cilindrada, clienteCpf, marca_id } = req.body;
       placa = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-      if (!placa || !ano || !cor || !modelo || !cilindrada || !clienteCpf) {
+      if (!placa || !ano || !cor || !modelo || !cilindrada || !clienteCpf || !marca_id) {
         return res.status(400).json({
           success: false,
           message: 'Todos os campos são obrigatórios'
@@ -43,12 +43,12 @@ class MotocicletaApiController {
       }
 
       const query = `
-        INSERT INTO Motocicleta (placa, ano, cor, modelo, cilindrada, cliente_cpf, ordem_de_servico_cod)
+        INSERT INTO Motocicleta (placa, ano, cor, modelo, cilindrada, cliente_cpf, marca_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      const novaMotocicleta = await db.one(query, [placa, ano, cor, modelo, cilindrada, clienteCpf, ordemDeServicoCod || null]);
+      const novaMotocicleta = await db.one(query, [placa, ano, cor, modelo, cilindrada, clienteCpf, marca_id]);
 
       res.status(201).json({
         success: true,
@@ -85,11 +85,12 @@ class MotocicletaApiController {
           m.modelo,
           m.cilindrada,
           m.cliente_cpf,
+          m.marca_id,
           c.nome AS cliente_nome,
           ma.nome AS marca_nome
         FROM Motocicleta m
         LEFT JOIN Cliente c ON m.cliente_cpf = c.cpf
-        LEFT JOIN Marca ma ON ma.motocicleta_placa = m.placa
+        LEFT JOIN Marca ma ON m.marca_id = ma.id
       `;
       
       let queryParams = [];
@@ -127,9 +128,10 @@ class MotocicletaApiController {
       const motocicleta = await db.oneOrNone(`
         SELECT 
           m.*,
-          ma.nome as marca_nome
+          ma.nome as marca_nome,
+          ma.id as marca_id
         FROM Motocicleta m
-        LEFT JOIN Marca ma ON m.placa = ma.motocicleta_placa
+        LEFT JOIN Marca ma ON m.marca_id = ma.id
         WHERE m.placa = $1
       `, [placa]);
 
@@ -159,7 +161,7 @@ class MotocicletaApiController {
   async update(req, res) {
     try {
       const { placa } = req.params;
-      const { ano, cor, modelo, cilindrada, clienteCpf, ordemDeServicoCod } = req.body;
+      const { ano, cor, modelo, cilindrada, clienteCpf, marca_id } = req.body;
 
       const existingMotocicleta = await db.oneOrNone('SELECT * FROM Motocicleta WHERE placa = $1', [placa]);
       if (!existingMotocicleta) {
@@ -171,12 +173,12 @@ class MotocicletaApiController {
 
       const query = `
         UPDATE Motocicleta 
-        SET ano = $1, cor = $2, modelo = $3, cilindrada = $4, cliente_cpf = $5, ordem_de_servico_cod = $6
+        SET ano = $1, cor = $2, modelo = $3, cilindrada = $4, cliente_cpf = $5, marca_id = $6
         WHERE placa = $7
         RETURNING *
       `;
 
-      const motocicletaAtualizada = await db.one(query, [ano, cor, modelo, cilindrada, clienteCpf, ordemDeServicoCod || null, placa]);
+      const motocicletaAtualizada = await db.one(query, [ano, cor, modelo, cilindrada, clienteCpf, marca_id, placa]);
 
       res.json({
         success: true,
@@ -261,6 +263,23 @@ class MotocicletaApiController {
         message: 'Erro interno do servidor',
         error: error.message
       });
+    }
+  }
+
+  // Exemplo de método corrigido para listar marcas e modelo de exemplo
+  async listarMarcasComModelo(req, res) {
+    try {
+      const marcas = await db.any(`
+        SELECT m.id, m.nome, MIN(moto.modelo) AS modelo_exemplo
+        FROM Marca m
+        LEFT JOIN Motocicleta moto ON moto.marca_id = m.id
+        GROUP BY m.id, m.nome
+        ORDER BY m.nome
+      `);
+      res.json({ success: true, data: marcas });
+    } catch (error) {
+      console.error('Erro ao listar marcas com modelo:', error);
+      res.status(500).json({ success: false, message: 'Erro ao listar marcas com modelo' });
     }
   }
 }

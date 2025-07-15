@@ -169,12 +169,18 @@ class ClienteApiController {
   async findOne(req, res) {
     try {
       let { cpf } = req.params;
-      cpf = cpf.replace(/\D/g, ''); 
-
-      const clientes = await db.any('SELECT * FROM Cliente');
-      const cliente = clientes.find(c => c.cpf.replace(/\D/g, '') === cpf);
+      
+      // Remover formatação do CPF para busca
+      const cpfLimpo = cpf.replace(/\D/g, '');
+      
+      // Buscar cliente diretamente no banco com CPF formatado ou não formatado
+      const cliente = await db.oneOrNone(`
+        SELECT * FROM Cliente 
+        WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = $1
+      `, [cpfLimpo]);
 
       if (!cliente) {
+        console.log(`Cliente não encontrado para CPF: ${cpf} (limpo: ${cpfLimpo})`);
         return res.status(404).json({
           success: false,
           message: 'Cliente não encontrado'
@@ -199,11 +205,25 @@ class ClienteApiController {
   // Atualizar cliente
   async update(req, res) {
     try {
-      const { cpf } = req.params;
-      let { nome, sexo, endereco, telefone, email, profissao, dataDeNascimento } = req.body;
+      let { cpf } = req.params;
+      const { nome, sexo, endereco, telefone: telefoneOriginal, email, profissao, data_de_nascimento } = req.body;
 
-      // Verificar se cliente existe
-      const existingCliente = await db.oneOrNone('SELECT * FROM Cliente WHERE cpf = $1', [cpf]);
+      // Remover formatação do CPF para busca
+      const cpfLimpo = cpf.replace(/\D/g, '');
+
+      // Validações
+      if (!nome || !sexo || !endereco || !telefoneOriginal || !email || !profissao || !data_de_nascimento) {
+        return res.status(400).json({
+          success: false,
+          message: 'Todos os campos são obrigatórios'
+        });
+      }
+
+      // Verificar se cliente existe usando a mesma lógica do findOne
+      const existingCliente = await db.oneOrNone(`
+        SELECT * FROM Cliente 
+        WHERE REPLACE(REPLACE(REPLACE(cpf, '.', ''), '-', ''), ' ', '') = $1
+      `, [cpfLimpo]);
       if (!existingCliente) {
         return res.status(404).json({
           success: false,
@@ -211,20 +231,25 @@ class ClienteApiController {
         });
       }
 
-      // Validações
-      if (!nome || !sexo || !endereco || !telefone || !email || !profissao || !dataDeNascimento) {
-        return res.status(400).json({
-          success: false,
-          message: 'Todos os campos são obrigatórios'
-        });
-      }
-
       // Validar formato do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z.]{2,}$/;
+      const validTlds = [
+        'com', 'net', 'org', 'edu', 'gov', 'mil', 'br',
+        'com.br', 'net.br', 'org.br', 'gov.br', 'edu.br'
+      ];
       if (!emailRegex.test(email)) {
         return res.status(400).json({
           success: false,
           message: 'Formato de email inválido'
+        });
+      }
+      const domain = email.split('@')[1].toLowerCase();
+      const tld = domain.split('.').slice(-2).join('.');
+      const tldSimple = domain.split('.').pop();
+      if (!validTlds.includes(tld) && !validTlds.includes(tldSimple)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Domínio de e-mail inválido'
         });
       }
 
@@ -237,7 +262,7 @@ class ClienteApiController {
       }
 
       // Validar data de nascimento
-      const dataNasc = new Date(dataDeNascimento);
+      const dataNasc = new Date(data_de_nascimento);
       if (isNaN(dataNasc.getTime())) {
         return res.status(400).json({
           success: false,
@@ -256,7 +281,7 @@ class ClienteApiController {
       }
 
       // Padronizar telefone para só números
-      telefone = telefone.replace(/\D/g, '');
+      let telefone = telefoneOriginal.replace(/\D/g, '');
       if (!/^\d{10,11}$/.test(telefone)) {
         return res.status(400).json({
           success: false,
@@ -264,28 +289,25 @@ class ClienteApiController {
         });
       }
 
-      // Verificar se email já existe (exceto para o cliente atual)
-      const existingEmail = await db.oneOrNone('SELECT email FROM Cliente WHERE email = $1 AND cpf != $2', [email, cpf]);
+      // Verificar se email já existe (mas não para este cliente)
+      const existingEmail = await db.oneOrNone('SELECT email FROM Cliente WHERE email = $1 AND cpf != $2', [email, existingCliente.cpf]);
       if (existingEmail) {
         return res.status(409).json({
           success: false,
-          message: 'Email já cadastrado por outro cliente'
+          message: 'Email já cadastrado para outro cliente'
         });
       }
 
-      const query = `
+      // Atualizar cliente usando o CPF do banco de dados
+      await db.none(`
         UPDATE Cliente 
         SET nome = $1, sexo = $2, endereco = $3, telefone = $4, email = $5, profissao = $6, data_de_nascimento = $7
         WHERE cpf = $8
-        RETURNING *
-      `;
-
-      const clienteAtualizado = await db.one(query, [nome, sexo, endereco, telefone, email, profissao, dataDeNascimento, cpf]);
+      `, [nome, sexo, endereco, telefone, email, profissao, data_de_nascimento, existingCliente.cpf]);
 
       res.json({
         success: true,
-        message: 'Cliente atualizado com sucesso',
-        data: clienteAtualizado
+        message: 'Cliente atualizado com sucesso'
       });
 
     } catch (error) {
@@ -346,6 +368,35 @@ class ClienteApiController {
       });
     }
   }
+
+  // Verificar se email já existe
+  async checkEmail(req, res) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email é obrigatório'
+        });
+      }
+
+      const existingEmail = await db.oneOrNone('SELECT email FROM Cliente WHERE email = $1', [email]);
+      
+      res.json({
+        success: true,
+        exists: !!existingEmail
+      });
+
+    } catch (error) {
+      console.error('Erro ao verificar email:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor',
+        error: error.message
+      });
+    }
+  }
 }
 
-module.exports = new ClienteApiController(); 
+module.exports = new ClienteApiController();

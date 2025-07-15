@@ -3,7 +3,7 @@ const db = require('../config/database');
 class MarcaApiController {
   async create(req, res) {
     try {
-      const { nome, motocicletaPlaca } = req.body;
+      const { nome } = req.body;
 
       if (!nome) {
         return res.status(400).json({
@@ -12,23 +12,13 @@ class MarcaApiController {
         });
       }
 
-      if (motocicletaPlaca) {
-        const moto = await db.oneOrNone('SELECT placa FROM Motocicleta WHERE placa = $1', [motocicletaPlaca]);
-        if (!moto) {
-          return res.status(404).json({
-            success: false,
-            message: 'Motocicleta não encontrada'
-          });
-        }
-      }
-
       const query = `
-        INSERT INTO Marca (nome, motocicleta_placa)
-        VALUES ($1, $2)
+        INSERT INTO Marca (nome)
+        VALUES ($1)
         RETURNING *
       `;
 
-      const novaMarca = await db.one(query, [nome, motocicletaPlaca || null]);
+      const novaMarca = await db.one(query, [nome]);
 
       res.status(201).json({
         success: true,
@@ -46,31 +36,17 @@ class MarcaApiController {
     }
   }
 
-  async findAll(req, res) {
+  async listarMarcas(req, res) {
     try {
       const marcas = await db.any(`
-        SELECT 
-          m.motocicleta_placa, 
-          m.nome, 
-          moto.modelo
+        SELECT m.id, m.nome
         FROM Marca m
-        LEFT JOIN Motocicleta moto ON m.motocicleta_placa = moto.placa
         ORDER BY m.nome
       `);
-
-      res.json({
-        success: true,
-        data: marcas,
-        count: marcas.length
-      });
-
+      res.json({ success: true, data: marcas });
     } catch (error) {
       console.error('Erro ao listar marcas:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor',
-        error: error.message
-      });
+      res.status(500).json({ success: false, message: 'Erro ao listar marcas' });
     }
   }
 
@@ -105,24 +81,16 @@ class MarcaApiController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const { nome, motocicletaPlaca } = req.body;
-
-      const existingMarca = await db.oneOrNone('SELECT * FROM Marca WHERE id = $1', [id]);
-      if (!existingMarca) {
-        return res.status(404).json({
-          success: false,
-          message: 'Marca não encontrada'
-        });
-      }
+      const { nome } = req.body;
 
       const query = `
         UPDATE Marca 
-        SET nome = $1, motocicleta_placa = $2
-        WHERE id = $3
+        SET nome = $1
+        WHERE id = $2
         RETURNING *
       `;
 
-      const marcaAtualizada = await db.one(query, [nome, motocicletaPlaca || null, id]);
+      const marcaAtualizada = await db.one(query, [nome, id]);
 
       res.json({
         success: true,
