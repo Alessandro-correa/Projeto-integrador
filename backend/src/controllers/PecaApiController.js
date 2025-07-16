@@ -1,11 +1,9 @@
-console.log('PecaApiController carregado');
 const db = require('../config/database');
 
 class PecaApiController {
   async create(req, res) {
     try {
       const { descricao, nome, valor, fornecedor } = req.body;
-      console.log('[create] body recebido:', req.body);
 
       if (!descricao || !nome || !valor || !fornecedor) {
         return res.status(400).json({
@@ -15,17 +13,12 @@ class PecaApiController {
       }
 
       const query = `
-        INSERT INTO Peca (descricao, nome, valor)
-        VALUES ($1, $2, $3)
+        INSERT INTO Peca (descricao, nome, valor, forn_id)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
 
-      const novaPeca = await db.one(query, [descricao, nome, valor]);
-      console.log('[create] nova peça criada:', novaPeca);
-
-      // Vincular fornecedor na tabela Fornece, sem duplicidade
-      await db.none('INSERT INTO Fornece (peca_id, fornecedor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [novaPeca.id, fornecedor]);
-      console.log('[create] vínculo Fornece criado:', { peca_id: novaPeca.id, fornecedor_id: fornecedor });
+      const novaPeca = await db.one(query, [descricao, nome, valor, fornecedor]);
 
       res.status(201).json({
         success: true,
@@ -34,7 +27,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao criar peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -45,18 +37,26 @@ class PecaApiController {
 
   async findAll(req, res) {
     try {
+      // Ordenação dinâmica
+      const allowedSort = ['nome', 'valor', 'fornecedor'];
+      const allowedOrder = ['asc', 'desc'];
+      let { sortBy, order } = req.query;
+      sortBy = allowedSort.includes(sortBy) ? sortBy : 'nome';
+      order = allowedOrder.includes((order || '').toLowerCase()) ? order.toUpperCase() : 'ASC';
+
+      // Ajuste para o nome correto da coluna fornecedor
+      const sortColumn = sortBy === 'fornecedor' ? 'f.nome' : `p.${sortBy}`;
+
       const pecas = await db.any(`
         SELECT 
           p.id, 
           p.nome, 
           p.descricao, 
           p.valor, 
-          COALESCE(string_agg(f.nome, ', '), '') AS fornecedor
+          f.nome AS fornecedor
         FROM Peca p
-        LEFT JOIN Fornece fnc ON p.id = fnc.peca_id
-        LEFT JOIN Fornecedor f ON fnc.fornecedor_id = f.id
-        GROUP BY p.id, p.nome, p.descricao, p.valor
-        ORDER BY p.nome
+        LEFT JOIN Fornecedor f ON p.forn_id = f.id
+        ORDER BY ${sortColumn} ${order}
       `);
 
       res.json({
@@ -66,7 +66,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao listar peças:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -78,7 +77,6 @@ class PecaApiController {
   async findOne(req, res) {
     try {
       const { id } = req.params;
-      console.log('[findOne] id recebido:', id);
 
       const query = `
         SELECT 
@@ -86,20 +84,15 @@ class PecaApiController {
           p.nome, 
           p.descricao, 
           p.valor, 
-          COALESCE(string_agg(f.nome, ', '), '') AS fornecedor
+          f.nome AS fornecedor
         FROM Peca p
-        LEFT JOIN Fornece fnc ON p.id = fnc.peca_id
-        LEFT JOIN Fornecedor f ON fnc.fornecedor_id = f.id
+        LEFT JOIN Fornecedor f ON p.forn_id = f.id
         WHERE p.id = $1
-        GROUP BY p.id, p.nome, p.descricao, p.valor
       `;
-      console.log('[findOne] query executada:', query);
 
       const peca = await db.oneOrNone(query, [id]);
-      console.log('[findOne] resultado do banco:', peca);
 
       if (!peca) {
-        console.log('[findOne] Peça não encontrada para id:', id);
         return res.status(404).json({
           success: false,
           message: 'Peça não encontrada'
@@ -112,7 +105,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao buscar peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -124,8 +116,6 @@ class PecaApiController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      console.log('[update] id recebido:', id);
-      console.log('[update] body recebido:', req.body);
       const { descricao, nome, valor, fornecedor } = req.body;
 
       const existingPeca = await db.oneOrNone('SELECT * FROM Peca WHERE id = $1', [id]);
@@ -139,22 +129,12 @@ class PecaApiController {
       // Atualiza os dados da peça
       const query = `
         UPDATE Peca 
-        SET descricao = $1, nome = $2, valor = $3
-        WHERE id = $4
+        SET descricao = $1, nome = $2, valor = $3, forn_id = $4
+        WHERE id = $5
         RETURNING *
       `;
-      console.log('[update] query executada:', query);
-      console.log('[update] valores:', [descricao, nome, valor, id]);
 
-      const pecaAtualizada = await db.one(query, [descricao, nome, valor, id]);
-
-      // Atualiza o fornecedor vinculado (tabela Fornece)
-      if (fornecedor) {
-        // Remove qualquer vínculo antigo
-        await db.none('DELETE FROM Fornece WHERE peca_id = $1', [id]);
-        // Cria novo vínculo, ignorando duplicidade
-        await db.none('INSERT INTO Fornece (peca_id, fornecedor_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, fornecedor]);
-      }
+      const pecaAtualizada = await db.one(query, [descricao, nome, valor, fornecedor, id]);
 
       res.json({
         success: true,
@@ -163,7 +143,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao atualizar peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -192,7 +171,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao remover peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',

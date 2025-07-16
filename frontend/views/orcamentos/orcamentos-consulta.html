@@ -81,6 +81,15 @@
 			<li><a href="../../views/usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
 		</ul>
 	</section>
+<script src="../../src/components/SidebarController.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!window.sidebarController) {
+      window.sidebarController = new SidebarController();
+      console.log('[SidebarController] Instanciado manualmente em orcamentos-consulta.html');
+    }
+  });
+</script>
 
 	<section id="content">
 		<nav>

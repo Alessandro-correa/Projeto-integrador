@@ -7,6 +7,8 @@ class PecaController {
     this.clearFiltersBtn = document.getElementById('clear-filters');
     this.novoBtn = document.querySelector('.btn-primary[href="pecas-cadastro.html"]');
     this.pecas = [];
+    this.sortColumn = 'nome';
+    this.sortDirection = 'asc';
     this.init();
   }
 
@@ -26,6 +28,7 @@ class PecaController {
         window.location.href = 'pecas-cadastro.html';
       });
     }
+    this.initSortableHeaders();
   }
 
   async loadPecas() {
@@ -59,7 +62,21 @@ class PecaController {
       this.tableBody.innerHTML = '<tr><td colspan="6">Nenhuma peça encontrada</td></tr>';
       return;
     }
-    this.tableBody.innerHTML = filtered.map(p => `
+    // Ordenação
+    const sorted = [...filtered].sort((a, b) => {
+      let valA, valB;
+      if (this.sortColumn === 'valor') {
+        valA = parseFloat(a.valor) || 0;
+        valB = parseFloat(b.valor) || 0;
+      } else {
+        valA = (a[this.sortColumn] || '').toString().toLowerCase();
+        valB = (b[this.sortColumn] || '').toString().toLowerCase();
+      }
+      if (valA < valB) return this.sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+    this.tableBody.innerHTML = sorted.map(p => `
       <tr>
         <td>PEC-${String(p.id).padStart(3, '0')}</td>
         <td>${p.nome}</td>
@@ -74,6 +91,7 @@ class PecaController {
       </tr>
     `).join('');
     this.addActionListeners();
+    this.updateSortIcons();
   }
 
   clearFilters() {
@@ -181,6 +199,58 @@ class PecaController {
       document.body.appendChild(notification);
       setTimeout(() => { if (notification && notification.parentElement) notification.remove(); }, 5000);
     }
+  }
+
+  initSortableHeaders() {
+    const table = document.getElementById('pecas-table');
+    if (!table) return;
+    const headers = table.querySelectorAll('th');
+    headers.forEach((th, idx) => {
+      // Nome, Fornecedor, Valor
+      if ([1,3,4].includes(idx)) {
+        th.classList.add('sortable');
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => {
+          const columns = ['nome', 'fornecedor', 'valor'];
+          const column = columns[[1,3,4].indexOf(idx)];
+          if (this.sortColumn === column) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            this.sortColumn = column;
+            this.sortDirection = 'asc';
+          }
+          this.renderTable();
+          this.updateSortIcons();
+        });
+      }
+    });
+    this.updateSortIcons();
+  }
+
+  updateSortIcons() {
+    const table = document.getElementById('pecas-table');
+    if (!table) return;
+    const headers = table.querySelectorAll('th');
+    headers.forEach((th, idx) => {
+      th.classList.remove('sorted-asc','sorted-desc');
+      const icon = th.querySelector('.sort-icon');
+      if (icon) {
+        icon.className = 'bx bx-sort-alt-2 sort-icon';
+      }
+      if ([1,3,4].includes(idx)) {
+        const columns = ['nome', 'fornecedor', 'valor'];
+        if (this.sortColumn === columns[[1,3,4].indexOf(idx)]) {
+          th.classList.add(this.sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+          if (icon) {
+            if (this.sortDirection === 'asc') {
+              icon.className = 'bx bx-sort-up sort-icon active';
+            } else {
+              icon.className = 'bx bx-sort-down sort-icon active';
+            }
+          }
+        }
+      }
+    });
   }
 }
 

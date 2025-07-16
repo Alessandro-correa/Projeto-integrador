@@ -347,7 +347,7 @@ class UsuarioApiController {
       // Gerar JWT
       const token = jwt.sign(
         { cpf: usuario.cpf, role: usuario.funcao },
-        process.env.JWT_SECRET || 'segredo_super_secreto',
+        process.env.JWT_SECRET,
         { expiresIn: '2h' }
       );
       res.json({
@@ -366,6 +366,17 @@ class UsuarioApiController {
       });
     }
   }
+
+  // Listar todos os mecânicos
+  async findMecanicos(req, res) {
+    try {
+      const mecanicos = await db.any("SELECT cpf, nome FROM Usuario WHERE funcao = 'Mecânico'");
+      res.json({ success: true, data: mecanicos });
+    } catch (error) {
+      console.error('Erro ao listar mecânicos:', error);
+      res.status(500).json({ success: false, message: 'Erro interno do servidor', error: error.message });
+    }
+  }
 }
 
 // Middleware de autorização por função
@@ -377,7 +388,7 @@ function authorizeRoles(...allowedRoles) {
     }
     const token = authHeader.split(' ')[1];
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'segredo_super_secreto');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       if (!allowedRoles.includes(decoded.role)) {
         return res.status(403).json({ message: 'Acesso negado' });
       }

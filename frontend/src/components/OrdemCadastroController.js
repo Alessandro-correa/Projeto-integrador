@@ -4,7 +4,8 @@ class OrdemCadastroController {
         this.clientesApiUrl = 'http://localhost:3000/api/clientes';
         this.motocicletasApiUrl = 'http://localhost:3000/api/motocicletas';
         this.pecasApiUrl = 'http://localhost:3000/api/pecas';
-        this.usuariosApiUrl = 'http://localhost:3000/api/usuarios';
+        // Remover referência a usuários
+        // this.usuariosApiUrl = 'http://localhost:3000/api/usuarios';
         this.form = document.getElementById('cadastroForm');
         this.clienteSelect = document.getElementById('cliente_id');
         this.motocicletaSelect = document.getElementById('motocicleta_id');
@@ -13,7 +14,7 @@ class OrdemCadastroController {
         this.addPecaBtn = document.getElementById('addPecaBtn');
         this.pecasSelecionadas = [];
         this.formOverlay = document.getElementById('form-overlay');
-        this.mecanicoResponsavel = null; 
+        // this.mecanicoResponsavel = null; // Não é mais necessário
         this.isSubmitting = false;
         this.init();
     }
@@ -30,7 +31,8 @@ class OrdemCadastroController {
         }
 
         this.loadClientes();
-        this.loadMecanico(); 
+        // Remover chamada de loadMecanico()
+        // this.loadMecanico(); 
         
         if (this.form) {
             this.form.addEventListener('submit', (e) => this.handleSubmit(e));
@@ -146,38 +148,7 @@ class OrdemCadastroController {
         }
     }
 
-    async loadMecanico() {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(this.usuariosApiUrl, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Erro ao carregar usuários');
-            
-            const json = await res.json();
-            const usuarios = json.data || [];
-
-            const mecanico = usuarios.find(usuario => 
-                usuario.funcao && (
-                    usuario.funcao.toLowerCase().includes('mecânico') ||
-                    usuario.tipo && usuario.tipo.toLowerCase().includes('mecânico')
-                )
-            );
-            
-            if (mecanico) {
-                this.mecanicoResponsavel = mecanico.cpf;
-                console.log('Mecânico responsável definido automaticamente:', mecanico.nome, '-', mecanico.cpf);
-            } else {
-                
-                this.mecanicoResponsavel = usuarios[0]?.cpf || null;
-                console.log('Usando primeiro usuário como responsável:', usuarios[0]?.nome);
-            }
-            
-        } catch (e) {
-            console.error('Erro ao carregar mecânico:', e);
-            this.showNotification('Erro ao definir mecânico responsável. Verifique a conexão.', 'error');
-        }
-    }
+    // Remover função loadMecanico
 
     async loadMotocicletasByCliente() {
         if (!this.clienteSelect || !this.clienteSelect.value) {
@@ -246,16 +217,21 @@ class OrdemCadastroController {
         submitButton.innerHTML = '<i class="bx bx-loader bx-spin"></i> Salvando...';
         
         const formData = new FormData(this.form);
+        // Calcular valor total das peças
+        const valorTotalPecas = this.pecasSelecionadas.reduce((acc, p) => acc + (p.valor * p.quantidade), 0);
+        // Pegar valor de mão de obra do formulário (se existir campo)
+        const valorMaoDeObra = parseFloat(formData.get('valor_mao_de_obra')) || 0;
         const data = {
             titulo: formData.get('titulo')?.trim(),
             data: formData.get('data_abertura'),
             descricao: formData.get('descricao')?.trim(),
             status: formData.get('status'),
-            observacao: formData.get('observacoes')?.trim() || null,
+            valor: valorTotalPecas,
+            valor_mao_de_obra: valorMaoDeObra,
             validada: false,
             clienteCpf: formData.get('cliente_id'), 
-            usuarioCpf: this.mecanicoResponsavel, 
-            motocicletaPlaca: formData.get('motocicleta_id')
+            motocicletaPlaca: formData.get('motocicleta_id'),
+            pecas: this.pecasSelecionadas // Enviar peças selecionadas
         };
 
         const errors = [];
@@ -264,7 +240,8 @@ class OrdemCadastroController {
         if (!data.titulo) errors.push('Título do serviço é obrigatório');
         if (!data.descricao) errors.push('Descrição dos serviços é obrigatória');
         if (!data.clienteCpf) errors.push('Cliente deve ser selecionado');
-        if (!data.usuarioCpf) errors.push('Erro interno: mecânico responsável não foi definido');
+        // Remover usuárioCpf
+        // if (!data.usuarioCpf) errors.push('Erro interno: mecânico responsável não foi definido');
         if (!data.motocicletaPlaca) errors.push('Motocicleta deve ser selecionada');
         
         if (data.titulo && data.titulo.length < 5) {
@@ -485,7 +462,10 @@ class OrdemCadastroController {
         if (!pecasDiv) return;
         pecasDiv.innerHTML = '<div class="loading">Carregando peças...</div>';
         try {
-            const res = await fetch(this.pecasApiUrl);
+            const token = localStorage.getItem('token');
+            const res = await fetch(this.pecasApiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!res.ok) throw new Error('Erro ao buscar peças');
             const json = await res.json();
             const pecas = json.data || [];

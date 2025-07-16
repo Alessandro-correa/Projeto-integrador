@@ -96,9 +96,6 @@ class ClienteController {
                         <button class="action-btn" onclick="clienteController.editarCliente('${cliente.cpf}')" title="Editar">
                             <i class='bx bx-edit'></i>
                         </button>
-                        <button class="action-btn" onclick="clienteController.ajustarCliente('${cliente.cpf}')" title="Ajustar">
-                            <i class='bx bx-cog'></i>
-                        </button>
                         <button class="action-btn" onclick="clienteController.confirmarExclusao('${cliente.cpf}', '${cliente.nome}')" title="Excluir">
                             <i class='bx bx-trash'></i>
                         </button>

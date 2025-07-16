@@ -82,5 +82,80 @@
 	</section>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
+	<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form.os-form');
+    const nomeInput = document.getElementById('nome');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    function showNotification(message, type = 'info') {
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        `;
+        const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle';
+        notification.innerHTML = `
+            <i class='bx bx-${icon}'></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            if (notification && notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const nome = nomeInput.value.trim();
+        if (!nome) {
+            showNotification('O nome da marca é obrigatório.', 'error');
+            nomeInput.focus();
+            return;
+        }
+        submitBtn.disabled = true;
+        submitBtn.classList.add('loading');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:3000/api/marcas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ nome })
+            });
+            const result = await response.json();
+            if (result.success) {
+                showNotification('Marca cadastrada com sucesso!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'marcas-consulta.html';
+                }, 1200);
+            } else {
+                showNotification(result.message || 'Erro ao cadastrar marca.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+            }
+        } catch (error) {
+            showNotification('Erro ao cadastrar marca.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+        }
+    });
+});
+</script>
 </body>
 </html>

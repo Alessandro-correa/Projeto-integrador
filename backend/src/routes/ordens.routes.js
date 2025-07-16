@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const OrdemServicoApiController = require('../controllers/OrdemServicoApiController');
+const OrdemServicoApiController = require('../controllers/ordemServicoApiController');
 const { authorizeRoles } = require('../controllers/UsuarioApiController');
 
 // Rotas para ordens de serviço

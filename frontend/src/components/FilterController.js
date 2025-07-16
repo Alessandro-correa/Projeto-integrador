@@ -157,7 +157,10 @@ class FilterController {
         if (!this.entity) return;
 
         try {
-            const response = await fetch(`${this.baseURL}/${this.entity}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${this.entity}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
 
             if (result.success) {
@@ -228,7 +231,6 @@ class FilterController {
                 ];
             case 'marcas':
                 return [
-                    item.id || '',
                     item.nome || ''
                 ];
             case 'motocicletas':
@@ -295,7 +297,10 @@ class FilterController {
         // Buscar motocicletas associadas à marca via API
         let motos = [];
         try {
-            const response = await fetch(`${this.baseURL}/motocicletas?marca_id=${id}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/motocicletas?marca_id=${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
             if (result.success && Array.isArray(result.data)) {
                 motos = result.data.filter(m => String(m.marca_id) === String(id));
@@ -398,10 +403,12 @@ class FilterController {
             document.getElementById('modal-confirm-delete').remove();
             try {
                 const url = `${this.baseURL}/${this.entity}/${id}`;
+                const token = localStorage.getItem('token');
                 const response = await fetch(url, {
-                method: 'DELETE'
-            });
-            const result = await response.json();
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const result = await response.json();
             if (result.success) {
                     this.showNotification(`${this.entity === 'marcas' && nome ? 'Marca "' + nome + '" excluída com sucesso!' : 'Item excluído com sucesso!'}`, 'success');
                 await this.loadData(); 

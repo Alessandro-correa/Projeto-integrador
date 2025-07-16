@@ -355,5 +355,3 @@ class FormController {
         }, 5000);
     }
 }
-
-export default FormController;

@@ -145,7 +145,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Carregar dados da marca
     try {
-        const response = await fetch(`http://localhost:3000/api/marcas/${marcaId}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/api/marcas/${marcaId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         const result = await response.json();
         if (result.success && result.data) {
             idInput.value = result.data.id;
@@ -170,9 +173,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         submitBtn.disabled = true;
         submitBtn.classList.add('loading');
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:3000/api/marcas/${marcaId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ nome })
             });
             const result = await response.json();

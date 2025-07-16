@@ -40,7 +40,12 @@
                 localStorage.setItem('token', result.token);
                 localStorage.setItem('userType', result.role || '');
                 localStorage.setItem('userName', result.nome || '');
-                window.location.href = '../../views/dashboard/index.html';
+                const role = (result.role || '').toLowerCase();
+                if (role === 'mecânico' || role === 'secretária') {
+                    window.location.href = '../../views/os/os-consulta.html';
+                } else {
+                    window.location.href = '../../views/dashboard/index.html';
+                }
             } else {
                 alert(result.message || 'Login falhou');
             }

@@ -17,7 +17,10 @@ class OrcamentoController {
             direction: 'desc' 
         };
         
-        this.init();
+        // Só inicializa se estiver na página de consulta
+        if (this.tableBody && this.filterText && this.filterStatus && this.clearFiltersBtn) {
+            this.init();
+        }
     }
 
     initSortableHeaders() {
@@ -305,7 +308,10 @@ class OrcamentoController {
             btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 const id = btn.getAttribute('data-id');
-                await this.abrirModalRejeicao(id);
+                const confirmar = confirm('Tem certeza que deseja rejeitar este orçamento? Esta ação não pode ser desfeita.');
+                if (confirmar) {
+                    await this.rejeitarOrcamentoComMotivo(id, { motivo: 'Rejeitado pelo usuário', observacao: '' });
+                }
             });
         });
 
@@ -606,11 +612,6 @@ class OrcamentoController {
         }
     }
 
-    async rejeitarOrcamento(id) {
-        // Método mantido para compatibilidade, mas redireciona para o modal
-        await this.abrirModalRejeicao(id);
-    }
-
     async excluirOrcamento(id) {
         try {
             const token = localStorage.getItem('token');
@@ -858,183 +859,6 @@ class OrcamentoController {
         });
     }
 
-    async abrirModalRejeicao(orcamentoId) {
-        try {
-            // Buscar dados do orçamento
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${this.apiUrl}/${orcamentoId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!response.ok) throw new Error('Erro ao buscar orçamento');
-            
-            const result = await response.json();
-            const orcamento = result.data;
-
-            this.criarModalRejeicao(orcamento);
-
-        } catch (error) {
-            console.error('Erro ao carregar dados do orçamento:', error);
-            this.showNotification('Erro ao carregar dados do orçamento', 'error');
-        }
-    }
-
-    criarModalRejeicao(orcamento) {
-        // Remover modal existente se houver
-        const modalExistente = document.getElementById('modal-rejeicao-orcamento');
-        if (modalExistente) {
-            modalExistente.remove();
-        }
-
-        const modalHtml = `
-            <div class="modal fade" id="modal-rejeicao-orcamento" tabindex="-1" data-bs-backdrop="static">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title">
-                                <i class='bx bx-x-circle me-2'></i>
-                                Rejeitar Orçamento #${orcamento.id}
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        
-                        <div class="modal-body">
-                            <!-- Informações do Orçamento -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h6 class="mb-0"><i class='bx bx-file-blank me-2'></i>Detalhes do Orçamento</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p><strong>Cliente:</strong> ${orcamento.cliente_nome}</p>
-                                            <p><strong>CPF:</strong> ${orcamento.cliente_cpf}</p>
-                                            <p><strong>Status Atual:</strong> 
-                                                <span class="badge bg-warning">${this.getStatusBadge(orcamento.status)}</span>
-                                            </p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p><strong>Valor:</strong> R$ ${parseFloat(orcamento.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                                            <p><strong>Validade:</strong> ${new Date(orcamento.validade).toLocaleDateString('pt-BR')}</p>
-                                            <p><strong>Data Criação:</strong> ${new Date(orcamento.data_criacao).toLocaleDateString('pt-BR')}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Motivo da Rejeição -->
-                            <div class="card mb-4">
-                                <div class="card-header bg-light">
-                                    <h6 class="mb-0"><i class='bx bx-message-detail me-2'></i>Motivo da Rejeição</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group mb-3">
-                                        <label for="motivo-rejeicao" class="form-label">Motivo <span class="text-danger">*</span></label>
-                                        <select class="form-select" id="motivo-rejeicao" required>
-                                            <option value="">Selecione um motivo...</option>
-                                            <option value="Valor muito alto">Valor muito alto</option>
-                                            <option value="Peças não disponíveis">Peças não disponíveis</option>
-                                            <option value="Cliente não aprovou">Cliente não aprovou</option>
-                                            <option value="Prazo de validade vencido">Prazo de validade vencido</option>
-                                            <option value="Erro no orçamento">Erro no orçamento</option>
-                                            <option value="Outros">Outros</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="observacao-rejeicao" class="form-label">Observações</label>
-                                        <textarea class="form-control" id="observacao-rejeicao" rows="4" 
-                                                  placeholder="Descreva detalhadamente o motivo da rejeição..."></textarea>
-                                        <div class="form-text">Essas informações ficarão registradas no sistema</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Aviso sobre a Ação -->
-                            <div class="alert alert-danger">
-                                <h6><i class='bx bx-error-circle me-2'></i>Atenção</h6>
-                                <ul class="mb-0">
-                                    <li>O orçamento será marcado como <strong>REJEITADO</strong></li>
-                                    <li>Esta ação <strong>não pode ser desfeita</strong></li>
-                                    <li>O cliente será notificado sobre a rejeição</li>
-                                    <li>O orçamento não poderá mais ser validado</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class='bx bx-x me-1'></i>Cancelar
-                            </button>
-                            <button type="button" class="btn btn-danger" id="confirmar-rejeicao" disabled>
-                                <i class='bx bx-x-circle me-1'></i>Rejeitar Orçamento
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Adicionar modal ao DOM
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        
-        // Configurar eventos
-        this.configurarEventosModalRejeicao(orcamento.id);
-        
-        // Mostrar modal
-        const modalElement = document.getElementById('modal-rejeicao-orcamento');
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-        
-        // Armazenar referência do modal para uso posterior
-        modalElement._bootstrapModal = modal;
-    }
-
-    configurarEventosModalRejeicao(orcamentoId) {
-        const modal = document.getElementById('modal-rejeicao-orcamento');
-        const btnConfirmar = modal.querySelector('#confirmar-rejeicao');
-        const selectMotivo = modal.querySelector('#motivo-rejeicao');
-
-        // Habilitar/desabilitar botão conforme seleção de motivo
-        selectMotivo.addEventListener('change', () => {
-            btnConfirmar.disabled = !selectMotivo.value;
-        });
-
-        // Confirmar rejeição
-        btnConfirmar.addEventListener('click', async () => {
-            const motivo = selectMotivo.value;
-            const observacao = modal.querySelector('#observacao-rejeicao').value;
-
-            if (!motivo) {
-                this.showNotification('Selecione um motivo para continuar', 'warning');
-                return;
-            }
-
-            // Desabilitar botão durante processamento
-            btnConfirmar.disabled = true;
-            btnConfirmar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processando...';
-
-            try {
-                await this.rejeitarOrcamentoComMotivo(orcamentoId, {
-                    motivo,
-                    observacao
-                });
-
-                // Fechar modal
-                const modalElement = document.getElementById('modal-rejeicao-orcamento');
-                if (modalElement._bootstrapModal) {
-                    modalElement._bootstrapModal.hide();
-                } else {
-                    modalElement.remove();
-                }
-                
-            } catch (error) {
-                // Reabilitar botão em caso de erro
-                btnConfirmar.disabled = false;
-                btnConfirmar.innerHTML = '<i class="bx bx-x-circle me-1"></i>Rejeitar Orçamento';
-            }
-        });
-    }
-
     showNotification(message, type = 'info') {
         // Remove qualquer notificação existente
         const existingNotification = document.querySelector('.notification-toast');
@@ -1097,5 +921,5 @@ class OrcamentoController {
 
 // Inicializar quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
-    window.orcamentoController = new OrcamentoController();
+    // Removido o trecho que instancia automaticamente a classe para evitar conflitos de escopo global.
 });

@@ -459,6 +459,7 @@ class OrcamentoCadastroController {
             descricao: JSON.stringify(descricaoEstruturada)
         };
         try {
+        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:3000/api/orcamentos', {
             method: 'POST',
             headers: {

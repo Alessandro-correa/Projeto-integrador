@@ -9,13 +9,13 @@ class OrdemServicoApiController {
   // Criar ordem de serviço
   async create(req, res) {
     try {
-      const { titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, valorMaoDeObra, validada, usuarioCpf, clienteCpf, motocicletaPlaca } = req.body;
+      const { titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, valorMaoDeObra, validada, clienteCpf, motocicletaPlaca } = req.body;
 
       // Validações
-      if (!titulo || !data || !descricao || !status || !usuarioCpf || !clienteCpf || !motocicletaPlaca) {
+      if (!titulo || !data || !descricao || !status || !clienteCpf || !motocicletaPlaca) {
         return res.status(400).json({
           success: false,
-          message: 'Título, data, descrição, status, CPF do usuário, CPF do cliente e placa da motocicleta são obrigatórios'
+          message: 'Título, data, descrição, status, CPF do cliente e placa da motocicleta são obrigatórios'
         });
       }
 
@@ -34,15 +34,6 @@ class OrdemServicoApiController {
         return res.status(400).json({
           success: false,
           message: 'Status inválido. Status válidos: ' + statusValidos.join(', ')
-        });
-      }
-
-      // Verificar se usuário existe
-      const usuario = await db.oneOrNone('SELECT cpf FROM Usuario WHERE cpf = $1', [usuarioCpf]);
-      if (!usuario) {
-        return res.status(404).json({
-          success: false,
-          message: 'Usuário não encontrado'
         });
       }
 
@@ -65,8 +56,8 @@ class OrdemServicoApiController {
       }
 
       const query = `
-        INSERT INTO Ordem_de_servico (titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, validada, usuario_cpf, cliente_cpf, motocicleta_placa)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO Ordem_de_servico (titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, validada, cliente_cpf, motocicleta_placa)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *
       `;
 
@@ -74,7 +65,19 @@ class OrdemServicoApiController {
       const valorMaoDeObraFinal = valor_mao_de_obra ? parseFloat(valor_mao_de_obra) : 
                                   valorMaoDeObra ? parseFloat(valorMaoDeObra) : 0.00;
 
-      const novaOrdem = await db.one(query, [titulo, data, descricao, status, observacao || null, valorFinal, valorMaoDeObraFinal, validada || false, usuarioCpf, clienteCpf, motocicletaPlaca]);
+      const novaOrdem = await db.one(query, [titulo, data, descricao, status, observacao || null, valorFinal, valorMaoDeObraFinal, validada || false, clienteCpf, motocicletaPlaca]);
+
+      // Inserir peças na Possui_peca
+      if (req.body.pecas && Array.isArray(req.body.pecas)) {
+        for (const peca of req.body.pecas) {
+          if (peca.id && peca.quantidade > 0) {
+            await db.none(
+              'INSERT INTO Possui_peca (ordem_de_servico_cod, peca_id, qtd_pecas) VALUES ($1, $2, $3)',
+              [novaOrdem.cod, peca.id, peca.quantidade]
+            );
+          }
+        }
+      }
 
       res.status(201).json({
         success: true,
@@ -106,9 +109,6 @@ class OrdemServicoApiController {
           os.valor,
           os.valor_mao_de_obra,
           os.validada,
-          os.usuario_cpf,
-          u.nome AS usuario_nome,
-          u.funcao AS usuario_funcao,
           c.nome AS cliente_nome,
           c.cpf AS cliente_cpf,
           c.telefone AS cliente_telefone,
@@ -118,7 +118,6 @@ class OrdemServicoApiController {
           m.ano AS motocicleta_ano,
           m.cor AS motocicleta_cor
         FROM Ordem_de_servico os
-        JOIN Usuario u ON os.usuario_cpf = u.cpf
         JOIN Cliente c ON os.cliente_cpf = c.cpf
         JOIN Motocicleta m ON os.motocicleta_placa = m.placa
         ORDER BY os.data DESC
@@ -157,11 +156,8 @@ class OrdemServicoApiController {
           os.valor,
           os.valor_mao_de_obra,
           os.validada,
-          os.usuario_cpf,
           os.cliente_cpf,
           os.motocicleta_placa,
-          u.nome AS usuario_nome,
-          u.funcao AS usuario_funcao,
           c.nome AS cliente_nome,
           c.telefone AS cliente_telefone,
           c.email AS cliente_email,
@@ -170,7 +166,6 @@ class OrdemServicoApiController {
           m.cor AS motocicleta_cor,
           m.cilindrada AS motocicleta_cilindrada
         FROM Ordem_de_servico os
-        JOIN Usuario u ON os.usuario_cpf = u.cpf
         JOIN Cliente c ON os.cliente_cpf = c.cpf
         JOIN Motocicleta m ON os.motocicleta_placa = m.placa
         WHERE os.cod = $1

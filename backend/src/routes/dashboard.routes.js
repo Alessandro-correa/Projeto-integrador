@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const DashboardApiController = require('../controllers/DashboardApiController');
-const { authorizeRoles } = require('../controllers/UsuarioApiController');
+const DashboardApiController = require('../controllers/dashboardApiController');
+const { authorizeRoles } = require('../controllers/usuarioApiController');
 
 // Rota para estatísticas gerais
 router.get('/stats', authorizeRoles('Administrador'), DashboardApiController.getStats);

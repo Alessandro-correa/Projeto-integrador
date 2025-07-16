@@ -411,6 +411,7 @@ class OrcamentoApiController {
                 console.log('🔧 Preservando itens existentes com alterações:', JSON.stringify(descricaoEstruturada, null, 2));
               }
             }
+
           }
         } catch (parseError) {
           console.log('🔧 Erro ao fazer parse dos itens existentes:', parseError.message);
@@ -696,11 +697,10 @@ class OrcamentoApiController {
             observacao, 
             valor,
             validada,
-            usuario_cpf, 
             cliente_cpf, 
             motocicleta_placa
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
           RETURNING *
         `, [
           `OS-ORC-${orcamento.id} - ${orcamento.cliente_nome}`,
@@ -710,7 +710,6 @@ class OrcamentoApiController {
           `Ordem de serviço criada a partir da aprovação do orçamento #${orcamento.id}`,
           parseFloat(orcamento.valor),
           true,
-          usuarioPadrao,
           orcamento.cliente_cpf,
           motocicleta.placa
         ]);

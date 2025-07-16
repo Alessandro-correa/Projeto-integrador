@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const OrcamentoApiController = require('../controllers/OrcamentoApiController');
+const OrcamentoApiController = require('../controllers/orcamentoApiController');
 const { authorizeRoles } = require('../controllers/UsuarioApiController');
 
 // Rotas para orçamentos

@@ -2,11 +2,46 @@
  * SERVIDOR PRINCIPAL - OFICINA MOTOCICLETAS
  * Estrutura MVC organizada com separação clara entre backend e frontend
  */
-
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const swaggerUi = require('swagger-ui-express');
+const swaggerJSDoc = require('swagger-jsdoc');
+
+// Configuração do Swagger
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Oficina Motocicletas API',
+    version: '1.0.0',
+    description: 'Documentação da API do sistema Oficina Motocicletas',
+  },
+  servers: [
+    {
+      url: 'http://localhost:3000/api',
+      description: 'Servidor local',
+    },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+};
+
+const options = {
+  swaggerDefinition,
+  apis: ['./src/routes/*.js', './src/controllers/*.js'],
+};
+const swaggerSpec = swaggerJSDoc(options);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,7 +63,7 @@ app.use('/api', (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'segredo_super_secreto');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (err) {
@@ -42,7 +77,6 @@ const usuarioRoutes = require('./src/routes/usuarios.routes');
 const ordemRoutes = require('./src/routes/ordens.routes');
 const orcamentoRoutes = require('./src/routes/orcamentos.routes');
 const motocicletaRoutes = require('./src/routes/motocicletas.routes');
-const aquisicaoRoutes = require('./src/routes/aquisicoes.routes');
 const pecaRoutes = require('./src/routes/pecas.routes');
 const fornecedorRoutes = require('./src/routes/fornecedores.routes');
 const marcaRoutes = require('./src/routes/marcas.routes');
@@ -54,11 +88,11 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/ordens', ordemRoutes);
 app.use('/api/orcamentos', orcamentoRoutes);
 app.use('/api/motocicletas', motocicletaRoutes);
-app.use('/api/aquisicoes', aquisicaoRoutes);
 app.use('/api/pecas', pecaRoutes);
 app.use('/api/fornecedores', fornecedorRoutes);
 app.use('/api/marcas', marcaRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Rota para servir a página principal
 app.get('/', (req, res) => {
@@ -85,10 +119,8 @@ app.use('*', (req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`📱 Frontend disponível em: http://localhost:${PORT}`);
-    console.log(`🔌 API disponível em: http://localhost:${PORT}/api`);
-    console.log(`📊 Dashboard: http://localhost:${PORT}/views/dashboard/index.html`);
+    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`Login disponível em: http://localhost:${PORT}/views/login/login.html`);
 });
 
 module.exports = app;
