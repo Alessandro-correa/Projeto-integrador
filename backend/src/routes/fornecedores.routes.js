@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const FornecedorApiController = require('../controllers/FornecedorApiController');
+const FornecedorApiController = require('../controllers/fornecedorApiController');
 
 // Rotas para fornecedores
 router.post('/', FornecedorApiController.create);        

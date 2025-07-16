@@ -3,31 +3,22 @@ const db = require('../config/database');
 class PecaApiController {
   async create(req, res) {
     try {
-      const { descricao, nome, valor, aquisicaoId, precoDaCompra, vencimento, quantidade } = req.body;
+      const { descricao, nome, valor, fornecedor } = req.body;
 
-      if (!descricao || !nome || !valor || !aquisicaoId || !precoDaCompra || !quantidade) {
+      if (!descricao || !nome || !valor || !fornecedor) {
         return res.status(400).json({
           success: false,
-          message: 'Descrição, nome, valor, ID da aquisição, preço da compra e quantidade são obrigatórios'
-        });
-      }
-
-      // Verificar se aquisição existe
-      const aquisicao = await db.oneOrNone('SELECT id FROM Aquisicao WHERE id = $1', [aquisicaoId]);
-      if (!aquisicao) {
-        return res.status(404).json({
-          success: false,
-          message: 'Aquisição não encontrada'
+          message: 'Descrição, nome, valor e fornecedor são obrigatórios'
         });
       }
 
       const query = `
-        INSERT INTO Peca (descricao, nome, valor, aquisicao_id, preco_da_compra, vencimento, quantidade)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO Peca (descricao, nome, valor, forn_id)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
 
-      const novaPeca = await db.one(query, [descricao, nome, valor, aquisicaoId, precoDaCompra, vencimento || null, quantidade]);
+      const novaPeca = await db.one(query, [descricao, nome, valor, fornecedor]);
 
       res.status(201).json({
         success: true,
@@ -36,7 +27,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao criar peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -47,18 +37,26 @@ class PecaApiController {
 
   async findAll(req, res) {
     try {
+      // Ordenação dinâmica
+      const allowedSort = ['nome', 'valor', 'fornecedor'];
+      const allowedOrder = ['asc', 'desc'];
+      let { sortBy, order } = req.query;
+      sortBy = allowedSort.includes(sortBy) ? sortBy : 'nome';
+      order = allowedOrder.includes((order || '').toLowerCase()) ? order.toUpperCase() : 'ASC';
+
+      // Ajuste para o nome correto da coluna fornecedor
+      const sortColumn = sortBy === 'fornecedor' ? 'f.nome' : `p.${sortBy}`;
+
       const pecas = await db.any(`
         SELECT 
           p.id, 
           p.nome, 
           p.descricao, 
           p.valor, 
-          COALESCE(string_agg(f.nome, ', '), '') AS fornecedor
+          f.nome AS fornecedor
         FROM Peca p
-        LEFT JOIN Fornece fnc ON p.id = fnc.peca_id
-        LEFT JOIN Fornecedor f ON fnc.fornecedor_id = f.id
-        GROUP BY p.id, p.nome, p.descricao, p.valor
-        ORDER BY p.nome
+        LEFT JOIN Fornecedor f ON p.forn_id = f.id
+        ORDER BY ${sortColumn} ${order}
       `);
 
       res.json({
@@ -68,7 +66,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao listar peças:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -81,7 +78,19 @@ class PecaApiController {
     try {
       const { id } = req.params;
 
-      const peca = await db.oneOrNone('SELECT * FROM Peca WHERE id = $1', [id]);
+      const query = `
+        SELECT 
+          p.id, 
+          p.nome, 
+          p.descricao, 
+          p.valor, 
+          f.nome AS fornecedor
+        FROM Peca p
+        LEFT JOIN Fornecedor f ON p.forn_id = f.id
+        WHERE p.id = $1
+      `;
+
+      const peca = await db.oneOrNone(query, [id]);
 
       if (!peca) {
         return res.status(404).json({
@@ -96,7 +105,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao buscar peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -108,7 +116,7 @@ class PecaApiController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const { descricao, nome, valor, aquisicaoId, precoDaCompra, vencimento, quantidade } = req.body;
+      const { descricao, nome, valor, fornecedor } = req.body;
 
       const existingPeca = await db.oneOrNone('SELECT * FROM Peca WHERE id = $1', [id]);
       if (!existingPeca) {
@@ -118,14 +126,15 @@ class PecaApiController {
         });
       }
 
+      // Atualiza os dados da peça
       const query = `
         UPDATE Peca 
-        SET descricao = $1, nome = $2, valor = $3, aquisicao_id = $4, preco_da_compra = $5, vencimento = $6, quantidade = $7
-        WHERE id = $8
+        SET descricao = $1, nome = $2, valor = $3, forn_id = $4
+        WHERE id = $5
         RETURNING *
       `;
 
-      const pecaAtualizada = await db.one(query, [descricao, nome, valor, aquisicaoId, precoDaCompra, vencimento || null, quantidade, id]);
+      const pecaAtualizada = await db.one(query, [descricao, nome, valor, fornecedor, id]);
 
       res.json({
         success: true,
@@ -134,7 +143,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao atualizar peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -163,7 +171,6 @@ class PecaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao remover peça:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',

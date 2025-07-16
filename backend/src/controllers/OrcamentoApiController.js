@@ -76,7 +76,8 @@ class OrcamentoApiController {
   // Criar orçamento
   async create(req, res) {
     try {
-      const { validade, clienteCpf, status, itens, motocicletaPlaca, observacoes } = req.body;
+
+      const { validade, clienteCpf, status, descricao } = req.body;
 
       if (!validade || !clienteCpf) {
         return res.status(400).json({
@@ -94,30 +95,22 @@ class OrcamentoApiController {
         });
       }
 
-      // Verificar se motocicleta existe (se fornecida)
-      if (motocicletaPlaca) {
-        const moto = await db.oneOrNone('SELECT placa FROM Motocicleta WHERE placa = $1', [motocicletaPlaca]);
-        if (!moto) {
-          return res.status(404).json({
-            success: false,
-            message: 'Motocicleta não encontrada'
-          });
-        }
+      // Se veio descricao estruturada do frontend, usar direto
+      let descricaoEstruturada;
+      if (descricao) {
+        descricaoEstruturada = typeof descricao === 'string' ? JSON.parse(descricao) : descricao;
+      } else {
+        descricaoEstruturada = {
+          pecas: [],
+          servicos: [],
+          observacoes: '',
+          motocicleta_placa: null
+        };
       }
 
-      // Processar itens do orçamento
-      const { pecas, servicos } = OrcamentoApiController.processarItensOrcamento(itens);
-      
       // Calcular valor total automaticamente
-      const valorTotal = OrcamentoApiController.calcularValorTotal(pecas, servicos);
-
-      // Preparar descrição estruturada
-      const descricaoEstruturada = {
-        pecas,
-        servicos,
-        observacoes: observacoes || '',
-        motocicleta_placa: motocicletaPlaca || null
-      };
+      const valorTotal = (descricaoEstruturada.pecas || []).reduce((acc, p) => acc + (p.valor_total || 0), 0)
+        + (descricaoEstruturada.servicos || []).reduce((acc, s) => acc + (s.valor || 0), 0);
 
       const query = `
         INSERT INTO Orcamento (valor, validade, cliente_cpf, status, descricao)
@@ -276,10 +269,10 @@ class OrcamentoApiController {
         JOIN Cliente c ON o.cliente_cpf = c.cpf
         LEFT JOIN Ordem_de_servico os ON o.ordem_servico_cod = os.cod
         LEFT JOIN Motocicleta m_os ON os.motocicleta_placa = m_os.placa
-        LEFT JOIN Marca marca_os ON marca_os.motocicleta_placa = m_os.placa
+        LEFT JOIN Marca marca_os ON m_os.marca_id = marca_os.id
         LEFT JOIN Possui p ON c.cpf = p.cliente_cpf
         LEFT JOIN Motocicleta m_possui ON p.motocicleta_placa = m_possui.placa
-        LEFT JOIN Marca marca_possui ON marca_possui.motocicleta_placa = m_possui.placa
+        LEFT JOIN Marca marca_possui ON m_possui.marca_id = marca_possui.id
         WHERE o.id = $1
       `, [id]);
 
@@ -418,6 +411,7 @@ class OrcamentoApiController {
                 console.log('🔧 Preservando itens existentes com alterações:', JSON.stringify(descricaoEstruturada, null, 2));
               }
             }
+
           }
         } catch (parseError) {
           console.log('🔧 Erro ao fazer parse dos itens existentes:', parseError.message);
@@ -703,11 +697,10 @@ class OrcamentoApiController {
             observacao, 
             valor,
             validada,
-            usuario_cpf, 
             cliente_cpf, 
             motocicleta_placa
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
           RETURNING *
         `, [
           `OS-ORC-${orcamento.id} - ${orcamento.cliente_nome}`,
@@ -717,7 +710,6 @@ class OrcamentoApiController {
           `Ordem de serviço criada a partir da aprovação do orçamento #${orcamento.id}`,
           parseFloat(orcamento.valor),
           true,
-          usuarioPadrao,
           orcamento.cliente_cpf,
           motocicleta.placa
         ]);

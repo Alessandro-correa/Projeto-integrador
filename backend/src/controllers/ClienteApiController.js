@@ -38,7 +38,6 @@ class ClienteApiController {
       const domain = email.split('@')[1].toLowerCase();
       const tld = domain.split('.').slice(-2).join('.');
       const tldSimple = domain.split('.').pop();
-    //  console.log('Email:', email, '| tld:', tld, '| tldSimple:', tldSimple);
       if (!validTlds.includes(tld) && !validTlds.includes(tldSimple)) {
         return res.status(400).json({
           success: false,

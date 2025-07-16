@@ -112,7 +112,10 @@ class MotocicletaAjusteController extends BasePageController {
             console.log('[MotocicletaAjusteController] Iniciando carregamento da motocicleta:', placa);
             this.showLoading('Carregando dados da motocicleta...');
 
-            const response = await fetch(`${this.apiUrl}/${placa}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${placa}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
             if (!response.ok) {
                 if (response.status === 404) {
@@ -213,10 +216,12 @@ class MotocicletaAjusteController extends BasePageController {
 
             console.log('📤 Enviando dados atualizados:', formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.apiUrl}/${this.currentItem.placa}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -438,7 +443,10 @@ class MotocicletaAjusteController extends BasePageController {
     async loadClientes() {
         try {
             console.log('[MotocicletaAjusteController] Carregando clientes...');
-            const response = await fetch(this.clientesApiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.clientesApiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
             
             if (result.success && result.data) {
@@ -459,7 +467,10 @@ class MotocicletaAjusteController extends BasePageController {
     async loadMarcas() {
         try {
             console.log('[MotocicletaAjusteController] Carregando marcas...');
-            const response = await fetch(this.marcasApiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.marcasApiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
             
             if (result.success && result.data) {

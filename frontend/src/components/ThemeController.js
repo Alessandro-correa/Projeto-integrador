@@ -49,3 +49,6 @@ if (typeof module === 'undefined') {
         }
     });
 }
+
+window.ThemeController = ThemeController;
+// export default ThemeController;

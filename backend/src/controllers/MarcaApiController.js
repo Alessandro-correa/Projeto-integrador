@@ -120,6 +120,15 @@ class MarcaApiController {
         });
       }
 
+      // Verificar se há motocicletas vinculadas a esta marca
+      const motoVinculada = await db.oneOrNone('SELECT placa FROM Motocicleta WHERE marca_id = $1', [id]);
+      if (motoVinculada) {
+        return res.status(400).json({
+          success: false,
+          message: 'Não é possível remover uma marca que possui motocicletas vinculadas.'
+        });
+      }
+
       await db.none('DELETE FROM Marca WHERE id = $1', [id]);
 
       res.json({
@@ -129,6 +138,13 @@ class MarcaApiController {
 
     } catch (error) {
       console.error('Erro ao remover marca:', error);
+      // Tratamento específico para erro de integridade referencial (FK)
+      if (error.code === '23503') {
+        return res.status(400).json({
+          success: false,
+          message: 'Não é possível remover uma marca que possui motocicletas vinculadas.'
+        });
+      }
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',

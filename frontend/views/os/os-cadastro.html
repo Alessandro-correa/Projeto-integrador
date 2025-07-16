@@ -69,6 +69,20 @@
 		.data {
 			position: relative;
 		}
+		.form-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 32px 32px 24px 32px !important;
+    background: var(--light);
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+@media (max-width: 800px) {
+    .form-container {
+        padding: 16px !important;
+    }
+}
 	</style>
 	<title>Sistema Campos Moto Peças - Nova Ordem de Serviço</title>
 </head>
@@ -82,7 +96,7 @@
 			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
 			<li class="divider" data-text="gestão">Gestão</li>
 			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
 			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
 			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
@@ -138,62 +152,88 @@
 					</div>
 				</div>
 				
-				<form id="os-form" class="form-container">
+				<form id="cadastroForm" class="form-container">
 					<div class="page-title">
-						<h2><i class='bx bx-plus'></i> Nova Ordem de Serviço</h2>
+						<h2><i class='bx bx-plus'></i> Formulário de Cadastro de Ordem de Serviço</h2>
 					</div>
-					
 					<div class="form-section">
 						<h3>Informações Básicas</h3>
 						<div class="form-row">
 							<div class="form-group">
-								<label for="titulo">Título do Serviço <span class="required">*</span></label>
-								<input type="text" id="titulo" name="titulo" required 
-									   placeholder="Ex: Troca de óleo, Revisão geral...">
-							</div>
-							<div class="form-group">
-								<label for="data">Data do Serviço <span class="required">*</span></label>
-								<input type="date" id="data" name="data" required>
+								<label for="data_abertura">Data de Abertura <span class="required">*</span></label>
+								<input type="date" id="data_abertura" name="data_abertura" required readonly>
 							</div>
 						</div>
-
 						<div class="form-row">
 							<div class="form-group">
-								<label for="cliente">Cliente <span class="required">*</span></label>
-								<select id="cliente" name="cliente" required>
-									<option value="">Carregando clientes...</option>
+								<label for="cliente_id">Cliente <span class="required">*</span></label>
+								<select id="cliente_id" name="cliente_id" required>
+									<option value="">Selecione o cliente...</option>
 								</select>
 							</div>
 							<div class="form-group">
-								<label for="motocicleta">Motocicleta <span class="required">*</span></label>
-								<select id="motocicleta" name="motocicleta" required disabled>
-									<option value="">Selecione primeiro um cliente</option>
+								<label for="motocicleta_id">Motocicleta <span class="required">*</span></label>
+								<select id="motocicleta_id" name="motocicleta_id" required>
+									<option value="">Selecione a motocicleta...</option>
 								</select>
 							</div>
 						</div>
+						<div class="form-group">
+							<label for="titulo">Título do Serviço <span class="required">*</span></label>
+							<input type="text" id="titulo" name="titulo" required placeholder="Título do serviço">
+						</div>
 					</div>
-
 					<div class="form-section">
-						<h3>Descrição dos Serviços</h3>
+						<h3>Descrição e Status</h3>
 						<div class="form-group">
-							<label for="descricao">Descrição dos Serviços <span class="required">*</span></label>
-							<textarea id="descricao" name="descricao" rows="4" required
-									  placeholder="Descreva detalhadamente os serviços a serem realizados na motocicleta..."></textarea>
+							<label for="descricao">Descrição do Serviço <span class="required">*</span></label>
+							<textarea id="descricao" name="descricao" rows="4" required placeholder="Descreva detalhadamente o serviço a ser realizado..."></textarea>
 						</div>
-
 						<div class="form-group">
-							<label for="observacao">Observações Adicionais</label>
-							<textarea id="observacao" name="observacao" rows="3"
-									  placeholder="Observações extras, detalhes específicos ou informações importantes (opcional)..."></textarea>
+							<label for="status">Status <span class="required">*</span></label>
+							<select id="status" name="status" required>
+								<option value="Aguardando Execução" selected>Aguardando Execução</option>
+								<option value="Em Andamento">Em Andamento</option>
+								<option value="Finalizada">Finalizada</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="observacoes">Observações</label>
+							<textarea id="observacoes" name="observacoes" rows="3" placeholder="Observações adicionais sobre o serviço..."></textarea>
 						</div>
 					</div>
-
+					<div class="form-section">
+						<h3>Valor e Peças</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="valor_mao_de_obra">Valor Mão de Obra <span class="required">*</span></label>
+								<input type="number" id="valor_mao_de_obra" name="valor_mao_de_obra" step="0.01" min="0" required placeholder="0.00">
+								<small class="form-text">Valor dos serviços executados</small>
+							</div>
+							<div class="form-group">
+								<label for="valor_total">Valor Total das Peças</label>
+								<input type="number" id="valor_total" name="valor_total" step="0.01" min="0" readonly placeholder="0.00">
+								<small class="form-text">Calculado automaticamente a partir das peças</small>
+							</div>
+						</div>
+						<div class="form-group">
+							<label>Peças Utilizadas</label>
+							<div class="pecas-header">
+								<button type="button" id="addPecaBtn" class="btn btn-outline btn-sm">
+									<i class='bx bx-plus'></i> Adicionar Peça
+								</button>
+							</div>
+							<div id="pecas-container" class="pecas-container">
+								<!-- Peças serão carregadas dinamicamente -->
+							</div>
+						</div>
+					</div>
 					<div class="form-actions">
-						<button type="button" onclick="window.location.href='os-consulta.html'" class="btn btn-secondary">
+						<button type="button" id="cancelBtn" class="btn btn-secondary">
 							<i class='bx bx-x'></i> Cancelar
 						</button>
-						<button type="submit" class="btn btn-primary">
-							<i class='bx bx-save'></i> Cadastrar Ordem de Serviço
+						<button type="submit" id="saveBtn" class="btn btn-primary">
+							<i class='bx bx-check'></i> Cadastrar OS
 						</button>
 					</div>
 				</form>
@@ -210,6 +250,18 @@
 		if (!window.ordemCadastroController) {
 			window.ordemCadastroController = new OrdemCadastroController();
 		}
+	</script>
+	<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dataInput = document.getElementById('data_abertura');
+    if (dataInput) {
+        const hoje = new Date();
+        const yyyy = hoje.getFullYear();
+        const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoje.getDate()).padStart(2, '0');
+        dataInput.value = `${yyyy}-${mm}-${dd}`;
+    }
+});
 	</script>
 </body>
 </html>

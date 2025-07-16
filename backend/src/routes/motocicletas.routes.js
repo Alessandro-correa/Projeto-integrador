@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const MotocicletaApiController = require('../controllers/MotocicletaApiController');
+const MotocicletaApiController = require('../controllers/motocicletaApiController');
 
 // Rotas para motocicletas
 router.post('/', MotocicletaApiController.create);                    

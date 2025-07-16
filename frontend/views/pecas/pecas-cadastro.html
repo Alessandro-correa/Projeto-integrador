@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/forms.css">
 	<title>Sistema Campos Moto Peças - Cadastro de Peça</title>
 </head>
 <body>
@@ -17,7 +18,7 @@
 			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
 			<li class="divider" data-text="gestão">Gestão</li>
 			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
 			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
 			<li><a href="pecas-consulta.html" class="active"><i class='bx bxs-wrench icon'></i> Peças</a></li>
@@ -57,9 +58,9 @@
 				<li><a href="#" class="active">Nova Peça</a></li>
 			</ul>
 			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Nova Peça</h3>
+				<div class="content-data form-container">
+					<div class="head form-header-info">
+						<h3 id="form-title">Nova Peça</h3>
 					</div>
 					<form action="#" class="os-form">
 						<div class="form-row">
@@ -73,26 +74,9 @@
 							</div>
 						</div>
 						<div class="form-row">
-							<div class="form-group">
-								<label for="marca">Marca</label>
-								<select id="marca" name="marca" required>
-									<option value="">Selecione...</option>
-									<option value="honda">Honda</option>
-									<option value="yamaha">Yamaha</option>
-									<option value="suzuki">Suzuki</option>
-									<option value="kawasaki">Kawasaki</option>
-								</select>
-							</div>
-							<div class="form-group">
-								<label for="categoria">Categoria</label>
-								<select id="categoria" name="categoria" required>
-									<option value="">Selecione...</option>
-									<option value="motor">Motor</option>
-									<option value="freios">Freios</option>
-									<option value="suspensao">Suspensão</option>
-									<option value="eletrica">Elétrica</option>
-									<option value="pneus">Pneus</option>
-								</select>
+							<div class="form-group full-width">
+								<label for="descricao">Descrição</label>
+								<textarea id="descricao" name="descricao" rows="3" placeholder="Descrição detalhada da peça" required></textarea>
 							</div>
 						</div>
 						<div class="form-row">
@@ -101,34 +85,16 @@
 								<input type="number" id="valor" name="valor" step="0.01" required>
 							</div>
 							<div class="form-group">
-								<label for="precoDaCompra">Preço de Compra (R$)</label>
-								<input type="number" id="precoDaCompra" name="precoDaCompra" step="0.01" required>
-							</div>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="quantidade">Quantidade em Estoque</label>
-								<input type="number" id="quantidade" name="quantidade" required>
-							</div>
-							<div class="form-group">
-								<label for="aquisicaoId">ID da Aquisição</label>
-								<select id="aquisicaoId" name="aquisicaoId" required>
-									<option value="">Selecione...</option>
-									<!-- Opções serão preenchidas via JS -->
+								<label for="fornecedor">Fornecedor</label>
+								<select id="fornecedor" name="fornecedor" required>
+									<option value="">Selecione o fornecedor</option>
+									<!-- opções dinâmicas via JS -->
 								</select>
 							</div>
 						</div>
-						<div class="form-group">
-							<label for="descricao">Descrição</label>
-							<textarea id="descricao" name="descricao" rows="3" placeholder="Descrição detalhada da peça"></textarea>
-						</div>
-						<div class="form-group">
-							<label for="fornecedor">Fornecedor</label>
-							<input type="text" id="fornecedor" name="fornecedor" required>
-						</div>
 						<div class="form-actions">
-							<button type="submit" class="btn-primary">Cadastrar Peça</button>
-							<a href="pecas-consulta.html" class="btn-secondary">Cancelar</a>
+							<button type="submit" class="btn btn-primary">Salvar Peça</button>
+							<a href="pecas-consulta.html" class="btn btn-secondary">Cancelar</a>
 						</div>
 					</form>
 				</div>
@@ -137,5 +103,6 @@
 	</section>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script type="module" src="../../src/components/PecaCadastroController.js"></script>
 </body>
 </html>

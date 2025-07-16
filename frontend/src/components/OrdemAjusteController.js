@@ -7,7 +7,9 @@ class OrdemAjusteController {
         this.init();
 
         const loading = document.getElementById('loading');
-        Controller.showLoadingElement(loading, show);
+        if (loading) {
+            loading.style.display = 'block';
+        }
     }
 
     setupThemeListeners() {
@@ -245,7 +247,10 @@ class OrdemAjusteController {
             this.showLoading(true);
             this.showNotification('Carregando...', 'info', null, 0);
             
-            const response = await fetch(`${this.baseURL}/${codigo}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${codigo}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) {
                 throw new Error(`Erro ${response.status}: ${response.statusText}`);
             }
@@ -374,26 +379,28 @@ class OrdemAjusteController {
     }
 
     async loadClientes(selectedCpf, selectedPlaca) {
+        const clienteSelect = document.getElementById('cliente_id');
+        if (!clienteSelect) return;
+        clienteSelect.innerHTML = '<option value="">Carregando clientes...</option>';
         try {
-            const response = await fetch('http://localhost:3000/api/clientes');
-            if (!response.ok) throw new Error('Erro ao carregar clientes');
-            const result = await response.json();
-            const clientes = result.data || result;
-            const select = document.getElementById('cliente_id');
-            select.innerHTML = '<option value="">Selecione um cliente...</option>';
-            clientes.forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente.cpf;
-                option.textContent = `${cliente.nome} - ${cliente.cpf}`;
-                select.appendChild(option);
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:3000/api/clientes', {
+                headers: { Authorization: `Bearer ${token}` }
             });
-            if (selectedCpf) {
-                select.value = selectedCpf;
-                await this.loadMotocicletas(selectedPlaca);
+            if (!res.ok) throw new Error('Erro ao carregar clientes');
+            const json = await res.json();
+            const clientes = json.data || [];
+            if (clientes.length === 0) {
+                clienteSelect.innerHTML = '<option value="">Nenhum cliente encontrado</option>';
+            } else {
+                clienteSelect.innerHTML = '<option value="">Selecione o cliente...</option>';
+                clientes.forEach(cliente => {
+                    clienteSelect.innerHTML += `<option value="${cliente.cpf}"${selectedCpf === cliente.cpf ? ' selected' : ''}>${cliente.nome} - ${cliente.cpf}</option>`;
+                });
             }
-        } catch (error) {
-            console.error('Erro ao carregar clientes:', error);
-            this.showAlert('Erro ao carregar lista de clientes', 'error');
+        } catch (e) {
+            clienteSelect.innerHTML = '<option value="">Erro ao carregar clientes</option>';
+            this.showNotification('Erro ao carregar clientes.', 'error');
         }
     }
 
@@ -480,10 +487,12 @@ class OrdemAjusteController {
             this.showNotification('Salvando alterações...', 'info', null, 0);
             
             const url = `${this.baseURL}/${this.currentItem.cod}`;
+            const token = localStorage.getItem('token');
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(updateData)
             });

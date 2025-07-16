@@ -17,6 +17,7 @@ class SidebarController {
         this.setActiveMenuItem();
         this.handleResize();
         this.setupEventListeners();
+        this.restrictMenuByRole();
     }
 
     createOverlay() {
@@ -183,4 +184,63 @@ class SidebarController {
             }
         });
     }
+
+    restrictMenuByRole() {
+        const userType = (localStorage.getItem('userType') || '').toLowerCase();
+        console.log('[SidebarController] userType detectado:', userType);
+        if (userType === 'administrador') {
+            console.log('[SidebarController] Administrador: menu completo exibido.');
+            return;
+        }
+        if (userType === 'mecânico') {
+            // Mecânico só vê páginas de Ordem de Serviço e Orçamentos
+            const allLinks = Array.from(document.querySelectorAll('#sidebar .side-menu li'));
+            console.log('[SidebarController] Links encontrados:', allLinks.map(li => li.innerText || li.textContent));
+            allLinks.forEach(li => {
+                const link = li.querySelector('a');
+                if (link) {
+                    const href = link.getAttribute('href') || '';
+                    const isAllowed = href.includes('os/') || href.includes('orcamentos/');
+                    if (!isAllowed) {
+                        console.log('[SidebarController] Removendo link para mecânico:', href, li.innerText || li.textContent);
+                        li.remove();
+                    }
+                } else if (!li.classList.contains('divider')) {
+                    li.remove();
+                }
+            });
+            // Remove dividers que ficaram sem links abaixo
+            document.querySelectorAll('#sidebar .side-menu .divider').forEach(divider => {
+                let next = divider.nextElementSibling;
+                let hasLink = false;
+                while (next && !next.classList.contains('divider')) {
+                    if (next.querySelector('a')) {
+                        hasLink = true;
+                        break;
+                    }
+                    next = next.nextElementSibling;
+                }
+                if (!hasLink) {
+                    console.log('[SidebarController] Removendo divider órfão:', divider.textContent);
+                    divider.remove();
+                }
+            });
+            return;
+        }
+        // Para todos os outros perfis, remove Dashboard e Usuários
+        const dashboardLink = document.querySelector('#sidebar .side-menu a[href*="dashboard"]');
+        if (dashboardLink && dashboardLink.parentElement) {
+            console.log('[SidebarController] Removendo Dashboard para perfil não admin:', dashboardLink.innerText || dashboardLink.textContent);
+            dashboardLink.parentElement.remove();
+        }
+        const usuariosLink = document.querySelector('#sidebar .side-menu a[href*="usuarios"]');
+        if (usuariosLink && usuariosLink.parentElement) {
+            console.log('[SidebarController] Removendo Usuários para perfil não admin:', usuariosLink.innerText || usuariosLink.textContent);
+            usuariosLink.parentElement.remove();
+        }
+    }
 }
+
+// Remover export default SidebarController;
+// Adicionar acesso global
+window.SidebarController = SidebarController;

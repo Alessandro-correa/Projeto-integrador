@@ -156,7 +156,10 @@ class OrdemController {
     async loadOrdens() {
         try {
             console.log('Carregando ordens de serviço da API...');
-            const res = await fetch(this.apiUrl);
+            const token = localStorage.getItem('token');
+            const res = await fetch(this.apiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             console.log('Response status:', res.status);
             
             if (!res.ok) {
@@ -252,6 +255,8 @@ class OrdemController {
                 if (isMecanico) {
                     actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Enviar para Validação"><i class='bx bx-check-circle'></i></a>`);
                 }
+                // Adicionar botão de excluir
+                actions.push(`<a href="#" class="action-icon excluir-ordem" data-id="${ordem.cod}" title="Excluir Ordem de Serviço"><i class='bx bx-trash'></i></a>`);
                 break;
                 
             case 'Validação Pendente':
@@ -264,6 +269,8 @@ class OrdemController {
                     actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Validar OS"><i class='bx bx-check-double'></i></a>`);
                     actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Rejeitar OS"><i class='bx bx-x-circle'></i></a>`);
                 }
+                // Adicionar botão de excluir
+                actions.push(`<a href="#" class="action-icon excluir-ordem" data-id="${ordem.cod}" title="Excluir Ordem de Serviço"><i class='bx bx-trash'></i></a>`);
                 break;
                 
             case 'Validado':
@@ -363,11 +370,26 @@ class OrdemController {
                 }
             });
         });
+
+        // Excluir ordem de serviço
+        this.tableBody.querySelectorAll('.excluir-ordem').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                const confirmar = confirm('Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita.');
+                if (confirmar) {
+                    await this.excluirOrdem(id);
+                }
+            });
+        });
     }
 
     async visualizarOrdem(id) {
         try {
-            const res = await fetch(`${this.apiUrl}/${id}`);
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${this.apiUrl}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!res.ok) throw new Error('Erro ao buscar ordem de serviço');
             
             const json = await res.json();
@@ -423,13 +445,18 @@ class OrdemController {
     async visualizarOrdemCompleta(id) {
         try {
             
-            const resOrdem = await fetch(`${this.apiUrl}/${id}`);
+            const token = localStorage.getItem('token');
+            const resOrdem = await fetch(`${this.apiUrl}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!resOrdem.ok) throw new Error('Erro ao buscar ordem de serviço');
             
             const jsonOrdem = await resOrdem.json();
             const ordem = jsonOrdem.data;
 
-            const resOrcamentos = await fetch(`http://localhost:3000/api/orcamentos?ordem=${id}`);
+            const resOrcamentos = await fetch(`http://localhost:3000/api/orcamentos?ordem=${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             let orcamentos = [];
             if (resOrcamentos.ok) {
                 const jsonOrcamentos = await resOrcamentos.json();
@@ -533,10 +560,12 @@ class OrdemController {
 
     async atualizarStatusOrdem(id, novoStatus) {
         try {
+            const token = localStorage.getItem('token');
             const res = await fetch(`${this.apiUrl}/${id}/status`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     status: novoStatus,
@@ -561,6 +590,29 @@ class OrdemController {
         } catch (e) {
             console.error('Erro ao atualizar status da ordem de serviço:', e);
             alert('Erro ao atualizar status da ordem de serviço');
+        }
+    }
+
+    async excluirOrdem(id) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error('Erro ao excluir ordem de serviço');
+            const result = await response.json();
+            if (result.success) {
+                alert('Ordem de serviço excluída com sucesso!');
+                this.loadOrdens();
+            } else {
+                throw new Error(result.message || 'Erro desconhecido');
+            }
+        } catch (error) {
+            alert('Erro ao excluir ordem de serviço: ' + error.message);
         }
     }
 }

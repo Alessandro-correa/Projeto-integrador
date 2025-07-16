@@ -28,7 +28,7 @@ class BasePageController {
                 }
                 break;
             case 'usuarios':
-                this.subControllers.usuario = new UsuarioController();
+                this.subControllers.usuario = new UsuarioCadastroController();
                 if (currentPage.action === 'ajustar') {
                     this.subControllers.usuarioAjuste = new UsuarioAjusteController();
                 }
@@ -424,7 +424,10 @@ class BasePageController {
 
     static async loadClientesIntoSelect(selectElement, apiUrl, showNotificationCallback, placeholder = 'Selecione um cliente') {
         try {
-            const response = await fetch(apiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(apiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) throw new Error('Erro ao carregar clientes');
             
             const result = await response.json();
@@ -550,10 +553,12 @@ class BaseAjusteController {
             const submitBtn = document.querySelector('#adjust-form button[type="submit"]');
             BasePageController.showLoading(submitBtn, true, '<i class="bx bx-save"></i> Salvar Ajustes');
 
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${this.currentItem.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(dadosAjustados)
             });

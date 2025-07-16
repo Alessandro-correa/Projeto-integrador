@@ -26,7 +26,10 @@ class UsuarioController {
         try {
             console.log('🔄 Carregando usuários...');
             
-            const response = await fetch(this.apiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.apiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status}`);
@@ -173,10 +176,12 @@ class UsuarioController {
 
             console.log('📤 Enviando dados do usuário:', formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -280,7 +285,10 @@ class UsuarioController {
         try {
             console.log(`✏️ Editando usuário: ${cpf}`);
 
-            const response = await fetch(`${this.apiUrl}/${cpf}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status}`);
@@ -387,10 +395,12 @@ class UsuarioController {
 
             console.log('📤 Atualizando usuário:', cpf, formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.apiUrl}/${cpf}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -467,8 +477,10 @@ class UsuarioController {
         try {
             console.log(`🗑️ Excluindo usuário: ${cpf}`);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.apiUrl}/${cpf}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
             });
 
             const result = await response.json();
@@ -490,7 +502,10 @@ class UsuarioController {
         try {
             console.log(`👁️ Visualizando usuário: ${cpf}`);
 
-            const response = await fetch(`${this.apiUrl}/${cpf}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status}`);

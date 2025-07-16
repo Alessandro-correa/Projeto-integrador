@@ -1,0 +1,179 @@
+#modal-visualizar-moto .modal-content {
+    min-width: 380px;
+    max-width: 90vw;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.22);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#modal-visualizar-moto .modal-header {
+    background: #22223b;
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+#modal-visualizar-moto .modal-body {
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#modal-visualizar-moto .basic-info {
+    width: 100%;
+    max-width: 90vw;
+    margin: 0 auto;
+}
+#modal-visualizar-moto .basic-info p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+#modal-visualizar-moto .modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+}
+#modal-visualizar-moto.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-visualizar-marca .modal-content {
+    min-width: 380px;
+    max-width: 90vw;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.22);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#modal-visualizar-marca .modal-header {
+    background: #22223b;
+    color: #fff;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+#modal-visualizar-marca .modal-body {
+    padding: 36px 32px 32px 32px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#modal-visualizar-marca .basic-info {
+    width: 100%;
+    max-width: 90vw;
+    margin: 0 auto;
+}
+#modal-visualizar-marca .basic-info p {
+    margin: 16px 0;
+    font-size: 17px;
+}
+#modal-visualizar-marca .modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+}
+#modal-visualizar-marca.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#modal-visualizar-marca .motos-list {
+    margin: 18px 0 0 0;
+    padding: 0 0 0 18px;
+    width: 100%;
+}
+#modal-visualizar-marca .motos-list li {
+    margin-bottom: 10px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+#modal-visualizar-fornecedor .modal-content {
+    min-width: 380px;
+    max-width: 90vw;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.22);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#modal-visualizar-fornecedor .modal-header {
+    background: #22223b;
+    color: #fff;
+    padding: 24px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+#modal-visualizar-fornecedor .modal-body {
+    padding: 32px 28px 28px 28px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#modal-visualizar-fornecedor .basic-info {
+    width: 100%;
+    max-width: 90vw;
+    margin: 0 auto;
+}
+#modal-visualizar-fornecedor .basic-info p {
+    margin: 14px 0;
+    font-size: 16px;
+}
+#modal-visualizar-fornecedor .modal-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+}
+#modal-visualizar-fornecedor.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 

@@ -5,6 +5,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/dashboard.css">
+	<link rel="stylesheet" href="../../assets/css/template.css">
+	<link rel="stylesheet" href="../../assets/css/forms.css">
+	<link rel="stylesheet" href="../../assets/css/ajuste.css">
+	<link rel="stylesheet" href="../../assets/css/orcamento-ajuste.css">
+	<link rel="stylesheet" href="../../assets/css/botoes-override.css">
 	<style>
 		select {
 			padding: 12px 16px;
@@ -83,13 +89,22 @@
 			<li><a href="../../views/orcamentos/orcamentos-consulta.html" class="active"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
 			<li class="divider" data-text="gestão">Gestão</li>
 			<li><a href="../../views/clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
 			<li><a href="../../views/marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="../../views/fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
 			<li><a href="../../views/pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
 			<li><a href="../../views/usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
 		</ul>
 	</section>
+<script src="../../src/components/SidebarController.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!window.sidebarController) {
+      window.sidebarController = new SidebarController();
+      console.log('[SidebarController] Instanciado manualmente em orcamentos-cadastro.html');
+    }
+  });
+</script>
 
 	<section id="content">
 		<nav>
@@ -127,96 +142,69 @@
 			
 			<div class="data">
 				<div class="content-data">
-					<div class="head">
-						<h3>Novo Orçamento</h3>
-					</div>
-					<form action="#" class="os-form">
-						<h4>Dados do Cliente</h4>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="nome">Nome Completo</label>
-								<input type="text" id="nome" placeholder="Nome do cliente" required>
-							</div>
-							<div class="form-group">
-								<label for="cpf">CPF</label>
-								<input type="text" id="cpf" placeholder="000.000.000-00" required>
+					<form id="cadastroForm" class="form-container">
+						<div class="page-title">
+							<h2><i class='bx bx-plus'></i> Formulário de Cadastro de Orçamento</h2>
+						</div>
+						<div class="form-section">
+							<h3>Informações Básicas</h3>
+							<div class="form-row">
+								<div class="form-group">
+									<label for="cliente_id">Cliente <span class="required">*</span></label>
+									<select id="cliente_id" name="cliente_id" required>
+										<option value="">Selecione o cliente...</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="motocicleta_id">Motocicleta <span class="required">*</span></label>
+									<select id="motocicleta_id" name="motocicleta_id" required>
+										<option value="">Selecione a motocicleta...</option>
+									</select>
+								</div>
 							</div>
 						</div>
-						<div class="form-group">
-							<label for="endereco">Endereço</label>
-							<input type="text" id="endereco" placeholder="Endereço completo do cliente" required>
-						</div>
-
-						<h4 style="margin-top: 20px;">Dados da Motocicleta</h4>
-						<div class="form-row">
-							<div class="form-group" style="flex: 2;">
-								<label for="motocicleta-select">Selecionar Motocicleta do Cliente</label>
-								<select id="motocicleta-select" required>
-									<option value="">Primeiro digite o CPF do cliente</option>
+						<div class="form-section">
+							<h3>Valores e Validade</h3>
+							<div class="form-row">
+								<div class="form-group">
+									<label for="valor">Valor do Orçamento <span class="required">*</span></label>
+									<input type="number" id="valor" name="valor" step="0.01" min="0" required placeholder="0.00">
+								</div>
+								<div class="form-group">
+									<label for="validade">Data de Validade <span class="required">*</span></label>
+									<input type="date" id="validade" name="validade" required>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="status">Status <span class="required">*</span></label>
+								<select id="status" name="status" required>
+									<option value="P">Pendente</option>
+									<option value="V">Validado</option>
+									<option value="R">Rejeitado</option>
 								</select>
 							</div>
 						</div>
-						
-						<h4 style="margin-top: 20px;">Peças e Serviços</h4>
-						<div class="form-row">
+						<div class="form-section">
+							<h3>Peças e Serviços</h3>
 							<div class="form-group">
-								<label for="tipo-item">Tipo de Item</label>
-								<select id="tipo-item">
-									<option value="peca">Peça</option>
-									<option value="servico">Serviço</option>
-								</select>
-							</div>
-							<div class="form-group" id="peca-select-group" style="display: none;">
-								<label for="peca-select">Selecionar Peça</label>
-								<select id="peca-select">
-									<option value="">Selecione uma peça</option>
-								</select>
-							</div>
-							<div class="form-group" id="descricao-group">
-								<label for="descricao-item">Descrição do Item</label>
-								<input type="text" id="descricao-item" placeholder="Digite a descrição da peça ou serviço">
-							</div>
-							<div class="form-group">
-								<label for="quantidade">Quantidade</label>
-								<input type="number" id="quantidade" min="1" value="1">
-							</div>
-							<div class="form-group">
-								<label for="valor-unitario">Valor Unitário (R$)</label>
-								<input type="number" id="valor-unitario" step="0.01" min="0">
-							</div>
-						</div>
-						<button type="button" class="btn-secondary" id="add-item" style="margin-top: 10px;">Adicionar Item</button>
-						
-						<div class="orders">
-							<table id="itens-orcamento">
-								<thead>
-									<tr>
-										<th>Tipo</th>
-										<th>Descrição</th>
-										<th>Qtd</th>
-										<th>Valor Unit.</th>
-										<th>Valor Total</th>
-										<th>Ação</th>
-									</tr>
-								</thead>
-								<tbody>
-								</tbody>
-							</table>
-						</div>
-
-						<div class="form-group" style="margin-top: 20px;">
-							<label for="observacoes">Observações</label>
-							<textarea id="observacoes" rows="3" placeholder="Observações adicionais sobre o orçamento"></textarea>
-						</div>
-						<div class="form-row">
-							<div class="form-group">
-								<label for="validade">Data de Validade</label>
-								<input type="date" id="validade" required>
+								<label>Itens do Orçamento</label>
+								<div class="pecas-header">
+									<button type="button" id="addItemBtn" class="btn btn-outline btn-sm">
+										<i class='bx bx-plus'></i> Adicionar Item
+									</button>
+								</div>
+								<div id="itens-container" class="pecas-container">
+									<!-- Itens serão carregados dinamicamente -->
+								</div>
 							</div>
 						</div>
 						<div class="form-actions">
-							<button type="submit" class="btn-primary">Gerar Orçamento</button>
-							<a href="orcamentos-consulta.html" class="btn-secondary">Cancelar</a>
+							<button type="button" id="cancelBtn" class="btn btn-secondary">
+								<i class='bx bx-x'></i> Cancelar
+							</button>
+							<button type="submit" id="saveBtn" class="btn btn-primary">
+								<i class='bx bx-check'></i> Cadastrar Orçamento
+							</button>
 						</div>
 					</form>
 				</div>
@@ -224,8 +212,33 @@
 		</main>
 	</section>
 
+	<!-- Remover o modal de item do cadastro, pois a edição é inline -->
+
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
     <script src="../../src/components/OrcamentoCadastroController.js"></script>
+    <script>
+      // Função para aplicar cores corretas aos botões (igual ajuste)
+      function aplicarCoresBotoes() {
+        setInterval(() => {
+          const saveButtons = document.querySelectorAll('.save-item-btn');
+          const cancelButtons = document.querySelectorAll('.cancel-item-btn');
+          saveButtons.forEach(btn => {
+            btn.style.backgroundColor = '#FC3B56';
+            btn.style.borderColor = '#FC3B56';
+            btn.style.color = '#ffffff';
+          });
+          cancelButtons.forEach(btn => {
+            btn.style.backgroundColor = '#9ca3af';
+            btn.style.borderColor = '#9ca3af';
+            btn.style.color = '#ffffff';
+          });
+        }, 100);
+      }
+      document.addEventListener('DOMContentLoaded', aplicarCoresBotoes);
+      if (document.readyState !== 'loading') {
+        aplicarCoresBotoes();
+      }
+    </script>
 </body>
 </html>

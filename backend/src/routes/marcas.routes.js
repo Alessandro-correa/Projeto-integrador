@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const MarcaApiController = require('../controllers/MarcaApiController');
+const MarcaApiController = require('../controllers/marcaApiController');
 
 // Rotas para marcas
 router.post('/', MarcaApiController.create);        

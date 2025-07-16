@@ -6,7 +6,7 @@
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
 	<link rel="stylesheet" href="../../assets/css/forms.css">
-	<title>Sistema Campos Moto Peças - Cadastro de Marca</title>
+	<title>Sistema Campos Moto Peças - Editar Marca</title>
 </head>
 <body>
 	<section id="sidebar">
@@ -49,31 +49,40 @@
 			</div>
 		</nav>
 		<main>
-			<h1 class="title">Marcas</h1>
+			<h1 class="title">Ajustar Marca</h1>
 			<ul class="breadcrumbs">
 				<li><a href="../../index.html">Home</a></li>
 				<li class="divider">/</li>
 				<li><a href="marcas-consulta.html">Marcas</a></li>
 				<li class="divider">/</li>
-				<li><a href="#" class="active">Nova Marca</a></li>
+				<li><a href="#" class="active">Ajustar</a></li>
 			</ul>
 			<div class="data">
 				<div class="content-data">
 					<div class="head">
-						<h3>Nova Marca</h3>
+						<h3><i class='bx bx-edit'></i> Formulário de Ajuste da Marca</h3>
 					</div>
-					<form action="#" class="os-form">
-						<div class="form-group">
-							<label for="id">ID</label>
-							<input type="text" id="id" disabled>
-						</div>
-						<div class="form-group">
-							<label for="nome">Nome</label>
-							<input type="text" id="nome" name="nome" required>
+					<form action="#" class="form-container os-form">
+						<div class="form-section">
+							<h3>Informações da Marca</h3>
+							<div class="form-row">
+								<div class="form-group">
+									<label for="id">ID</label>
+									<input type="text" id="id" disabled>
+								</div>
+								<div class="form-group">
+									<label for="nome">Nome <span class="required">*</span></label>
+									<input type="text" id="nome" name="nome" required placeholder="Nome da marca">
+								</div>
+							</div>
 						</div>
 						<div class="form-actions">
-							<button type="submit" class="btn-primary">Cadastrar Marca</button>
-							<a href="marcas-consulta.html" class="btn-secondary">Cancelar</a>
+							<button type="button" onclick="window.location.href='marcas-consulta.html'" class="btn btn-secondary">
+								<i class='bx bx-x'></i> Cancelar
+							</button>
+							<button type="submit" class="btn btn-primary">
+								<i class='bx bx-check'></i> Salvar Alterações
+							</button>
 						</div>
 					</form>
 				</div>
@@ -83,9 +92,10 @@
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
 	<script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const form = document.querySelector('form.os-form');
     const nomeInput = document.getElementById('nome');
+    const idInput = document.getElementById('id');
     const submitBtn = form.querySelector('button[type="submit"]');
 
     function showNotification(message, type = 'info') {
@@ -121,6 +131,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 
+    // Foco automático
+    nomeInput.focus();
+
+    // Obter o ID da marca da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const marcaId = urlParams.get('id');
+    if (!marcaId) {
+        showNotification('ID da marca não informado.', 'error');
+        submitBtn.disabled = true;
+        return;
+    }
+
+    // Carregar dados da marca
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/api/marcas/${marcaId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = await response.json();
+        if (result.success && result.data) {
+            idInput.value = result.data.id;
+            nomeInput.value = result.data.nome;
+        } else {
+            showNotification('Marca não encontrada.', 'error');
+            submitBtn.disabled = true;
+        }
+    } catch (error) {
+        showNotification('Erro ao carregar dados da marca.', 'error');
+        submitBtn.disabled = true;
+    }
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         const nome = nomeInput.value.trim();
@@ -133,24 +174,26 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.classList.add('loading');
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:3000/api/marcas', {
-                method: 'POST',
+            const response = await fetch(`http://localhost:3000/api/marcas/${marcaId}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({ nome })
             });
             const result = await response.json();
+            console.log('[Marca Edit] Resultado da API:', result);
             if (result.success) {
-                showNotification('Marca cadastrada com sucesso!', 'success');
+                showNotification('Marca atualizada com sucesso!', 'success');
                 setTimeout(() => {
                     window.location.href = 'marcas-consulta.html';
                 }, 1200);
             } else {
-                showNotification(result.message || 'Erro ao cadastrar marca.', 'error');
+                showNotification(result.message || 'Erro ao atualizar marca.', 'error');
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('loading');
             }
         } catch (error) {
-            showNotification('Erro ao cadastrar marca.', 'error');
+            console.error('[Marca Edit] Erro na requisição:', error);
+            showNotification('Erro ao atualizar marca.', 'error');
             submitBtn.disabled = false;
             submitBtn.classList.remove('loading');
         }
@@ -158,4 +201,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body>
-</html>
+</html> 

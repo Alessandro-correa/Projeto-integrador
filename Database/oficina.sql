@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Usuario (
     Cpf       VARCHAR(14) PRIMARY KEY,
     Nome      VARCHAR(100) NOT NULL,
     Funcao    VARCHAR(50) NOT NULL,
-    Senha     VARCHAR(100) NOT NULL,
+    Senha     VARCHAR(200) NOT NULL,
     Email     VARCHAR(100) NOT NULL UNIQUE,
     Telefone  VARCHAR(15) NOT NULL UNIQUE,
     Codigo    VARCHAR(20) NOT NULL UNIQUE
@@ -56,10 +56,8 @@ CREATE TABLE IF NOT EXISTS Ordem_de_servico (
     Valor             DECIMAL(10,2) DEFAULT 0.00,
     Valor_mao_de_obra DECIMAL(10,2) DEFAULT 0.00,
     Validada          BOOLEAN     DEFAULT FALSE,
-    Usuario_CPF       VARCHAR(14) NOT NULL,
     Cliente_CPF       VARCHAR(14) NOT NULL,
     Motocicleta_placa VARCHAR(8)  NOT NULL,
-    FOREIGN KEY (Usuario_CPF)       REFERENCES Usuario(Cpf),
     FOREIGN KEY (Cliente_CPF)       REFERENCES Cliente(Cpf),
     FOREIGN KEY (Motocicleta_placa) REFERENCES Motocicleta(Placa)
 );
@@ -85,43 +83,22 @@ CREATE TABLE IF NOT EXISTS Possui (
     FOREIGN KEY (Motocicleta_placa) REFERENCES Motocicleta(Placa)
 );
 
-CREATE TABLE IF NOT EXISTS Aquisicao (
-    Id            SERIAL PRIMARY KEY,
-    Dia_da_compra DATE   NOT NULL
+CREATE TABLE IF NOT EXISTS Fornecedor (
+    Id       SERIAL      PRIMARY KEY,
+    CNPJ     VARCHAR(18) NOT NULL UNIQUE,
+    Email    VARCHAR(100) NOT NULL UNIQUE,
+    Endereco VARCHAR(100) NOT NULL,
+    Telefone VARCHAR(15) NOT NULL,
+    Nome     VARCHAR(50)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Peca (
     Id        SERIAL      PRIMARY KEY,
     Descricao VARCHAR(100) NOT NULL,
     Nome      VARCHAR(50)  NOT NULL,
-    Valor     DECIMAL(10,2) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS Aquisicao_Produto (
-    Aquisicao_ID    INT  NOT NULL,
-    Peca_ID         INT  NOT NULL,
-    Preco_da_compra DECIMAL(10,2) NOT NULL,
-    Vencimento      DATE,
-    Quantidade      INT  NOT NULL CHECK (Quantidade > 0),
-    PRIMARY KEY (Aquisicao_ID, Peca_ID),
-    FOREIGN KEY (Aquisicao_ID) REFERENCES Aquisicao(Id),
-    FOREIGN KEY (Peca_ID)      REFERENCES Peca(Id)
-);
-
-CREATE TABLE IF NOT EXISTS Fornecedor (
-    Id       SERIAL      PRIMARY KEY,
-    CNPJ     VARCHAR(18) NOT NULL UNIQUE,
-    Email    VARCHAR(100) NOT NULL UNIQUE,
-    Endereco VARCHAR(100) NOT NULL,
-    Nome     VARCHAR(50)  NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS Fornece (
-    Peca_ID       INT,
-    Fornecedor_ID INT,
-    PRIMARY KEY (Peca_ID, Fornecedor_ID),
-    FOREIGN KEY (Peca_ID)       REFERENCES Peca(Id),
-    FOREIGN KEY (Fornecedor_ID) REFERENCES Fornecedor(Id)
+    Valor     DECIMAL(10,2) NOT NULL,
+    forn_id   INT,
+    FOREIGN KEY (forn_id) REFERENCES Fornecedor(Id)
 );
 
 CREATE TABLE IF NOT EXISTS Possui_peca (
@@ -138,9 +115,9 @@ CREATE TABLE IF NOT EXISTS Possui_peca (
 -- USUÁRIOS (3 tipos: Secretária, Mecânico, Administrador)
 INSERT INTO Usuario (Cpf, Nome, Funcao, Senha, Email, Telefone, Codigo) 
 VALUES
-  ('111.111.111-11', 'Maria Fernanda', 'Secretária', 'senha123', 'maria.secretaria@oficina.com', '11999-0001', 'SEC001'),
-  ('222.222.222-22', 'João Carlos', 'Mecânico', 'senha456', 'joao.mecanico@oficina.com', '11999-0002', 'MEC001'),
-  ('333.333.333-33', 'Roberto Silva', 'Administrador', 'senha789', 'roberto.admin@oficina.com', '11999-0003', 'ADM001');
+  ('111.111.111-11', 'Maria Fernanda', 'Secretária', '$2a$10$MUOirjoeqHSnfkMZsx2OC.SR5exbG5sPhSSjI5y4s.zE3vC8HE9Oi', 'maria.secretaria@oficina.com', '11999-0001', 'SEC001'),
+  ('222.222.222-22', 'João Carlos', 'Mecânico', '$2a$10$VZBewjtTjczj8fuk9jpJLergOPm6GcOAqBC9NT8YYfZ6eGTAEvCpa', 'joao.mecanico@oficina.com', '11999-0002', 'MEC001'),
+  ('333.333.333-33', 'Roberto Silva', 'Administrador', '$2a$10$z5dZZ/1b.8pbUyKQFMEKC.e1S8sZQIeaVWeAcPEOVg.45pZF6QMnS', 'roberto.admin@oficina.com', '11999-0003', 'ADM001');
 
 -- CLIENTES (10 exemplos)
 INSERT INTO Cliente (Cpf, Nome, Sexo, Endereco, Telefone, Email, Profissao, Data_de_nascimento)
@@ -187,18 +164,18 @@ VALUES
   ('BCD7845', 2021, 'Preta', 'CB 250 Twister', 250, '128.764.959-32', 1);
 
 -- ORDENS DE SERVIÇO (10 exemplos - distribuídos ao longo do ano)
-INSERT INTO Ordem_de_servico (Titulo, Data, Descricao, Status, Observacao, Valor, Valor_mao_de_obra, Validada, Usuario_CPF, Cliente_CPF, Motocicleta_placa)
+INSERT INTO Ordem_de_servico (Titulo, Data, Descricao, Status, Observacao, Valor, Valor_mao_de_obra, Validada, Cliente_CPF, Motocicleta_placa)
 VALUES
-  ('Revisão Completa', '2025-01-15', 'Troca de óleo, filtros, velas e revisão geral', 'Validada', 'Cliente solicitou urgência', 850.00, 350.00, TRUE, '222.222.222-22', '100.200.300-01', 'ABC1234'),
-  ('Troca de Pneus', '2025-02-20', 'Substituição dos pneus dianteiro e traseiro', 'Validada', 'Pneus substituídos com sucesso', 450.00, 100.00, TRUE, '222.222.222-22', '100.200.300-02', 'DEF5678'),
-  ('Reparo de Freios', '2025-03-10', 'Troca de pastilhas e fluido de freio', 'Validada', 'Serviço concluído com sucesso', 320.00, 150.00, TRUE, '222.222.222-22', '100.200.300-03', 'GHI9012'),
-  ('Manutenção Preventiva', '2025-05-05', 'Lubrificação da corrente e ajustes gerais', 'Validada', 'Manutenção preventiva concluída', 180.00, 120.00, TRUE, '222.222.222-22', '100.200.300-04', 'JKL3456'),
-  ('Troca de Bateria', '2025-05-12', 'Substituição da bateria e teste elétrico', 'Validada', 'Bateria com defeito substituída', 280.00, 80.00, TRUE, '222.222.222-22', '100.200.300-05', 'MNO7890'),
-  ('Reparo de Suspensão', '2025-06-18', 'Regulagem e troca de componentes da suspensão', 'Validada', 'Suspensão ajustada perfeitamente', 750.00, 200.00, TRUE, '222.222.222-22', '100.200.300-06', 'PQR1234'),
-  ('Limpeza e Enceramento', '2025-07-08', 'Lavagem completa e aplicação de cera protetiva', 'Em Andamento', 'Em processo de finalização', 120.00, 120.00, FALSE, '222.222.222-22', '100.200.300-07', 'STU5678'),
-  ('Troca de Corrente', '2025-07-14', 'Substituição de corrente e coroas', 'Validação Pendente', 'Aguardando validação do mecânico', 650.00, 200.00, FALSE, '222.222.222-22', '100.200.300-08', 'VWX9012'),
-  ('Revisão de Motor', '2025-05-14', 'Análise completa do motor e ajustes', 'Ajuste Pendente', 'Motor com ruído anormal - ajustes necessários', 1200.00, 600.00, FALSE, '222.222.222-22', '100.200.300-09', 'YZA3456'),
-  ('Instalação de Acessórios', '2025-06-30', 'Instalação de baú, protetor de motor e farol auxiliar', 'Rejeitada', 'Cliente cancelou o serviço', 380.00, 180.00, FALSE, '222.222.222-22', '100.200.300-10', 'BCD7890');
+  ('Revisão Completa', '2025-01-15', 'Troca de óleo, filtros, velas e revisão geral', 'Validada', 'Cliente solicitou urgência', 850.00, 350.00, TRUE, '100.200.300-01', 'ABC1234'),
+  ('Troca de Pneus', '2025-02-20', 'Substituição dos pneus dianteiro e traseiro', 'Validada', 'Pneus substituídos com sucesso', 450.00, 100.00, TRUE, '100.200.300-02', 'DEF5678'),
+  ('Reparo de Freios', '2025-03-10', 'Troca de pastilhas e fluido de freio', 'Validada', 'Serviço concluído com sucesso', 320.00, 150.00, TRUE, '100.200.300-03', 'GHI9012'),
+  ('Manutenção Preventiva', '2025-05-05', 'Lubrificação da corrente e ajustes gerais', 'Validada', 'Manutenção preventiva concluída', 180.00, 120.00, TRUE, '100.200.300-04', 'JKL3456'),
+  ('Troca de Bateria', '2025-05-12', 'Substituição da bateria e teste elétrico', 'Validada', 'Bateria com defeito substituída', 280.00, 80.00, TRUE, '100.200.300-05', 'MNO7890'),
+  ('Reparo de Suspensão', '2025-06-18', 'Regulagem e troca de componentes da suspensão', 'Validada', 'Suspensão ajustada perfeitamente', 750.00, 200.00, TRUE, '100.200.300-06', 'PQR1234'),
+  ('Limpeza e Enceramento', '2025-07-08', 'Lavagem completa e aplicação de cera protetiva', 'Em Andamento', 'Em processo de finalização', 120.00, 120.00, FALSE, '100.200.300-07', 'STU5678'),
+  ('Troca de Corrente', '2025-07-14', 'Substituição de corrente e coroas', 'Validação Pendente', 'Aguardando validação do mecânico', 650.00, 200.00, FALSE, '100.200.300-08', 'VWX9012'),
+  ('Revisão de Motor', '2025-05-14', 'Análise completa do motor e ajustes', 'Ajuste Pendente', 'Motor com ruído anormal - ajustes necessários', 1200.00, 600.00, FALSE, '100.200.300-09', 'YZA3456'),
+  ('Instalação de Acessórios', '2025-06-30', 'Instalação de baú, protetor de motor e farol auxiliar', 'Rejeitada', 'Cliente cancelou o serviço', 380.00, 180.00, FALSE, '100.200.300-10', 'BCD7890');
 
 -- ORÇAMENTOS (10 exemplos - com descrições detalhadas)
 INSERT INTO Orcamento (Valor, Validade, Status, Descricao, Ordem_servico_COD, Cliente_CPF) 
@@ -234,75 +211,34 @@ VALUES
   ('100.200.300-09', 'YZA3456'),
   ('100.200.300-10', 'BCD7890');
 
--- AQUISIÇÕES (10 exemplos - distribuídas ao longo do ano)
-INSERT INTO Aquisicao (Dia_da_compra) 
+-- FORNECEDORES (10 exemplos)
+INSERT INTO Fornecedor (CNPJ, Email, Endereco, Telefone, Nome) 
 VALUES
-  ('2024-12-15'),  -- Dezembro anterior
-  ('2025-01-10'),  -- Janeiro
-  ('2025-02-05'),  -- Fevereiro
-  ('2025-03-20'),  -- Março
-  ('2025-04-12'),  -- Abril
-  ('2025-05-08'),  -- Maio
-  ('2025-06-25'),  -- Junho
-  ('2025-07-03'),  -- Julho
-  ('2025-08-18'),  -- Agosto
-  ('2025-09-22');  -- Setembro
+  ('11.111.111/0001-11', 'vendas@hondapecas.com', 'Av. Honda, 1000 - São Paulo', '119990001', 'Honda Peças Originais'),
+  ('22.222.222/0002-22', 'contato@yamahapecas.com', 'Rua Yamaha, 500 - São Paulo', '119990002', 'Yamaha Parts Brasil'),
+  ('33.333.333/0003-33', 'pedidos@brembo.com.br', 'Av. Brembo, 300 - Campinas', '119990003', 'Brembo Freios Brasil'),
+  ('44.444.444/0004-44', 'vendas@michelin.com.br', 'Rua Michelin, 200 - Rio de Janeiro', '119990004', 'Michelin Pneus'),
+  ('55.555.555/0005-55', 'comercial@ngk.com.br', 'Av. NGK, 150 - Guarulhos', '119990005', 'NGK Velas do Brasil'),
+  ('66.666.666/0006-66', 'atendimento@motul.com.br', 'Rua Motul, 400 - São Bernardo', '119990006', 'Motul Lubrificantes'),
+  ('77.777.777/0007-77', 'vendas@pirelli.com.br', 'Av. Pirelli, 800 - Santo André', '119990007', 'Pirelli Pneus Brasil'),
+  ('88.888.888/0008-88', 'comercial@yss.com.br', 'Rua YSS, 250 - Sorocaba', '119990008', 'YSS Suspensões'),
+  ('99.999.999/0009-99', 'pedidos@moura.com.br', 'Av. Moura, 600 - Belo Horizonte', '119990009', 'Moura Baterias'),
+  ('10.101.010/0010-10', 'vendas@vaz.com.br', 'Rua Vaz, 350 - Curitiba', '119990010', 'Vaz Transmissões');
 
 -- PEÇAS (10 exemplos)
-INSERT INTO Peca (Descricao, Nome, Valor) 
+INSERT INTO Peca (Descricao, Nome, Valor, forn_id) 
 VALUES
-  ('Filtro de óleo original Honda para CB500', 'Filtro de Óleo Honda', 45.00),
-  ('Pneu traseiro esportivo Michelin 180/55', 'Pneu Traseiro Michelin', 380.00),
-  ('Pastilha de freio dianteira Brembo', 'Pastilha Freio Brembo', 120.00),
-  ('Vela de ignição NGK Iridium', 'Vela NGK Iridium', 25.00),
-  ('Corrente DID 520 com 120 elos', 'Corrente DID 520', 180.00),
-  ('Bateria Moura 12V 8Ah selada', 'Bateria Moura 8Ah', 220.00),
-  ('Óleo motor Motul 5100 15W50 semissintético', 'Óleo Motul 5100', 75.00),
-  ('Amortecedor traseiro YSS regulável', 'Amortecedor YSS', 850.00),
-  ('Pneu dianteiro Pirelli Diablo 120/70', 'Pneu Dianteiro Pirelli', 320.00),
-  ('Kit relação completo Vaz', 'Kit Relação Vaz', 450.00);
+  ('Filtro de óleo original Honda para CB500', 'Filtro de Óleo Honda', 45.00, 1),
+  ('Pneu traseiro esportivo Michelin 180/55', 'Pneu Traseiro Michelin', 380.00, 4),
+  ('Pastilha de freio dianteira Brembo', 'Pastilha Freio Brembo', 120.00, 3),
+  ('Vela de ignição NGK Iridium', 'Vela NGK Iridium', 25.00, 5),
+  ('Corrente DID 520 com 120 elos', 'Corrente DID 520', 180.00, 1),
+  ('Bateria Moura 12V 8Ah selada', 'Bateria Moura 8Ah', 220.00, 9),
+  ('Óleo motor Motul 5100 15W50 semissintético', 'Óleo Motul 5100', 75.00, 6),
+  ('Amortecedor traseiro YSS regulável', 'Amortecedor YSS', 850.00, 8),
+  ('Pneu dianteiro Pirelli Diablo 120/70', 'Pneu Dianteiro Pirelli', 320.00, 7),
+  ('Kit relação completo Vaz', 'Kit Relação Vaz', 450.00, 10);
 
--- AQUISIÇÃO DE PRODUTOS (10 exemplos)
-INSERT INTO Aquisicao_Produto (Aquisicao_ID, Peca_ID, Preco_da_compra, Vencimento, Quantidade)
-VALUES
-  (1, 1, 35.00, '2025-12-01', 50),
-  (2, 2, 300.00, NULL, 20),
-  (3, 3, 90.00, '2026-06-01', 30),
-  (4, 4, 18.00, '2025-12-15', 100),
-  (5, 5, 150.00, NULL, 25),
-  (6, 6, 180.00, '2025-11-30', 15),
-  (7, 7, 60.00, '2026-03-01', 80),
-  (8, 8, 700.00, NULL, 10),
-  (9, 9, 250.00, NULL, 18),
-  (10, 10, 380.00, NULL, 12);
-
--- FORNECEDORES (10 exemplos)
-INSERT INTO Fornecedor (CNPJ, Email, Endereco, Nome) 
-VALUES
-  ('11.111.111/0001-11', 'vendas@hondapecas.com', 'Av. Honda, 1000 - São Paulo', 'Honda Peças Originais'),
-  ('22.222.222/0002-22', 'contato@yamahapecas.com', 'Rua Yamaha, 500 - São Paulo', 'Yamaha Parts Brasil'),
-  ('33.333.333/0003-33', 'pedidos@brembo.com.br', 'Av. Brembo, 300 - Campinas', 'Brembo Freios Brasil'),
-  ('44.444.444/0004-44', 'vendas@michelin.com.br', 'Rua Michelin, 200 - Rio de Janeiro', 'Michelin Pneus'),
-  ('55.555.555/0005-55', 'comercial@ngk.com.br', 'Av. NGK, 150 - Guarulhos', 'NGK Velas do Brasil'),
-  ('66.666.666/0006-66', 'atendimento@motul.com.br', 'Rua Motul, 400 - São Bernardo', 'Motul Lubrificantes'),
-  ('77.777.777/0007-77', 'vendas@pirelli.com.br', 'Av. Pirelli, 800 - Santo André', 'Pirelli Pneus Brasil'),
-  ('88.888.888/0008-88', 'comercial@yss.com.br', 'Rua YSS, 250 - Sorocaba', 'YSS Suspensões'),
-  ('99.999.999/0009-99', 'pedidos@moura.com.br', 'Av. Moura, 600 - Belo Horizonte', 'Moura Baterias'),
-  ('10.101.010/0010-10', 'vendas@vaz.com.br', 'Rua Vaz, 350 - Curitiba', 'Vaz Transmissões');
-
--- RELACIONAMENTO FORNECEDOR-PEÇA (10 exemplos)
-INSERT INTO Fornece (Peca_ID, Fornecedor_ID) 
-VALUES
-  (1, 1),
-  (2, 4),
-  (3, 3),
-  (4, 5),
-  (5, 10),
-  (6, 9),
-  (7, 6),
-  (8, 8),
-  (9, 7),
-  (10, 10);
 
 -- PEÇAS UTILIZADAS NAS ORDENS (10 exemplos)
 INSERT INTO Possui_peca (Ordem_de_servico_COD, Peca_ID, Qtd_pecas) 

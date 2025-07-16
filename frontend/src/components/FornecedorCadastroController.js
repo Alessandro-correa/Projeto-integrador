@@ -1,21 +1,14 @@
-class FornecedorAjusteController {
-    constructor() {
-    this.form = document.getElementById('ajusteFornecedorForm');
+class FornecedorCadastroController {
+  constructor() {
+    this.form = document.getElementById('cadastroFornecedorForm');
     this.cancelBtn = document.getElementById('cancelBtn');
     this.apiUrl = 'http://localhost:3000/api/fornecedores';
     this.isSubmitting = false;
-    this.id = this.getIdFromUrl();
     this.init();
   }
 
-  getIdFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id');
-  }
-
   init() {
-    if (this.form && this.id) {
-      this.loadFornecedor();
+    if (this.form) {
       this.form.addEventListener('submit', (e) => this.handleSubmit(e));
       // Máscara para CNPJ
       const cnpjInput = this.form.cnpj;
@@ -35,8 +28,10 @@ class FornecedorAjusteController {
         telInput.addEventListener('input', (e) => {
           let v = e.target.value.replace(/\D/g, '').slice(0, 11);
           if (v.length <= 10) {
+            // Fixo: (99) 9999-9999
             v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
           } else {
+            // Celular: (99) 99999-9999
             v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
           }
           e.target.value = v.trim();
@@ -47,26 +42,6 @@ class FornecedorAjusteController {
       this.cancelBtn.addEventListener('click', () => {
         window.location.href = 'fornecedores-consulta.html';
       });
-    }
-  }
-
-  async loadFornecedor() {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${this.apiUrl}/${this.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Erro ao buscar fornecedor');
-      const json = await res.json();
-      const f = json.data;
-      this.form.nome.value = f.nome;
-      this.form.cnpj.value = f.cnpj;
-      this.form.email.value = f.email;
-      this.form.telefone.value = f.telefone;
-      this.form.endereco.value = f.endereco;
-    } catch (e) {
-      alert('Erro ao carregar fornecedor: ' + e.message);
-      window.location.href = 'fornecedores-consulta.html';
     }
   }
 
@@ -86,28 +61,28 @@ class FornecedorAjusteController {
     }
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${this.apiUrl}/${this.id}`, {
-        method: 'PUT',
+      const res = await fetch(this.apiUrl, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ nome, cnpj, email, endereco })
+        body: JSON.stringify({ nome, cnpj, email, telefone, endereco })
       });
       const json = await res.json();
       if (res.ok && json.success) {
-        alert('Fornecedor atualizado com sucesso!');
+        alert('Fornecedor cadastrado com sucesso!');
         window.location.href = 'fornecedores-consulta.html';
       } else {
-        alert(json.message || 'Erro ao atualizar fornecedor');
+        alert(json.message || 'Erro ao cadastrar fornecedor');
       }
     } catch (e) {
-      alert('Erro ao atualizar fornecedor: ' + e.message);
+      alert('Erro ao cadastrar fornecedor: ' + e.message);
     } finally {
       this.isSubmitting = false;
     }
   }
 }
 window.addEventListener('DOMContentLoaded', () => {
-  window.fornecedorAjusteController = new FornecedorAjusteController();
-});
+  window.fornecedorCadastroController = new FornecedorCadastroController();
+}); 

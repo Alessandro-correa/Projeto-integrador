@@ -31,6 +31,7 @@ class FilterController {
         if (this.table) {
             this.setupEventListeners();
             await this.loadData();
+            this.setupSortEvents();
         }
     }
 
@@ -41,6 +42,48 @@ class FilterController {
         if (this.filterMarca) this.filterMarca.addEventListener('change', () => this.filterTable());
         if (this.filterFornecedor) this.filterFornecedor.addEventListener('change', () => this.filterTable());
         if (this.clearFiltersBtn) this.clearFiltersBtn.addEventListener('click', () => this.clearAllFilters());
+    }
+
+    setupSortEvents() {
+        const headers = this.table.querySelectorAll('th.sortable');
+        headers.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.getAttribute('data-column');
+                const currentSort = header.getAttribute('data-sort') || header.getAttribute('data-default-sort') || 'asc';
+                const newSort = currentSort === 'asc' ? 'desc' : 'asc';
+                headers.forEach(h => h.removeAttribute('data-sort'));
+                header.setAttribute('data-sort', newSort);
+                this.sortTableByColumn(column, newSort);
+                this.updateSortIcons(headers, header, newSort);
+            });
+        });
+    }
+
+    sortTableByColumn(column, order) {
+        const tbody = this.table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const colIndex = Array.from(this.table.querySelectorAll('th')).findIndex(th => th.getAttribute('data-column') === column);
+        rows.sort((a, b) => {
+            const aText = a.cells[colIndex]?.textContent.trim().toLowerCase() || '';
+            const bText = b.cells[colIndex]?.textContent.trim().toLowerCase() || '';
+            if (aText < bText) return order === 'asc' ? -1 : 1;
+            if (aText > bText) return order === 'asc' ? 1 : -1;
+            return 0;
+        });
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    updateSortIcons(headers, activeHeader, order) {
+        headers.forEach(header => {
+            const icon = header.querySelector('.sort-icon');
+            if (icon) {
+                icon.className = 'bx bx-sort-alt-2 sort-icon';
+            }
+        });
+        const activeIcon = activeHeader.querySelector('.sort-icon');
+        if (activeIcon) {
+            activeIcon.className = order === 'asc' ? 'bx bx-sort-up sort-icon active' : 'bx bx-sort-down sort-icon active';
+        }
     }
 
     filterTable() {
@@ -114,7 +157,10 @@ class FilterController {
         if (!this.entity) return;
 
         try {
-            const response = await fetch(`${this.baseURL}/${this.entity}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${this.entity}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
 
             if (result.success) {
@@ -185,7 +231,6 @@ class FilterController {
                 ];
             case 'marcas':
                 return [
-                    item.motocicleta_placa || '',
                     item.nome || ''
                 ];
             case 'motocicletas':
@@ -230,17 +275,79 @@ class FilterController {
     createActionButtons(item) {
         const editUrl = this.getEditUrl(item);
         const deleteId = this.getDeleteId(item);
-        
+        let visualizarBtn = '';
+        if (this.entity === 'marcas') {
+            visualizarBtn = `<button class="action-btn" onclick="filterController.visualizarMarca('${item.id || item.motocicleta_placa || ''}', '${item.nome || ''}')" title="Visualizar"><i class='bx bx-show'></i></button>`;
+        }
+        // Passa o nome ao chamar deleteItem
         return `
-            <div class="action-buttons">
-                <a href="${editUrl}" class="btn-edit" title="Editar">
-                    <i class='bx bxs-edit-alt'></i>
+            <div class="actions">
+                ${visualizarBtn}
+                <a href="${editUrl}" class="action-btn" title="Editar">
+                    <i class='bx bx-edit'></i>
                 </a>
-                <button class="btn-delete" onclick="filterController.deleteItem('${deleteId}')" title="Excluir">
+                <button class="action-btn" onclick="filterController.deleteItem('${deleteId}', '${item.nome || ''}')" title="Excluir">
                     <i class='bx bxs-trash'></i>
                 </button>
             </div>
         `;
+    }
+
+    async visualizarMarca(id, nome) {
+        // Buscar motocicletas associadas à marca via API
+        let motos = [];
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/motocicletas?marca_id=${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const result = await response.json();
+            if (result.success && Array.isArray(result.data)) {
+                motos = result.data.filter(m => String(m.marca_id) === String(id));
+            }
+        } catch (e) {
+            // Se der erro, mostra vazio
+        }
+        this.mostrarModalVisualizacaoMarca({ id, nome, motos });
+    }
+
+    mostrarModalVisualizacaoMarca(marca) {
+        // Remove modal anterior se existir
+        const modalExistente = document.getElementById('modal-visualizar-marca');
+        if (modalExistente) modalExistente.remove();
+
+        const motosHtml = marca.motos && marca.motos.length > 0
+            ? `<ul class="motos-list">
+                    ${marca.motos.map(m => `<li><strong>${m.modelo}</strong> - Placa: ${m.placa}</li>`).join('')}
+               </ul>`
+            : '<p style="margin-top: 16px;">Nenhuma motocicleta cadastrada para esta marca.</p>';
+
+        const modalHtml = `
+            <div id="modal-visualizar-marca" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Detalhes da Marca</h3>
+                        <button class="modal-close" id="close-modal-marca">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="basic-info">
+                            <p><strong>Nome da Marca:</strong> ${marca.nome || 'N/A'}</p>
+                            <hr/>
+                            <h4>Motocicletas vinculadas:</h4>
+                            ${motosHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        // Fechar ao clicar fora do modal ou no botão de fechar
+        document.getElementById('modal-visualizar-marca').addEventListener('click', function(e) {
+            if (e.target === this) this.remove();
+        });
+        document.getElementById('close-modal-marca').onclick = function() {
+            document.getElementById('modal-visualizar-marca').remove();
+        };
     }
 
     getEditUrl(item) {
@@ -264,26 +371,99 @@ class FilterController {
         return item.id || item.codigo || item.cpf || item.cnpj;
     }
 
-    async deleteItem(id) {
-        if (!confirm('Tem certeza que deseja excluir este item?')) return;
-
-        try {
-            const response = await fetch(`${this.baseURL}/${this.entity}/${id}`, {
-                method: 'DELETE'
-            });
-
-            const result = await response.json();
-
+    async deleteItem(id, nome = '') {
+        // Modal de confirmação customizado
+        const existingModal = document.getElementById('modal-confirm-delete');
+        if (existingModal) existingModal.remove();
+        const modalHtml = `
+            <div id="modal-confirm-delete" class="modal-overlay">
+                <div class="modal-content" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h3>Confirmar Exclusão</h3>
+                        <button class="modal-close" onclick="document.getElementById('modal-confirm-delete').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir ${nome ? 'a marca <b>\"' + nome + '\"</b>' : 'este item'}? Esta ação não poderá ser desfeita.</p>
+                        <div style="margin-top: 24px; display: flex; gap: 16px; justify-content: flex-end;">
+                            <button id="btn-cancel-delete" class="btn-secondary">Cancelar</button>
+                            <button id="btn-confirm-delete" class="btn-primary">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.getElementById('btn-cancel-delete').onclick = function() {
+            document.getElementById('modal-confirm-delete').remove();
+        };
+        document.getElementById('btn-confirm-delete').onclick = async (e) => {
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = 'Excluindo...';
+            document.getElementById('modal-confirm-delete').remove();
+            try {
+                const url = `${this.baseURL}/${this.entity}/${id}`;
+                const token = localStorage.getItem('token');
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const result = await response.json();
             if (result.success) {
-                this.showSuccess('Item excluído com sucesso!');
+                    this.showNotification(`${this.entity === 'marcas' && nome ? 'Marca "' + nome + '" excluída com sucesso!' : 'Item excluído com sucesso!'}`, 'success');
                 await this.loadData(); 
             } else {
-                this.showError('Erro ao excluir: ' + result.message);
+                    if (result.message && result.message.includes('motocicletas vinculadas')) {
+                        this.showNotification('Não é possível excluir uma marca que possui motocicletas vinculadas.', 'error');
+                    } else {
+                        this.showNotification(result.message || 'Erro ao excluir.', 'error');
+                    }
             }
         } catch (error) {
-            console.error('Erro ao excluir:', error);
-            this.showError('Erro ao excluir item');
+                this.showNotification('Erro ao excluir item.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Excluir';
+            }
+        };
+    }
+
+    showNotification(message, type = 'info') {
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            position: fixed !important;
+            top: 32px !important;
+            right: 32px !important;
+            left: auto !important;
+            transform: none !important;
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'} !important;
+            color: white !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            z-index: 99999 !important;
+            max-width: 400px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-size: 1.1rem !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            padding: 15px 24px !important;
+        `;
+        const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle';
+        notification.innerHTML = `
+            <i class='bx bx-${icon}'></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            if (notification && notification.parentElement) {
+                notification.remove();
         }
+        }, 5000);
     }
 
     showSuccess(message) {

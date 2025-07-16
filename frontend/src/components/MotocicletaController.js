@@ -83,7 +83,10 @@ class MotocicletaController {
 
     async loadMotocicletas() {
         try {
-            const response = await fetch(this.baseURL);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.baseURL, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) throw new Error('Erro ao carregar motocicletas');
             const result = await response.json();
             console.log('[MotocicletaController] Dados recebidos da API:', result);
@@ -98,7 +101,10 @@ class MotocicletaController {
 
     async loadMarcas() {
         try {
-            const response = await fetch(this.marcasURL);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.marcasURL, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) throw new Error('Erro ao carregar marcas');
             
             this.marcas = await response.json();
@@ -297,10 +303,12 @@ class MotocicletaController {
         };
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(dadosAtualizados)
             });
@@ -328,8 +336,10 @@ class MotocicletaController {
 
     async excluirMotocicleta(id) {
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
             });
             const result = await response.json();
             if (result.success) {
@@ -384,48 +394,6 @@ class MotocicletaController {
                             <p><strong>Cliente:</strong> ${motocicleta.cliente_nome || 'N/A'}</p>
                             <p><strong>CPF do Cliente:</strong> ${motocicleta.cliente_cpf || 'N/A'}</p>
                         </div>
-                        <style>
-                            #modal-visualizar-moto .modal-content {
-                                max-width: 400px;
-                                margin: 40px auto;
-                                background: #fff;
-                                border-radius: 10px;
-                                box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-                                padding: 0;
-                                overflow: hidden;
-                            }
-                            #modal-visualizar-moto .modal-header {
-                                background: #22223b;
-                                color: #fff;
-                                padding: 16px 24px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: space-between;
-                            }
-                            #modal-visualizar-moto .modal-body {
-                                padding: 24px;
-                            }
-                            #modal-visualizar-moto .basic-info p {
-                                margin: 8px 0;
-                                font-size: 16px;
-                            }
-                            #modal-visualizar-moto .modal-close {
-                                background: none;
-                                border: none;
-                                color: #fff;
-                                font-size: 28px;
-                                cursor: pointer;
-                            }
-                            #modal-visualizar-moto .modal-overlay {
-                                position: fixed;
-                                top: 0; left: 0; right: 0; bottom: 0;
-                                background: rgba(0,0,0,0.3);
-                                z-index: 9999;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                            }
-                        </style>
                     </div>
                 </div>
             </div>

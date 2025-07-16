@@ -99,7 +99,10 @@ class ClienteAjusteController {
             
             console.log(`🔍 Buscando cliente com CPF: ${cpf} (formatado: ${cpfFormatted})`);
             
-            const response = await fetch(`${this.baseURL}/${cpfFormatted}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${cpfFormatted}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
             console.log(`📡 Resposta da API:`, response.status, response.statusText);
             
@@ -291,10 +294,12 @@ class ClienteAjusteController {
             
             const cpf = this.currentItem.cpf.replace(/\D/g, '');
             
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${cpf}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(dados)
             });

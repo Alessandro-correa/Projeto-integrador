@@ -8,7 +8,7 @@
 </head>
 <body class="login-body">
     <div class="login-container">
-        <form action="../../views/dashboard/index.html" class="login-form">
+        <form id="login-form" class="login-form">
             <div class="login-header">
                 <img src="../../assets/images/logo.png" alt="Logo">
                 <p>Faça login para continuar</p>
@@ -24,5 +24,35 @@
             <button type="submit" class="btn-login">Entrar</button>
         </form>
     </div>
+    <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('username').value;
+        const senha = document.getElementById('password').value;
+        try {
+            const res = await fetch('http://localhost:3000/api/usuarios/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+            const result = await res.json();
+            if (result.success && result.token) {
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('userType', result.role || '');
+                localStorage.setItem('userName', result.nome || '');
+                const role = (result.role || '').toLowerCase();
+                if (role === 'mecânico' || role === 'secretária') {
+                    window.location.href = '../../views/os/os-consulta.html';
+                } else {
+                    window.location.href = '../../views/dashboard/index.html';
+                }
+            } else {
+                alert(result.message || 'Login falhou');
+            }
+        } catch (err) {
+            alert('Erro ao conectar ao servidor.');
+        }
+    });
+    </script>
 </body>
 </html>

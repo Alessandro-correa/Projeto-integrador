@@ -84,7 +84,10 @@ class OrcamentoAjusteController {
             this.showLoading(true);
             this.showNotification('Carregando dados do orçamento...', 'info', null, 0);
             
-            const response = await fetch(`${this.baseURL}/${id}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             console.log('Response status:', response.status);
             
             if (!response.ok) {
@@ -199,7 +202,10 @@ class OrcamentoAjusteController {
 
     async loadClienteData(cpf) {
         try {
-            const response = await fetch(`http://localhost:3000/api/clientes/${cpf}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:3000/api/clientes/${cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (response.ok) {
                 const result = await response.json();
                 if (result.success) {
@@ -214,11 +220,14 @@ class OrcamentoAjusteController {
     async loadMotocicletaData(placa) {
         try {
             console.log('Carregando dados da motocicleta:', placa);
-            const response = await fetch(`http://localhost:3000/api/motocicletas/${placa}`);
-            console.log('Response motocicleta status:', response.status);
+            const token2 = localStorage.getItem('token');
+            const response2 = await fetch(`http://localhost:3000/api/motocicletas/${placa}`, {
+                headers: { Authorization: `Bearer ${token2}` }
+            });
+            console.log('Response motocicleta status:', response2.status);
             
-            if (response.ok) {
-                const result = await response.json();
+            if (response2.ok) {
+                const result = await response2.json();
                 console.log('Resultado da API motocicleta:', result);
                 
                 if (result.success) {
@@ -227,7 +236,7 @@ class OrcamentoAjusteController {
                     console.error('Erro na resposta da API:', result.message);
                 }
             } else {
-                console.error('Erro HTTP ao buscar motocicleta:', response.status);
+                console.error('Erro HTTP ao buscar motocicleta:', response2.status);
             }
         } catch (error) {
             console.error('Erro ao carregar motocicleta:', error);
@@ -236,10 +245,12 @@ class OrcamentoAjusteController {
 
     async loadItensOrcamento(codOrdem) {
         try {
-            
-            const response = await fetch(`http://localhost:3000/api/ordens/${codOrdem}/pecas`);
-            if (response.ok) {
-                const result = await response.json();
+            const token3 = localStorage.getItem('token');
+            const response3 = await fetch(`http://localhost:3000/api/ordens/${codOrdem}/pecas`, {
+                headers: { Authorization: `Bearer ${token3}` }
+            });
+            if (response3.ok) {
+                const result = await response3.json();
                 if (result.success && result.data) {
                     this.populateItensContainer(result.data);
                 }
@@ -253,9 +264,12 @@ class OrcamentoAjusteController {
 
     async carregarValorTotal(codOrdem) {
         try {
-            const response = await fetch(`http://localhost:3000/api/ordens/${codOrdem}/valor-total`);
-            if (response.ok) {
-                const result = await response.json();
+            const token4 = localStorage.getItem('token');
+            const response4 = await fetch(`http://localhost:3000/api/ordens/${codOrdem}/valor-total`, {
+                headers: { Authorization: `Bearer ${token4}` }
+            });
+            if (response4.ok) {
+                const result = await response4.json();
                 if (result.success) {
                     const valorTotal = result.data.valor_total;
                     this.atualizarValorOrcamento(valorTotal);
@@ -970,10 +984,12 @@ class OrcamentoAjusteController {
             
             console.log('📡 Fazendo requisição PUT...');
             
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${this.currentItem.id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(updateData)
             });

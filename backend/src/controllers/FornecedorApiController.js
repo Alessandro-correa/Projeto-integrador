@@ -90,7 +90,8 @@ class FornecedorApiController {
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
-        error: error.message
+        error: error.message,
+        stack: error.stack
       });
     }
   }
