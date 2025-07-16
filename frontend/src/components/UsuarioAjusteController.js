@@ -34,7 +34,10 @@ class UsuarioAjusteController extends BaseAjusteController {
             const searchBtn = document.getElementById('btn-search');
             BasePageController.showLoading(searchBtn, true, '<i class="bx bx-search"></i> Buscar');
             
-            const response = await fetch(`${this.baseURL}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) throw new Error('Erro ao buscar usuários');
             
             const usuarios = await response.json();

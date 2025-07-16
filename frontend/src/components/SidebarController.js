@@ -184,3 +184,5 @@ class SidebarController {
         });
     }
 }
+
+window.SidebarController = SidebarController;

@@ -135,10 +135,12 @@ class MotocicletaCadastroController extends BasePageController {
 
             console.log('📤 Enviando dados da motocicleta:', formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -378,7 +380,10 @@ class MotocicletaCadastroController extends BasePageController {
         const currentRequestId = this._clientesRequestId;
         try {
             console.log('🔄 Carregando clientes...');
-            const response = await fetch(this.clientesApiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.clientesApiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
             console.log('🔎 Resultado clientes:', result);
             if (currentRequestId !== this._clientesRequestId) return; // Ignora respostas antigas
@@ -404,7 +409,10 @@ class MotocicletaCadastroController extends BasePageController {
         const currentRequestId = this._marcasRequestId;
         try {
             console.log('🔄 Carregando marcas...');
-            const response = await fetch(this.marcasApiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.marcasApiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const result = await response.json();
             console.log('🔎 Resultado marcas:', result);
             if (currentRequestId !== this._marcasRequestId) return; // Ignora respostas antigas

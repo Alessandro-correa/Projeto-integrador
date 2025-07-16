@@ -8,48 +8,55 @@
 	<link rel="stylesheet" href="../../assets/css/usuarios.css">
 	<title>Sistema Campos Moto Peças - Ajustar Usuário</title>
 </head>
+
 <body>
+	<!-- Sidebar de navegação -->
 	<section id="sidebar">
 		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
 		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon'></i> Dashboard</a></li>
 			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon'></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon'></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestao">Gestão</li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon'></i> Clientes</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
 			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
 			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
 			<li><a href="usuarios-consulta.html" class="active"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
 		</ul>
 	</section>
+
 	<section id="content">
+		<!-- Barra de navegação superior -->
 		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
+			<i class='bx bx-menu toggle-sidebar'></i>
 			<div class="theme-toggle">
-				<input type="checkbox" id="theme-toggle-checkbox">
-				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+				<input type="checkbox" id="themeToggleCheckbox">
+				<label for="themeToggleCheckbox" class="theme-toggle-label">
 					<i class='bx bxs-sun'></i>
 					<i class='bx bxs-moon'></i>
 				</label>
 			</div>
 			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon' ></i>
+				<i class='bx bxs-bell icon'></i>
 			</a>
 			<span class="divider"></span>
 			<div class="profile">
 				<a href="#" class="nav-link">
 					<i class='bx bxs-cog icon' title="Configurações"></i>
 				</a>
-				<a href="#" class="nav-link">
+				<!-- Botão de logout pode ser implementado em JS -->
+				<a href="../../login.html" class="nav-link">
 					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
 				</a>
 			</div>
 		</nav>
+
 		<main>
 			<h1 class="title">Ajustar Usuário</h1>
+			<!-- Breadcrumbs de navegação -->
 			<ul class="breadcrumbs">
 				<li><a href="../../index.html">Home</a></li>
 				<li class="divider">/</li>
@@ -57,6 +64,7 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Ajustar Usuário</a></li>
 			</ul>
+
 			<div class="data">
 				<div class="content-data">
 					<div class="head">
@@ -75,11 +83,11 @@
 							<div class="search-form">
 								<div class="form-row">
 									<div class="form-group">
-										<label for="search-email">E-mail do Usuário</label>
-										<input type="email" id="search-email" placeholder="usuario@exemplo.com" required>
+										<label for="searchEmail">E-mail do Usuário</label>
+										<input type="email" id="searchEmail" placeholder="usuario@exemplo.com" required>
 									</div>
 									<div class="form-group">
-										<button type="button" id="btn-search" class="btn-primary">
+										<button type="button" id="btnSearch" class="btn-primary">
 											<i class='bx bx-search'></i> Buscar
 										</button>
 									</div>
@@ -92,50 +100,52 @@
 					<div class="edit-section" id="editSection" style="display: none;">
 						<div class="current-data-info">
 							<h4><i class='bx bx-user'></i> Dados Atuais do Usuário</h4>
-							<div id="current-user-data"></div>
+							<div id="currentUserData"></div>
 						</div>
 
-						<form id="adjust-form" class="adjust-form">
+						<!-- Formulário de ajuste de usuário -->
+						<form id="adjustForm" class="adjust-form">
 							<h4><i class='bx bx-edit-alt'></i> Ajustar Informações</h4>
 							
 							<div class="form-row">
 								<div class="form-group">
-									<label for="adjust-nome">Nome Completo</label>
-									<input type="text" id="adjust-nome" name="nome" required>
+									<label for="adjustNome">Nome Completo</label>
+									<input type="text" id="adjustNome" name="nome" required>
 									<small>Nome completo do usuário</small>
 								</div>
 								<div class="form-group">
-									<label for="adjust-email">E-mail</label>
-									<input type="email" id="adjust-email" name="email" required>
+									<label for="adjustEmail">E-mail</label>
+									<input type="email" id="adjustEmail" name="email" required>
 									<small>E-mail válido para login</small>
 								</div>
 							</div>
 
 							<div class="form-row">
 								<div class="form-group">
-									<label for="adjust-cpf">CPF</label>
-									<input type="text" id="adjust-cpf" name="cpf" required>
+									<label for="adjustCpf">CPF</label>
+									<input type="text" id="adjustCpf" name="cpf" required readonly>
 									<small>CPF do usuário</small>
 								</div>
 								<div class="form-group">
-									<label for="adjust-telefone">Telefone</label>
-									<input type="text" id="adjust-telefone" name="telefone">
+									<label for="adjustTelefone">Telefone</label>
+									<input type="text" id="adjustTelefone" name="telefone">
 									<small>Telefone para contato (opcional)</small>
 								</div>
 							</div>
 
 							<div class="form-row">
 								<div class="form-group">
-									<label for="adjust-tipo">Tipo de Usuário</label>
-									<select id="adjust-tipo" name="tipo" required>
-										<option value="funcionario">Funcionário</option>
-										<option value="admin">Administrador</option>
+									<label for="adjustFuncao">Função</label>
+									<select id="adjustFuncao" name="funcao" required>
+										<option value="Administrador">Administrador</option>
+										<option value="Mecanico">Mecânico</option>
+										<option value="Secretaria">Secretária</option>
 									</select>
-									<small>Nível de acesso do usuário</small>
+									<small>Função do usuário no sistema</small>
 								</div>
 								<div class="form-group">
-									<label for="adjust-status">Status</label>
-									<select id="adjust-status" name="status">
+									<label for="adjustStatus">Status</label>
+									<select id="adjustStatus" name="status">
 										<option value="Ativo">Ativo</option>
 										<option value="Inativo">Inativo</option>
 									</select>
@@ -146,8 +156,8 @@
 							<!-- Seção de alteração de senha -->
 							<div class="form-row">
 								<div class="form-group full-width">
-									<label for="adjust-senha">Nova Senha (opcional)</label>
-									<input type="password" id="adjust-senha" name="senha" minlength="6">
+									<label for="adjustSenha">Nova Senha (opcional)</label>
+									<input type="password" id="adjustSenha" name="senha" minlength="6">
 									<small>Deixe em branco para manter a senha atual. Mínimo 6 caracteres.</small>
 								</div>
 							</div>
@@ -155,8 +165,8 @@
 							<!-- Seção de observações -->
 							<div class="form-row">
 								<div class="form-group full-width">
-									<label for="adjust-observacoes">Observações do Ajuste</label>
-									<textarea id="adjust-observacoes" name="observacoes" rows="3" placeholder="Digite as observações sobre este ajuste (opcional)"></textarea>
+									<label for="adjustObservacoes">Observações do Ajuste</label>
+									<textarea id="adjustObservacoes" name="observacoes" rows="3" placeholder="Digite as observações sobre este ajuste (opcional)"></textarea>
 									<small>Observações sobre as alterações realizadas</small>
 								</div>
 							</div>
@@ -165,10 +175,10 @@
 								<button type="submit" class="btn-primary">
 									<i class='bx bx-save'></i> Salvar Ajustes
 								</button>
-								<button type="button" id="btn-cancel" class="btn-secondary">
+								<button type="button" id="btnCancel" class="btn-secondary">
 									<i class='bx bx-x'></i> Cancelar
 								</button>
-								<button type="button" id="btn-reset" class="btn-warning">
+								<button type="button" id="btnReset" class="btn-warning">
 									<i class='bx bx-reset'></i> Restaurar Dados Originais
 								</button>
 							</div>
@@ -179,6 +189,7 @@
 		</main>
 	</section>
 
+	<!-- Scripts principais -->
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
 	<script src="../../src/components/BasePageController.js"></script>

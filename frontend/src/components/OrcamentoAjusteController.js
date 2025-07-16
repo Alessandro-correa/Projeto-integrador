@@ -84,7 +84,10 @@ class OrcamentoAjusteController {
             this.showLoading(true);
             this.showNotification('Carregando dados do orçamento...', 'info', null, 0);
             
-            const response = await fetch(`${this.baseURL}/${id}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             console.log('Response status:', response.status);
             
             if (!response.ok) {
@@ -970,10 +973,12 @@ class OrcamentoAjusteController {
             
             console.log('📡 Fazendo requisição PUT...');
             
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${this.currentItem.id}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(updateData)
             });

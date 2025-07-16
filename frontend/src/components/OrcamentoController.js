@@ -138,7 +138,10 @@ class OrcamentoController {
     async loadOrcamentos() {
         try {
             console.log('Carregando orçamentos da API...');
-            const res = await fetch(this.apiUrl);
+            const token = localStorage.getItem('token');
+            const res = await fetch(this.apiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             console.log('Response status:', res.status);
             
             if (!res.ok) {
@@ -186,10 +189,10 @@ class OrcamentoController {
         this.tableBody.innerHTML = sorted.map(o => `
             <tr>
                 <td><p>ORC-${String(o.id).padStart(3, '0')}</p></td>
-                <td><p>${o.cliente_nome || 'N/A'}</p></td>
-                <td><p>${o.placa || 'N/A'}</p></td>
-                <td>R$ ${(parseFloat(o.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                <td><span class="status-${this.getStatusClass(o.status)}">${o.status_descricao || this.getStatusLabel(o.status)}</span></td>
+                <td><p>${o.cliente_nome ? o.cliente_nome : 'N/A'}</p></td>
+                <td><p>${o.placa ? o.placa : 'N/A'}</p></td>
+                <td>R$ ${(isNaN(parseFloat(o.valor)) ? 0 : parseFloat(o.valor)).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                <td><span class="status-${this.getStatusClass(o.status)}">${o.status_descricao ? o.status_descricao : this.getStatusLabel(o.status)}</span></td>
                 <td>
                     ${this.getActionsForStatus(o)}
                 </td>
@@ -214,6 +217,8 @@ class OrcamentoController {
                     actions.push(`<a href="#" class="action-icon validar-orcamento" data-id="${orcamento.id}" title="Validar Orçamento (Gerar OS)"><i class='bx bx-check-shield'></i></a>`);
                     actions.push(`<a href="#" class="action-icon rejeitar-orcamento" data-id="${orcamento.id}" title="Rejeitar Orçamento"><i class='bx bx-x-circle'></i></a>`);
                 }
+                // Adicionar botão de excluir para pendente
+                actions.push(`<a href="#" class="action-icon excluir-orcamento" data-id="${orcamento.id}" title="Excluir Orçamento"><i class='bx bx-trash'></i></a>`);
                 break;
                 
             case 'A': 
@@ -303,11 +308,26 @@ class OrcamentoController {
                 await this.abrirModalRejeicao(id);
             });
         });
+
+        // Excluir orçamento
+        this.tableBody.querySelectorAll('.excluir-orcamento').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                const confirmar = confirm('Tem certeza que deseja excluir este orçamento? Esta ação não pode ser desfeita.');
+                if (confirmar) {
+                    await this.excluirOrcamento(id);
+                }
+            });
+        });
     }
 
     async visualizarOrcamento(id) {
         try {
-            const res = await fetch(`${this.apiUrl}/${id}`);
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${this.apiUrl}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!res.ok) throw new Error('Erro ao buscar orçamento');
             
             const json = await res.json();
@@ -500,10 +520,12 @@ class OrcamentoController {
 
     async validarOrcamento(id) {
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.apiUrl}/${id}/validar`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 }
             });
             
@@ -545,10 +567,12 @@ class OrcamentoController {
 
     async rejeitarOrcamentoComMotivo(id, parametros) {
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.apiUrl}/${id}/rejeitar`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     motivo: parametros.motivo,
@@ -587,17 +611,45 @@ class OrcamentoController {
         await this.abrirModalRejeicao(id);
     }
 
+    async excluirOrcamento(id) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!response.ok) throw new Error('Erro ao excluir orçamento');
+            const result = await response.json();
+            if (result.success) {
+                this.showNotification('Orçamento excluído com sucesso!', 'success');
+                this.loadOrcamentos();
+            } else {
+                throw new Error(result.message || 'Erro desconhecido');
+            }
+        } catch (error) {
+            this.showNotification('Erro ao excluir orçamento: ' + error.message, 'error');
+        }
+    }
+
     async abrirModalValidacao(orcamentoId) {
         try {
             // Buscar dados completos do orçamento
-            const response = await fetch(`${this.apiUrl}/${orcamentoId}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${orcamentoId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) throw new Error('Erro ao buscar orçamento');
             
             const result = await response.json();
             const orcamento = result.data;
 
             // Buscar motocicletas disponíveis para o cliente
-            const motocicletasResponse = await fetch(`/api/motocicletas?cliente_cpf=${orcamento.cliente_cpf}`);
+            const motocicletasResponse = await fetch(`/api/motocicletas?cliente_cpf=${orcamento.cliente_cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const motocicletasResult = await motocicletasResponse.json();
             const motocicletas = motocicletasResult.data || [];
 
@@ -809,7 +861,10 @@ class OrcamentoController {
     async abrirModalRejeicao(orcamentoId) {
         try {
             // Buscar dados do orçamento
-            const response = await fetch(`${this.apiUrl}/${orcamentoId}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.apiUrl}/${orcamentoId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) throw new Error('Erro ao buscar orçamento');
             
             const result = await response.json();

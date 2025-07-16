@@ -8,7 +8,7 @@ class UsuarioCadastroController extends BasePageController {
     init() {
         this.setupEventListeners();
         this.applyMasks();
-        this.generateUserCode();
+        // this.generateUserCode(); // Código agora só no backend
     }
 
     setupEventListeners() {
@@ -78,6 +78,21 @@ class UsuarioCadastroController extends BasePageController {
         }
     }
 
+    showLoading(button, isLoading, text) {
+        if (!button) return;
+        if (isLoading) {
+            button.disabled = true;
+            button.dataset.originalText = button.innerHTML;
+            button.innerHTML = text || 'Salvando...';
+        } else {
+            button.disabled = false;
+            if (button.dataset.originalText) {
+                button.innerHTML = button.dataset.originalText;
+                delete button.dataset.originalText;
+            }
+        }
+    }
+
     async handleSubmit(e) {
         e.preventDefault();
         
@@ -89,14 +104,16 @@ class UsuarioCadastroController extends BasePageController {
             }
 
             const submitBtn = e.target.querySelector('button[type="submit"]');
-            BasePageController.showLoading(submitBtn, true, '<i class="bx bx-save"></i> Cadastrar Usuário');
+            this.showLoading(submitBtn, true, 'Salvando...');
 
             console.log('📤 Enviando dados do usuário:', formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(this.baseURL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -118,7 +135,7 @@ class UsuarioCadastroController extends BasePageController {
         } finally {
             const submitBtn = document.querySelector('button[type="submit"]');
             if (submitBtn) {
-                BasePageController.showLoading(submitBtn, false, '<i class="bx bx-save"></i> Cadastrar Usuário');
+                this.showLoading(submitBtn, false, 'Salvar Usuário');
             }
         }
     }
@@ -131,13 +148,13 @@ class UsuarioCadastroController extends BasePageController {
             telefone: document.getElementById('register-telefone')?.value.trim() || '',
             funcao: document.getElementById('register-funcao')?.value || '',
             senha: document.getElementById('register-senha')?.value || '',
-            codigo: document.getElementById('register-codigo')?.value || '',
+            // código não é enviado, backend gera
             observacoes: document.getElementById('register-observacoes')?.value.trim() || ''
         };
     }
 
     validateForm(data) {
-        const requiredFields = ['nome', 'email', 'cpf', 'telefone', 'funcao', 'senha', 'codigo'];
+        const requiredFields = ['nome', 'email', 'cpf', 'telefone', 'funcao', 'senha'];
         
         for (const field of requiredFields) {
             if (!data[field]) {
@@ -201,7 +218,7 @@ class UsuarioCadastroController extends BasePageController {
         const form = document.getElementById('register-form');
         if (form) {
             form.reset();
-            this.generateUserCode();
+            // this.generateUserCode(); // Código agora só no backend
             
             // Limpar validações customizadas
             const confirmInput = document.getElementById('register-confirm-senha');

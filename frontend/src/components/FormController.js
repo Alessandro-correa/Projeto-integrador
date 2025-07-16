@@ -280,11 +280,79 @@ class FormController {
     }
 
     showSuccess(message) {
-        alert(message);
+        // Notificação visual verde no canto direito
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+        const notification = document.createElement('div');
+        notification.className = 'notification notification-success';
+        notification.style.cssText = `
+            position: fixed !important;
+            top: 32px !important;
+            right: 32px !important;
+            left: auto !important;
+            transform: none !important;
+            background: #10b981 !important;
+            color: #fff !important;
+            padding: 15px 24px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            z-index: 99999 !important;
+            max-width: 400px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-size: 1.1rem !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        `;
+        notification.innerHTML = `
+            <i class='bx bx-check-circle'></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            if (notification && notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     }
 
     showError(message) {
-        alert('Erro: ' + message);
+        // Notificação visual vermelha no canto direito
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+        const notification = document.createElement('div');
+        notification.className = 'notification notification-error';
+        notification.style.cssText = `
+            position: fixed !important;
+            top: 32px !important;
+            right: 32px !important;
+            left: auto !important;
+            transform: none !important;
+            background: #ef4444 !important;
+            color: #fff !important;
+            padding: 15px 24px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            z-index: 99999 !important;
+            max-width: 400px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            font-size: 1.1rem !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        `;
+        notification.innerHTML = `
+            <i class='bx bx-x-circle'></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => {
+            if (notification && notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     }
 }
 

@@ -1248,3 +1248,93 @@ body.dark .loading-content p {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Sobrescreve posição das notificações para centralizar no topo */
+.notification, .notification-container {
+    position: fixed !important;
+    top: 32px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 auto !important;
+    z-index: 9999 !important;
+    width: auto !important;
+    max-width: 90vw !important;
+}
+
+/* Limita tamanho dos modais para evitar que fiquem grandes demais */
+.modal-content {
+    max-width: 420px !important;
+    width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+.modal-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.12);
+    z-index: 9998;
+}
+
+#modal-confirm-delete .btn-primary {
+    background: #dc3545 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 18px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background 0.2s !important;
+    margin-left: 8px !important;
+}
+#modal-confirm-delete .btn-primary:hover {
+    background: #b52a37 !important;
+}
+#modal-confirm-delete .btn-secondary {
+    background: #e0e0e0 !important;
+    color: #333 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 18px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: background 0.2s !important;
+}
+#modal-confirm-delete .btn-secondary:hover {
+    background: #bdbdbd !important;
+}
+
+/* Força a notificação a aparecer acima de tudo, centralizada no topo */
+.notification, .notification-success, .notification-error, .notification-info {
+    position: fixed !important;
+    top: 32px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    background: #10b981 !important;
+    color: #fff !important;
+    padding: 15px 24px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    max-width: 400px !important;
+    font-size: 1.1rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+.notification-error {
+    background: #ef4444 !important;
+}
+.notification-info {
+    background: #3b82f6 !important;
+}

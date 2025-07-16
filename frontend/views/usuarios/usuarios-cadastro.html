@@ -8,48 +8,55 @@
 	<link rel="stylesheet" href="../../assets/css/usuarios.css">
 	<title>Sistema Campos Moto Peças - Cadastro de Usuário</title>
 </head>
+
 <body>
+	<!-- Sidebar de navegação -->
 	<section id="sidebar">
 		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
 		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon'></i> Dashboard</a></li>
 			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bxs-motorcycle icon' ></i> Motocicletas</a></li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon'></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon'></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestao">Gestão</li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon'></i> Clientes</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
 			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
 			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
 			<li><a href="usuarios-consulta.html" class="active"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
 		</ul>
 	</section>
+
 	<section id="content">
+		<!-- Barra de navegação superior -->
 		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
+			<i class='bx bx-menu toggle-sidebar'></i>
 			<div class="theme-toggle">
-				<input type="checkbox" id="theme-toggle-checkbox">
-				<label for="theme-toggle-checkbox" class="theme-toggle-label">
+				<input type="checkbox" id="themeToggleCheckbox">
+				<label for="themeToggleCheckbox" class="theme-toggle-label">
 					<i class='bx bxs-sun'></i>
 					<i class='bx bxs-moon'></i>
 				</label>
 			</div>
 			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon' ></i>
+				<i class='bx bxs-bell icon'></i>
 			</a>
 			<span class="divider"></span>
 			<div class="profile">
 				<a href="#" class="nav-link">
 					<i class='bx bxs-cog icon' title="Configurações"></i>
 				</a>
-				<a href="#" class="nav-link">
+				<!-- Botão de logout pode ser implementado em JS -->
+				<a href="../../login.html" class="nav-link">
 					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
 				</a>
 			</div>
 		</nav>
+
 		<main>
 			<h1 class="title">Cadastro de Usuário</h1>
+			<!-- Breadcrumbs de navegação -->
 			<ul class="breadcrumbs">
 				<li><a href="../../index.html">Home</a></li>
 				<li class="divider">/</li>
@@ -57,108 +64,66 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Novo Usuário</a></li>
 			</ul>
+
 			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3><i class='bx bx-user-plus'></i> Cadastrar Novo Usuário</h3>
-						<div class="menu">
-							<a href="usuarios-consulta.html" class="btn-secondary">
-								<i class='bx bx-arrow-back'></i> Voltar
-							</a>
+				<div class="content-data form-container">
+					<div class="head form-header-info">
+						<h3 id="formTitle">Novo Usuário</h3>
+					</div>
+					<!-- Formulário de cadastro de usuário -->
+					<form action="#" class="os-form" id="registerForm">
+						<div class="form-row">
+							<div class="form-group">
+								<label for="registerNome">Nome Completo</label>
+								<input type="text" id="registerNome" name="nome" required>
+							</div>
+							<div class="form-group">
+								<label for="registerEmail">E-mail</label>
+								<input type="email" id="registerEmail" name="email" required>
+							</div>
 						</div>
-					</div>
-
-					<!-- Seção de cadastro -->
-					<div class="register-section">
-						<form id="register-form" class="register-form">
-							<h4><i class='bx bx-edit-alt'></i> Informações do Usuário</h4>
-							
-							<div class="form-row">
-								<div class="form-group">
-									<label for="register-nome">Nome Completo</label>
-									<input type="text" id="register-nome" name="nome" required>
-									<small>Nome completo do usuário</small>
-								</div>
-								<div class="form-group">
-									<label for="register-email">E-mail</label>
-									<input type="email" id="register-email" name="email" required>
-									<small>E-mail válido para login</small>
-								</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="registerCpf">CPF</label>
+								<input type="text" id="registerCpf" name="cpf" placeholder="XXX.XXX.XXX-XX" required>
 							</div>
-
-							<div class="form-row">
-								<div class="form-group">
-									<label for="register-cpf">CPF</label>
-									<input type="text" id="register-cpf" name="cpf" placeholder="XXX.XXX.XXX-XX" required>
-									<small>CPF do usuário</small>
-								</div>
-								<div class="form-group">
-									<label for="register-telefone">Telefone</label>
-									<input type="text" id="register-telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required>
-									<small>Telefone para contato</small>
-								</div>
+							<div class="form-group">
+								<label for="registerTelefone">Telefone</label>
+								<input type="text" id="registerTelefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required>
 							</div>
-
-							<div class="form-row">
-								<div class="form-group">
-									<label for="register-funcao">Função</label>
-									<select id="register-funcao" name="funcao" required>
-										<option value="">Selecione a função...</option>
-										<option value="Administrador">Administrador</option>
-										<option value="Mecânico">Mecânico</option>
-										<option value="Atendente">Atendente</option>
-										<option value="Secretaria">Secretaria</option>
-									</select>
-									<small>Função do usuário no sistema</small>
-								</div>
-								<div class="form-group">
-									<label for="register-codigo">Código do Usuário</label>
-									<input type="text" id="register-codigo" name="codigo" placeholder="Será gerado automaticamente" readonly>
-									<small>Código único gerado automaticamente</small>
-								</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label for="registerFuncao">Função</label>
+								<select id="registerFuncao" name="funcao" class="input" required>
+									<option value="">Selecione a função</option>
+									<option value="Administrador">Administrador</option>
+									<option value="Mecanico">Mecânico</option>
+									<option value="Secretaria">Secretária</option>
+								</select>
 							</div>
-
-							<!-- Seção de senha -->
-							<div class="form-row">
-								<div class="form-group">
-									<label for="register-senha">Senha</label>
-									<input type="password" id="register-senha" name="senha" required minlength="6">
-									<small>Senha de acesso. Mínimo 6 caracteres.</small>
-								</div>
-								<div class="form-group">
-									<label for="register-confirm-senha">Confirmar Senha</label>
-									<input type="password" id="register-confirm-senha" name="confirmSenha" required minlength="6">
-									<small>Digite a senha novamente para confirmação</small>
-								</div>
+							<div class="form-group">
+								<label for="registerSenha">Senha</label>
+								<input type="password" id="registerSenha" name="senha" required minlength="6">
 							</div>
-
-							<!-- Seção de observações -->
-							<div class="form-row">
-								<div class="form-group full-width">
-									<label for="register-observacoes">Observações do Cadastro</label>
-									<textarea id="register-observacoes" name="observacoes" rows="3" placeholder="Digite observações sobre este usuário (opcional)"></textarea>
-									<small>Observações adicionais sobre o usuário</small>
-								</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group full-width">
+								<label for="registerConfirmSenha">Confirmar Senha</label>
+								<input type="password" id="registerConfirmSenha" name="confirmSenha" required minlength="6">
 							</div>
-
-							<div class="form-actions">
-								<button type="submit" class="btn-primary">
-									<i class='bx bx-save'></i> Cadastrar Usuário
-								</button>
-								<button type="button" id="btn-clear" class="btn-secondary">
-									<i class='bx bx-x'></i> Limpar Formulário
-								</button>
-								<button type="button" id="btn-generate-code" class="btn-warning">
-									<i class='bx bx-refresh'></i> Gerar Novo Código
-								</button>
-							</div>
-						</form>
-					</div>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-primary">Salvar Usuário</button>
+							<a href="usuarios-consulta.html" class="btn btn-secondary">Cancelar</a>
+						</div>
+					</form>
 				</div>
 			</div>
 		</main>
 	</section>
 
+	<!-- Scripts principais -->
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
 	<script src="../../src/components/BasePageController.js"></script>

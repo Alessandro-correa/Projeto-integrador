@@ -477,23 +477,14 @@ class OrdemServicoApiController {
         });
       }
 
-      // Verificar se há orçamentos vinculados
-      const orcamentosVinculados = await db.oneOrNone('SELECT id FROM Orcamento WHERE ordem_servico_cod = $1', [id]);
-      if (orcamentosVinculados) {
-        return res.status(400).json({
-          success: false,
-          message: 'Não é possível remover ordem de serviço que possui orçamentos vinculados'
-        });
+      // Se houver orçamento vinculado, desvincular e voltar para pendente
+      const orcamentoVinculado = await db.oneOrNone('SELECT id FROM Orcamento WHERE ordem_servico_cod = $1', [id]);
+      if (orcamentoVinculado) {
+        await db.none('UPDATE Orcamento SET ordem_servico_cod = NULL, status = $1 WHERE id = $2', ['P', orcamentoVinculado.id]);
       }
 
-      // Verificar se há peças vinculadas
-      const pecasVinculadas = await db.oneOrNone('SELECT Peca_ID FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [id]);
-      if (pecasVinculadas) {
-        return res.status(400).json({
-          success: false,
-          message: 'Não é possível remover ordem de serviço que possui peças vinculadas'
-        });
-      }
+      // Remover todas as peças vinculadas antes de excluir a ordem
+      await db.none('DELETE FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [id]);
 
       await db.none('DELETE FROM Ordem_de_servico WHERE cod = $1', [id]);
 
@@ -507,7 +498,8 @@ class OrdemServicoApiController {
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
-        error: error.message
+        error: error.message,
+        stack: error.stack
       });
     }
   }

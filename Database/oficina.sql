@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS Fornecedor (
     CNPJ     VARCHAR(18) NOT NULL UNIQUE,
     Email    VARCHAR(100) NOT NULL UNIQUE,
     Endereco VARCHAR(100) NOT NULL,
+    Telefone VARCHAR(15) NOT NULL,
     Nome     VARCHAR(50)  NOT NULL
 );
 
@@ -277,18 +278,18 @@ VALUES
   (10, 10, 380.00, NULL, 12);
 
 -- FORNECEDORES (10 exemplos)
-INSERT INTO Fornecedor (CNPJ, Email, Endereco, Nome) 
+INSERT INTO Fornecedor (CNPJ, Email, Endereco, Telefone, Nome) 
 VALUES
-  ('11.111.111/0001-11', 'vendas@hondapecas.com', 'Av. Honda, 1000 - São Paulo', 'Honda Peças Originais'),
-  ('22.222.222/0002-22', 'contato@yamahapecas.com', 'Rua Yamaha, 500 - São Paulo', 'Yamaha Parts Brasil'),
-  ('33.333.333/0003-33', 'pedidos@brembo.com.br', 'Av. Brembo, 300 - Campinas', 'Brembo Freios Brasil'),
-  ('44.444.444/0004-44', 'vendas@michelin.com.br', 'Rua Michelin, 200 - Rio de Janeiro', 'Michelin Pneus'),
-  ('55.555.555/0005-55', 'comercial@ngk.com.br', 'Av. NGK, 150 - Guarulhos', 'NGK Velas do Brasil'),
-  ('66.666.666/0006-66', 'atendimento@motul.com.br', 'Rua Motul, 400 - São Bernardo', 'Motul Lubrificantes'),
-  ('77.777.777/0007-77', 'vendas@pirelli.com.br', 'Av. Pirelli, 800 - Santo André', 'Pirelli Pneus Brasil'),
-  ('88.888.888/0008-88', 'comercial@yss.com.br', 'Rua YSS, 250 - Sorocaba', 'YSS Suspensões'),
-  ('99.999.999/0009-99', 'pedidos@moura.com.br', 'Av. Moura, 600 - Belo Horizonte', 'Moura Baterias'),
-  ('10.101.010/0010-10', 'vendas@vaz.com.br', 'Rua Vaz, 350 - Curitiba', 'Vaz Transmissões');
+  ('11.111.111/0001-11', 'vendas@hondapecas.com', 'Av. Honda, 1000 - São Paulo', '119990001', 'Honda Peças Originais'),
+  ('22.222.222/0002-22', 'contato@yamahapecas.com', 'Rua Yamaha, 500 - São Paulo', '119990002', 'Yamaha Parts Brasil'),
+  ('33.333.333/0003-33', 'pedidos@brembo.com.br', 'Av. Brembo, 300 - Campinas', '119990003', 'Brembo Freios Brasil'),
+  ('44.444.444/0004-44', 'vendas@michelin.com.br', 'Rua Michelin, 200 - Rio de Janeiro', '119990004', 'Michelin Pneus'),
+  ('55.555.555/0005-55', 'comercial@ngk.com.br', 'Av. NGK, 150 - Guarulhos', '119990005', 'NGK Velas do Brasil'),
+  ('66.666.666/0006-66', 'atendimento@motul.com.br', 'Rua Motul, 400 - São Bernardo', '119990006', 'Motul Lubrificantes'),
+  ('77.777.777/0007-77', 'vendas@pirelli.com.br', 'Av. Pirelli, 800 - Santo André', '119990007', 'Pirelli Pneus Brasil'),
+  ('88.888.888/0008-88', 'comercial@yss.com.br', 'Rua YSS, 250 - Sorocaba', '119990008', 'YSS Suspensões'),
+  ('99.999.999/0009-99', 'pedidos@moura.com.br', 'Av. Moura, 600 - Belo Horizonte', '119990009', 'Moura Baterias'),
+  ('10.101.010/0010-10', 'vendas@vaz.com.br', 'Rua Vaz, 350 - Curitiba', '119990010', 'Vaz Transmissões');
 
 -- RELACIONAMENTO FORNECEDOR-PEÇA (10 exemplos)
 INSERT INTO Fornece (Peca_ID, Fornecedor_ID) 

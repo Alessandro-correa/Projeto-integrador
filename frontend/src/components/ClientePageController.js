@@ -37,7 +37,10 @@ class ClienteController {
         try {
             console.log('🔄 Carregando clientes...');
             
-            const response = await fetch(this.apiUrl);
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.apiUrl, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status}`);
@@ -92,6 +95,9 @@ class ClienteController {
                     <div class="actions">
                         <button class="action-btn" onclick="clienteController.editarCliente('${cliente.cpf}')" title="Editar">
                             <i class='bx bx-edit'></i>
+                        </button>
+                        <button class="action-btn" onclick="clienteController.ajustarCliente('${cliente.cpf}')" title="Ajustar">
+                            <i class='bx bx-cog'></i>
                         </button>
                         <button class="action-btn" onclick="clienteController.confirmarExclusao('${cliente.cpf}', '${cliente.nome}')" title="Excluir">
                             <i class='bx bx-trash'></i>
@@ -170,10 +176,12 @@ class ClienteController {
 
             console.log('📤 Enviando dados do cliente:', formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -315,8 +323,10 @@ class ClienteController {
         try {
             console.log(`🗑️ Excluindo cliente: ${cpf}`);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(`${this.apiUrl}/${cpf}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
             });
 
             const result = await response.json();

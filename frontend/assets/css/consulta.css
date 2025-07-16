@@ -282,35 +282,27 @@ body.dark .badge-danger {
     transition: background-color 0.2s ease;
 }
 
-.sortable:hover {
-    background: rgba(0, 0, 0, 0.05);
+.sortable .sort-icon::after {
+    content: '';
 }
 
-body.dark .sortable:hover {
-    background: rgba(255, 255, 255, 0.05);
+.sortable.sorted-asc .sort-icon::after {
+    content: '▲';
+    color: #1976d2;
+    margin-left: 2px;
+    font-size: 12px;
 }
 
-.sort-icon {
-    margin-left: 8px;
-    font-size: 14px;
-    color: #999;
-    transition: color 0.2s ease;
+.sortable.sorted-desc .sort-icon::after {
+    content: '▼';
+    color: #1976d2;
+    margin-left: 2px;
+    font-size: 12px;
 }
 
-.sortable:hover .sort-icon {
-    color: #666;
-}
-
-body.dark .sortable:hover .sort-icon {
-    color: #ccc;
-}
-
-.sort-icon.active {
-    color: var(--blue);
-}
-
-.sort-icon {
-    transition: transform 0.2s ease, color 0.2s ease;
+body.dark .sortable.sorted-asc .sort-icon::after,
+body.dark .sortable.sorted-desc .sort-icon::after {
+    color: #90caf9;
 }
 
 .sortable.sorted {
@@ -319,4 +311,13 @@ body.dark .sortable:hover .sort-icon {
 
 body.dark .sortable.sorted {
     background: rgba(33, 150, 243, 0.15);
+}
+
+/* Remover setas Unicode do ::after, deixando só o ícone do Boxicons */
+.sortable .sort-icon::after,
+.sortable.sorted-asc .sort-icon::after,
+.sortable.sorted-desc .sort-icon::after,
+body.dark .sortable.sorted-asc .sort-icon::after,
+body.dark .sortable.sorted-desc .sort-icon::after {
+    content: '' !important;
 }

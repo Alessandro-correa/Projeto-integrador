@@ -7,7 +7,9 @@ class OrdemAjusteController {
         this.init();
 
         const loading = document.getElementById('loading');
-        Controller.showLoadingElement(loading, show);
+        if (loading) {
+            loading.style.display = 'block';
+        }
     }
 
     setupThemeListeners() {
@@ -245,7 +247,10 @@ class OrdemAjusteController {
             this.showLoading(true);
             this.showNotification('Carregando...', 'info', null, 0);
             
-            const response = await fetch(`${this.baseURL}/${codigo}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${this.baseURL}/${codigo}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (!response.ok) {
                 throw new Error(`Erro ${response.status}: ${response.statusText}`);
             }
@@ -480,10 +485,12 @@ class OrdemAjusteController {
             this.showNotification('Salvando alterações...', 'info', null, 0);
             
             const url = `${this.baseURL}/${this.currentItem.cod}`;
+            const token = localStorage.getItem('token');
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(updateData)
             });

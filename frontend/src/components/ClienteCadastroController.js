@@ -109,10 +109,12 @@ class ClienteCadastroController extends BasePageController {
 
             console.log('📤 Enviando dados do cliente:', formData);
 
+            const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData)
             });
@@ -1020,10 +1022,12 @@ class ClienteCadastroController extends BasePageController {
         try {
             console.log('📤 Enviando dados de teste:', dadosTeste);
             
+            const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(dadosTeste)
             });

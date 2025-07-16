@@ -6,6 +6,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,23 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir arquivos estáticos do frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Middleware global de autenticação JWT para rotas /api (exceto login)
+app.use('/api', (req, res, next) => {
+    if (req.path === '/usuarios/login') return next(); // Login é público
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Token não fornecido' });
+    }
+    const token = authHeader.split(' ')[1];
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'segredo_super_secreto');
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ message: 'Token inválido' });
+    }
+});
 
 // Importar rotas com novos nomes
 const clienteRoutes = require('./src/routes/clientes.routes');

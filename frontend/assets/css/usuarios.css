@@ -627,3 +627,20 @@
         padding: 20px 15px;
     }
 }
+
+/* Estilização do select de função para igualar aos inputs */
+#register-funcao.input, select.input, .form-group select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 1rem;
+    color: #333;
+    height: 40px;
+    transition: border-color 0.2s;
+}
+#register-funcao.input:focus, select.input:focus, .form-group select:focus {
+    border-color: #007bff;
+    outline: none;
+}
