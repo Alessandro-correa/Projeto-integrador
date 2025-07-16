@@ -8,6 +8,7 @@
 - **Rhuan Lehmen de Souza Leite** — 20230001285  
  [🔗 LinkedIn](https://www.linkedin.com/in/rhuan-leite/)
 
+
 Projeto integrador das disciplinas:
 
 - Engenharia de Software I  
