@@ -3,7 +3,7 @@
 ## 👥 Equipe Responsável pelo Projeto
 
 - **Alessandro Luigi Ferreira Correa** — 20230003860  
- [🔗 LinkedIn](www.linkedin.com/in/alessandro-corrêa-644551223)
+ [🔗 LinkedIn](https://www.linkedin.com/in/alessandro-corr%C3%AAa-644551223/)
 
 - **Rhuan Lehmen de Souza Leite** — 20230001285  
  [🔗 LinkedIn](https://www.linkedin.com/in/rhuan-leite/)
