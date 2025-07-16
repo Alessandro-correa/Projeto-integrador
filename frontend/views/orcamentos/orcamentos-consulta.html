@@ -8,6 +8,7 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="../../assets/css/style.css">
 	<link rel="stylesheet" href="../../assets/css/consulta.css">
+	<link rel="stylesheet" href="../../assets/css/mobile-cards.css">
 	<style>
 		.modal-overlay {
 			position: fixed;
@@ -146,36 +147,41 @@
 						<a href="orcamentos-cadastro.html" class="btn-primary">Novo Orçamento</a>
 					</div>
 					<div class="orders">
-						<table id="orcamentos-table">
-							<thead>
-								<tr>
-									<th class="sortable" data-column="id">
-										Código
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="cliente_nome">
-										Cliente
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="placa">
-										Placa
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="valor">
-										Valor Total
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="status">
-										Status
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th>Ações</th>
-								</tr>
-							</thead>
-							<tbody>
-								<!-- Os dados serão carregados dinamicamente via JavaScript -->
-							</tbody>
-						</table>
+						<div class="table-wrapper">
+							<table id="orcamentos-table">
+								<thead>
+									<tr>
+										<th class="sortable" data-column="id">
+											Código
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="cliente_nome">
+											Cliente
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="placa">
+											Placa
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="valor">
+											Valor Total
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="status">
+											Status
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th>Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- Os dados serão carregados dinamicamente via JavaScript -->
+								</tbody>
+							</table>
+						</div>
+						<div id="mobile-cards">
+							<!-- Os cards móveis serão carregados dinamicamente via JavaScript -->
+						</div>
 					</div>
 				</div>
 			</div>

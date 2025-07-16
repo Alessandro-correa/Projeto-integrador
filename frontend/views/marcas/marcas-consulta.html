@@ -1,104 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-	<link rel="stylesheet" href="../../assets/css/style.css">
-	<link rel="stylesheet" href="../../assets/css/consulta.css">
-	<link rel="stylesheet" href="../../assets/css/modal.css">
-	<link rel="stylesheet" href="../../assets/css/ajuste.css">
-	<title>Sistema Campos Moto Peças - Marcas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/consulta.css">
+    <link rel="stylesheet" href="../../assets/css/marcas.css">
+    <title>Sistema Campos Moto Peças - Marcas</title>
 </head>
 <body>
-	<section id="sidebar">
-		<a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
-		<ul class="side-menu">
-			<li><a href="../../views/dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
-			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../../views/os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
-			<li><a href="../../views/orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../../views/clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
-			<li><a href="marcas-consulta.html" class="active"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
-			<li><a href="../../views/fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../../views/pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="../../views/usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon' ></i> Usuários</a></li>
-		</ul>
-	</section>
-	<section id="content">
-		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
-			<div class="theme-toggle">
-				<input type="checkbox" id="theme-toggle-checkbox">
-				<label for="theme-toggle-checkbox" class="theme-toggle-label">
-					<i class='bx bxs-sun'></i>
-					<i class='bx bxs-moon'></i>
-				</label>
-			</div>
-			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon' ></i>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<a href="#" class="nav-link">
-					<i class='bx bxs-cog icon' title="Configurações"></i>
-				</a>
-				<a href="#" class="nav-link">
-					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
-				</a>
-			</div>
-		</nav>
-		<main>
-			<h1 class="title">Marcas de Motocicletas</h1>
-			<ul class="breadcrumbs">
-				<li><a href="../../index.html">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="#" class="active">Marcas</a></li>
-			</ul>
-			<div class="filter-container">
-				<div class="filter-group">
-					<input type="text" id="filter-text" placeholder="Buscar por Nome da Marca...">
-				</div>
-				<div class="filter-group">
-					<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
-				</div>
-			</div>
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Lista de Marcas</h3>
-						<a href="marcas-cadastro.html" class="btn-primary">Nova Marca <i class='bx bx-plus'></i></a>
-					</div>
-					<div class="orders">
-						<table id="marcas-table">
-							<thead>
-								<tr>
-									<th class="sortable" data-column="nome">
-										Nome
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th>Ações</th>
-								</tr>
-							</thead>
-							<tbody>
-								<!-- As linhas são preenchidas pelo JS -->
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</main>
-	</section>
+    <section id="sidebar">
+        <a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+        <ul class="side-menu">
+            <li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+            <li class="divider" data-text="principal">Principal</li>
+            <li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+            <li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+            <li class="divider" data-text="gestão">Gestão</li>
+            <li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+            <li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
+            <li><a href="marcas-consulta.html" class="active"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+            <li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+            <li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+            <li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+        </ul>
+    </section>
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu toggle-sidebar' ></i>
+            <div class="theme-toggle">
+                <input type="checkbox" id="theme-toggle-checkbox">
+                <label for="theme-toggle-checkbox" class="theme-toggle-label">
+                    <i class='bx bxs-sun'></i>
+                    <i class='bx bxs-moon'></i>
+                </label>
+            </div>
+            <a href="#" class="nav-link" style="margin-left: auto;">
+                <i class='bx bxs-bell icon' ></i>
+            </a>
+            <span class="divider"></span>
+            <div class="profile">
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-cog icon' title="Configurações"></i>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-log-out-circle icon' title="Sair"></i>
+                </a>
+            </div>
+        </nav>
+        <main>
+            <h1 class="title">Marcas</h1>
+            <ul class="breadcrumbs">
+                <li><a href="../../index.html">Home</a></li>
+                <li class="divider">/</li>
+                <li><a href="#" class="active">Marcas</a></li>
+            </ul>
 
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+            <div class="filter-container">
+                <div class="filter-group">
+                    <input type="text" id="filter-text" placeholder="Buscar por Nome...">
+                </div>
+                <div class="filter-group">
+                    <button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
+                </div>
+            </div>
+            
+            <div class="data">
+                <div class="content-data">
+                    <div class="head">
+                        <h3>Lista de Marcas</h3>
+                        <a href="marcas-cadastro.html" class="btn-primary">Nova Marca</a>
+                    </div>
+                    
+                    <!-- Tabela para desktop -->
+                    <div class="orders table-container">
+                        <table id="marcas-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-column="nome">
+                                        Nome
+                                        <i class='bx bx-sort-alt-2 sort-icon'></i>
+                                    </th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão carregados dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cards para mobile -->
+                    <div class="orders cards-container">
+                        <div id="marcas-cards" class="cards-grid">
+                            <!-- Cards serão carregados dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
     <script src="../../src/components/BasePageController.js"></script>
     <script src="../../src/components/MarcaController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            window.marcaController = new MarcaController();
+            if (!window.marcaController) {
+                window.marcaController = new MarcaController();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.sidebarController) {
+                window.sidebarController = new SidebarController();
+                console.log('[SidebarController] Instanciado manualmente em marcas-consulta.html');
+            }
         });
     </script>
 </body>

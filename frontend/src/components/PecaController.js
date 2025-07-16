@@ -58,10 +58,7 @@ class PecaController {
       const matchFornecedor = !fornecedor || (p.fornecedor && p.fornecedor.toLowerCase() === fornecedor);
       return matchText && matchFornecedor;
     });
-    if (filtered.length === 0) {
-      this.tableBody.innerHTML = '<tr><td colspan="6">Nenhuma peça encontrada</td></tr>';
-      return;
-    }
+
     // Ordenação
     const sorted = [...filtered].sort((a, b) => {
       let valA, valB;
@@ -76,6 +73,27 @@ class PecaController {
       if (valA > valB) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
+
+    // Renderizar mensagem de nenhum resultado
+    if (filtered.length === 0) {
+      this.tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 20px;">
+            <i class='bx bx-info-circle'></i>
+            Nenhuma peça encontrada
+          </td>
+        </tr>
+      `;
+      document.querySelector('#pecas-cards').innerHTML = `
+        <div class="empty-state">
+          <i class='bx bx-info-circle'></i>
+          <p>Nenhuma peça encontrada</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Renderizar tabela
     this.tableBody.innerHTML = sorted.map(p => `
       <tr>
         <td>PEC-${String(p.id).padStart(3, '0')}</td>
@@ -84,13 +102,50 @@ class PecaController {
         <td>${p.fornecedor || ''}</td>
         <td>R$ ${(parseFloat(p.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
         <td>
-          <a href="#" class="action-icon visualizar-peca" data-id="${p.id}" title="Visualizar"><i class='bx bx-show'></i></a>
-          <a href="pecas-ajustar.html?id=${p.id}" class="action-icon" title="Editar"><i class='bx bx-edit'></i></a>
-          <a href="#" class="action-icon excluir-peca" data-id="${p.id}" title="Excluir"><i class='bx bx-trash'></i></a>
+          <div class="actions">
+            <button class="action-btn" onclick="pecaController.visualizarPeca(${p.id})" title="Visualizar">
+              <i class='bx bx-show'></i>
+            </button>
+            <button class="action-btn" onclick="window.location.href='pecas-ajustar.html?id=${p.id}'" title="Editar">
+              <i class='bx bx-edit'></i>
+            </button>
+            <button class="action-btn" onclick="pecaController.confirmarExclusao(${p.id}, '${p.nome}')" title="Excluir">
+              <i class='bx bx-trash'></i>
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
-    this.addActionListeners();
+
+    // Renderizar cards
+    const cardsContainer = document.querySelector('#pecas-cards');
+    if (cardsContainer) {
+      cardsContainer.innerHTML = sorted.map(p => `
+        <div class="peca-card">
+          <div class="card-header">
+            <h3 class="peca-nome">${p.nome}</h3>
+            <span class="peca-codigo">PEC-${String(p.id).padStart(3, '0')}</span>
+          </div>
+          <div class="peca-info">
+            <p><i class='bx bx-detail'></i> ${p.descricao || 'Sem descrição'}</p>
+            <p><i class='bx bx-store'></i> ${p.fornecedor || 'Sem fornecedor'}</p>
+            <p><i class='bx bx-money'></i> R$ ${(parseFloat(p.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
+          </div>
+          <div class="card-actions">
+            <button class="action-btn" onclick="pecaController.visualizarPeca(${p.id})" title="Visualizar">
+              <i class='bx bx-show'></i>
+            </button>
+            <button class="action-btn" onclick="window.location.href='pecas-ajustar.html?id=${p.id}'" title="Editar">
+              <i class='bx bx-edit'></i>
+            </button>
+            <button class="action-btn" onclick="pecaController.confirmarExclusao(${p.id}, '${p.nome}')" title="Excluir">
+              <i class='bx bx-trash'></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
     this.updateSortIcons();
   }
 
@@ -101,14 +156,8 @@ class PecaController {
   }
 
   addActionListeners() {
-    this.tableBody.querySelectorAll('.visualizar-peca').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const id = btn.getAttribute('data-id');
-        await this.visualizarPeca(id);
-      });
-    });
-    this.tableBody.querySelectorAll('.excluir-peca').forEach(btn => {
+    // Botões de excluir na tabela e nos cards
+    document.querySelectorAll('.excluir-peca').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.preventDefault();
         const id = btn.getAttribute('data-id');
@@ -197,23 +246,33 @@ class PecaController {
     }
   }
 
+  async confirmarExclusao(id, nome) {
+    const confirmar = confirm(`Deseja realmente excluir a peça "${nome}"?`);
+    if (confirmar) {
+      await this.excluirPeca(id);
+    }
+  }
+
   async excluirPeca(id) {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${this.apiUrl}/${id}`, {
+      const response = await fetch(`${this.apiUrl}/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Erro ao excluir peça');
-      const json = await res.json();
-      if (json.success) {
+
+      if (!response.ok) throw new Error('Erro ao excluir peça');
+
+      const result = await response.json();
+      if (result.success) {
         this.showNotification('Peça excluída com sucesso!', 'success');
         this.loadPecas();
       } else {
-        this.showNotification(json.message || 'Erro desconhecido ao excluir peça.', 'error');
+        throw new Error(result.message || 'Erro ao excluir peça');
       }
-    } catch (e) {
-      this.showNotification('Erro ao excluir peça: ' + e.message, 'error');
+    } catch (error) {
+      console.error('❌ Erro ao excluir peça:', error);
+      this.showNotification('Erro ao excluir peça', 'error');
     }
   }
 

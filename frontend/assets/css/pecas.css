@@ -1,4 +1,4 @@
-/* Estilos específicos para o módulo de Usuários */
+/* Estilos específicos para o módulo de Peças */
 
 /* Filtros */
 .filter-container {
@@ -81,7 +81,7 @@ body.dark .filter-group select {
     padding: 20px;
 }
 
-.usuario-card {
+.peca-card {
     background: var(--light);
     border-radius: 8px;
     padding: 20px;
@@ -89,7 +89,7 @@ body.dark .filter-group select {
     transition: all 0.3s ease;
 }
 
-.usuario-card:hover {
+.peca-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
@@ -98,23 +98,27 @@ body.dark .filter-group select {
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--grey);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
-.usuario-nome {
+.peca-nome {
     font-size: 1.2em;
     font-weight: 600;
     color: var(--dark);
     margin: 0;
 }
 
-.usuario-info {
+.peca-codigo {
+    font-size: 0.9em;
+    color: var(--grey);
+    display: block;
+    margin-top: 5px;
+}
+
+.peca-info {
     margin-bottom: 20px;
 }
 
-.usuario-info p {
+.peca-info p {
     display: flex;
     align-items: center;
     margin: 8px 0;
@@ -122,7 +126,7 @@ body.dark .filter-group select {
     font-size: 0.95em;
 }
 
-.usuario-info p i {
+.peca-info p i {
     margin-right: 8px;
     font-size: 1.1em;
     color: var(--grey);
@@ -137,53 +141,25 @@ body.dark .filter-group select {
     border-top: 1px solid var(--grey);
 }
 
-/* Badges */
-.badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.85em;
-    font-weight: 500;
-}
-
-.badge-primary {
-    background: #e3f2fd;
-    color: #1976d2;
-    border: 1px solid #bbdefb;
-}
-
-.badge-success {
-    background: #e8f5e8;
-    color: #2e7d32;
-    border: 1px solid #c8e6c8;
-}
-
-.badge-warning {
-    background: #fff8e1;
-    color: #f57c00;
-    border: 1px solid #ffecb3;
-}
-
-.badge-secondary {
-    background: #f5f5f5;
-    color: #616161;
-    border: 1px solid #e0e0e0;
-}
-
 /* Tema Escuro */
-body.dark .usuario-card {
+body.dark .peca-card {
     background: var(--dark-surface);
     border: 1px solid var(--dark-border);
 }
 
-body.dark .usuario-nome {
+body.dark .peca-nome {
     color: var(--dark-text-primary);
 }
 
-body.dark .usuario-info p {
+body.dark .peca-codigo {
+    color: var(--dark-text-secondary);
+}
+
+body.dark .peca-info p {
     color: var(--dark-text-primary);
 }
 
-body.dark .usuario-info p i {
+body.dark .peca-info p i {
     color: var(--dark-text-secondary);
 }
 
@@ -193,30 +169,6 @@ body.dark .card-header {
 
 body.dark .card-actions {
     border-top-color: var(--dark-border);
-}
-
-body.dark .badge-primary {
-    background: rgba(33, 150, 243, 0.2);
-    color: #90caf9;
-    border-color: rgba(33, 150, 243, 0.3);
-}
-
-body.dark .badge-success {
-    background: rgba(76, 175, 80, 0.2);
-    color: #a5d6a7;
-    border-color: rgba(76, 175, 80, 0.3);
-}
-
-body.dark .badge-warning {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffd54f;
-    border-color: rgba(255, 140, 0, 0.6);
-}
-
-body.dark .badge-secondary {
-    background: rgba(158, 158, 158, 0.2);
-    color: #bdbdbd;
-    border-color: rgba(158, 158, 158, 0.3);
 }
 
 /* Responsividade */
@@ -235,7 +187,7 @@ body.dark .badge-secondary {
         gap: 15px;
     }
 
-    .usuario-card {
+    .peca-card {
         padding: 15px;
     }
 
@@ -244,11 +196,11 @@ body.dark .badge-secondary {
         padding-bottom: 8px;
     }
 
-    .usuario-nome {
+    .peca-nome {
         font-size: 1.1em;
     }
 
-    .usuario-info p {
+    .peca-info p {
         font-size: 0.9em;
     }
 }
@@ -308,4 +260,4 @@ body.dark .action-btn:hover {
     background-color: var(--dark-bg) !important;
     color: var(--dark-text-primary) !important;
     border-color: var(--dark-text-secondary) !important;
-}
+} 

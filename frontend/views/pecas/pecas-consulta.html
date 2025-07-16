@@ -4,10 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="../../assets/css/style.css">
 	<link rel="stylesheet" href="../../assets/css/consulta.css">
-	<link rel="stylesheet" href="../../assets/css/modal.css">
-	<link rel="stylesheet" href="../../assets/css/ajuste.css">
+	<link rel="stylesheet" href="../../assets/css/pecas.css">
 	<title>Sistema Campos Moto Peças - Peças</title>
 </head>
 <body>
@@ -62,9 +63,11 @@
 					<input type="text" id="filter-text" placeholder="Buscar por Nome, Código, Fornecedor...">
 				</div>
 				<div class="filter-group">
-					<select id="filter-fornecedor">
-						<option value="">Todos os Fornecedores</option>
-					</select>
+					<div class="select-container">
+						<select id="filter-fornecedor">
+							<option value="">Todos os Fornecedores</option>
+						</select>
+					</div>
 					<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
 				</div>
 			</div>
@@ -72,23 +75,25 @@
 				<div class="content-data">
 					<div class="head">
 						<h3>Lista de Peças</h3>
-						<a href="pecas-cadastro.html" class="btn-primary">Nova Peça <i class='bx bx-plus'></i></a>
+						<a href="pecas-cadastro.html" class="btn-primary">Nova Peça</a>
 					</div>
-					<div class="orders">
+					
+					<!-- Tabela para desktop -->
+					<div class="orders table-container">
 						<table id="pecas-table">
 							<thead>
 								<tr>
 									<th>ID</th>
-									<th class="sortable">
+									<th class="sortable" data-column="nome">
 										Nome
 										<i class='bx bx-sort-alt-2 sort-icon'></i>
 									</th>
 									<th>Descrição</th>
-									<th class="sortable">
+									<th class="sortable" data-column="fornecedor">
 										Fornecedor
 										<i class='bx bx-sort-alt-2 sort-icon'></i>
 									</th>
-									<th class="sortable">
+									<th class="sortable" data-column="valor">
 										Valor
 										<i class='bx bx-sort-alt-2 sort-icon'></i>
 									</th>
@@ -100,23 +105,33 @@
 							</tbody>
 						</table>
 					</div>
+
+					<!-- Cards para mobile -->
+					<div class="orders cards-container">
+						<div id="pecas-cards" class="cards-grid">
+							<!-- Cards serão carregados dinamicamente -->
+						</div>
+					</div>
 				</div>
 			</div>
 		</main>
 	</section>
 
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script type="module" src="../../assets/js/main.js"></script>
-    <script src="../../src/components/BasePageController.js"></script>
-    <script src="../../src/components/PecaController.js"></script>
-    <script src="../../src/components/SidebarController.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        if (!window.sidebarController) {
-          window.sidebarController = new SidebarController();
-          console.log('[SidebarController] Instanciado manualmente em pecas-consulta.html');
-        }
-      });
-    </script>
+	<script type="module" src="../../assets/js/main.js"></script>
+	<script src="../../src/components/BasePageController.js"></script>
+	<script src="../../src/components/PecaController.js"></script>
+	<script src="../../src/components/SidebarController.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			if (!window.pecaController) {
+				window.pecaController = new PecaController();
+			}
+			if (!window.sidebarController) {
+				window.sidebarController = new SidebarController();
+				console.log('[SidebarController] Instanciado manualmente em pecas-consulta.html');
+			}
+		});
+	</script>
 </body>
 </html>

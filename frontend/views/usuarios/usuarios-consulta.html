@@ -1,122 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
-	<link rel="stylesheet" href="../../assets/css/style.css">
-	<link rel="stylesheet" href="../../assets/css/usuarios.css">
-	<link rel="stylesheet" href="../../assets/css/consulta.css">
-	<title>Sistema Campos Moto Peças - Usuários</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/consulta.css">
+    <link rel="stylesheet" href="../../assets/css/usuarios.css">
+    <title>Sistema Campos Moto Peças - Usuários</title>
 </head>
-
 <body>
-	<!-- Sidebar de navegação -->
-	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
-		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon'></i> Dashboard</a></li>
-			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon'></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon'></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestao">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon'></i> Clientes</a></li>
-			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
-			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
-			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="usuarios-consulta.html" class="active"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
-		</ul>
-	</section>
+    <section id="sidebar">
+        <a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+        <ul class="side-menu">
+            <li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon'></i> Dashboard</a></li>
+            <li class="divider" data-text="principal">Principal</li>
+            <li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon'></i> Ordem de Serviço</a></li>
+            <li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon'></i> Orçamentos</a></li>
+            <li class="divider" data-text="gestão">Gestão</li>
+            <li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon'></i> Clientes</a></li>
+            <li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
+            <li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+            <li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
+            <li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+            <li><a href="usuarios-consulta.html" class="active"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+        </ul>
+    </section>
+    <section id="content">
+        <nav>
+            <i class='bx bx-menu toggle-sidebar'></i>
+            <div class="theme-toggle">
+                <input type="checkbox" id="theme-toggle-checkbox">
+                <label for="theme-toggle-checkbox" class="theme-toggle-label">
+                    <i class='bx bxs-sun'></i>
+                    <i class='bx bxs-moon'></i>
+                </label>
+            </div>
+            <a href="#" class="nav-link" style="margin-left: auto;">
+                <i class='bx bxs-bell icon'></i>
+            </a>
+            <span class="divider"></span>
+            <div class="profile">
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-cog icon' title="Configurações"></i>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class='bx bxs-log-out-circle icon' title="Sair"></i>
+                </a>
+            </div>
+        </nav>
+        <main>
+            <h1 class="title">Usuários</h1>
+            <ul class="breadcrumbs">
+                <li><a href="../../index.html">Home</a></li>
+                <li class="divider">/</li>
+                <li><a href="#" class="active">Usuários</a></li>
+            </ul>
 
-	<section id="content">
-		<!-- Barra de navegação superior -->
-		<nav>
-			<i class='bx bx-menu toggle-sidebar'></i>
-			<div class="theme-toggle">
-				<input type="checkbox" id="themeToggleCheckbox">
-				<label for="themeToggleCheckbox" class="theme-toggle-label">
-					<i class='bx bxs-sun'></i>
-					<i class='bx bxs-moon'></i>
-				</label>
-			</div>
-			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon'></i>
-			</a>
-			<span class="divider"></span>
-			<div class="profile">
-				<a href="#" class="nav-link">
-					<i class='bx bxs-cog icon' title="Configurações"></i>
-				</a>
-				<!-- Botão de logout pode ser implementado em JS -->
-				<a href="../../login.html" class="nav-link">
-					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
-				</a>
-			</div>
-		</nav>
+            <div class="filter-container">
+                <div class="filter-group">
+                    <input type="text" id="filter-text" placeholder="Buscar por Nome, Email, CPF...">
+                </div>
+                <div class="filter-group">
+                    <div class="select-container">
+                        <select id="filter-funcao">
+                            <option value="">Todas as funções</option>
+                            <option value="Administrador">Administrador</option>
+                            <option value="Mecânico">Mecânico</option>
+                            <option value="Atendente">Atendente</option>
+                        </select>
+                    </div>
+                    <button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
+                </div>
+            </div>
+            
+            <div class="data">
+                <div class="content-data">
+                    <div class="head">
+                        <h3>Lista de Usuários</h3>
+                        <a href="usuarios-cadastro.html" class="btn-primary">Novo Usuário</a>
+                    </div>
+                    
+                    <!-- Tabela para desktop -->
+                    <div class="orders table-container">
+                        <table id="usuarios-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-column="nome">
+                                        Nome
+                                        <i class='bx bx-sort-alt-2 sort-icon'></i>
+                                    </th>
+                                    <th class="sortable" data-column="email">
+                                        Email
+                                        <i class='bx bx-sort-alt-2 sort-icon'></i>
+                                    </th>
+                                    <th class="sortable" data-column="funcao">
+                                        Função
+                                        <i class='bx bx-sort-alt-2 sort-icon'></i>
+                                    </th>
+                                    <th>Telefone</th>
+                                    <th>CPF</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão carregados dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
 
-		<main>
-			<h1 class="title">Usuários</h1>
-			<!-- Breadcrumbs de navegação -->
-			<ul class="breadcrumbs">
-				<li><a href="../../index.html">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="usuarios-consulta.html" class="active">Usuários</a></li>
-			</ul>
+                    <!-- Cards para mobile -->
+                    <div class="orders cards-container">
+                        <div id="usuarios-cards" class="cards-grid">
+                            <!-- Cards serão carregados dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
 
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Lista de Usuários</h3>
-						<div class="menu">
-							<a href="usuarios-cadastro.html" class="btn-primary">
-								<i class='bx bxs-plus-circle'></i> Novo Usuário
-							</a>
-						</div>
-					</div>
-					<!-- Filtros de busca -->
-					<div class="filters">
-						<div class="filter-group">
-							<input type="text" id="filterText" placeholder="Buscar...">
-						</div>
-						<div class="filter-group">
-							<select id="filterStatus">
-								<option value="">Todos os status</option>
-								<option value="Ativo">Ativo</option>
-								<option value="Inativo">Inativo</option>
-							</select>
-						</div>
-						<div class="filter-group">
-							<button id="clearFilters" class="btn-secondary">Limpar Filtros</button>
-						</div>
-					</div>
-					<!-- Tabela de usuários -->
-					<div class="table-container">
-						<table id="usuariosTable">
-							<thead>
-								<tr>
-									<th>Nome</th>
-									<th>Email</th>
-									<th>Função</th>
-									<th>Telefone</th>
-									<th>CPF</th>
-									<th>Ações</th>
-								</tr>
-							</thead>
-							<tbody>
-								<!-- Dados serão carregados dinamicamente -->
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-		</main>
-	</section>
-
-	<!-- Scripts principais -->
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-	<script type="module" src="../../assets/js/main.js"></script>
-	<script src="../../src/services/ApiService.js"></script>
-	<script src="../../src/components/UsuarioController.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/BasePageController.js"></script>
+    <script src="../../src/components/UsuarioPageController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.usuarioController) {
+                window.usuarioController = new UsuarioController();
+            }
+            if (!window.sidebarController) {
+                window.sidebarController = new SidebarController();
+                console.log('[SidebarController] Instanciado manualmente em usuarios-consulta.html');
+            }
+        });
+    </script>
 </body>
 </html>

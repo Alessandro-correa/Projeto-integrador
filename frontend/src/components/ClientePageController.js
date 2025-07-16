@@ -13,6 +13,8 @@ class ClienteController {
             direction: 'asc'
         };
         this.clientes = [];
+        this.tableBody = document.querySelector('#clientes-table tbody');
+        this.cardsContainer = document.querySelector('#clientes-cards');
         this.init();
     }
 
@@ -63,15 +65,13 @@ class ClienteController {
     }
 
     renderClientes(clientes) {
-        const tbody = document.querySelector('#clientes-table tbody');
-        
-        if (!tbody) {
-            console.error('❌ Tabela não encontrada');
+        if (!this.tableBody || !this.cardsContainer) {
+            console.error('❌ Elementos da tabela ou cards não encontrados');
             return;
         }
 
         if (clientes.length === 0) {
-            tbody.innerHTML = `
+            this.tableBody.innerHTML = `
                 <tr>
                     <td colspan="5" style="text-align: center; padding: 20px;">
                         <i class='bx bx-info-circle'></i>
@@ -79,13 +79,20 @@ class ClienteController {
                     </td>
                 </tr>
             `;
+            this.cardsContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class='bx bx-info-circle'></i>
+                    <p>Nenhum cliente encontrado</p>
+                </div>
+            `;
             return;
         }
 
         // Aplicar ordenação
         const sortedClientes = this.sortClientes(clientes);
 
-        tbody.innerHTML = sortedClientes.map(cliente => `
+        // Renderizar tabela
+        this.tableBody.innerHTML = sortedClientes.map(cliente => `
             <tr data-cpf="${cliente.cpf}">
                 <td>${cliente.nome}</td>
                 <td>${cliente.email}</td>
@@ -102,6 +109,28 @@ class ClienteController {
                     </div>
                 </td>
             </tr>
+        `).join('');
+
+        // Renderizar cards
+        this.cardsContainer.innerHTML = sortedClientes.map(cliente => `
+            <div class="cliente-card" data-cpf="${cliente.cpf}">
+                <div class="card-header">
+                    <h3 class="cliente-nome">${cliente.nome}</h3>
+                </div>
+                <div class="cliente-info">
+                    <p><i class='bx bx-envelope'></i> ${cliente.email}</p>
+                    <p><i class='bx bx-phone'></i> ${cliente.telefone}</p>
+                    <p><i class='bx bx-id-card'></i> ${cliente.cpf}</p>
+                </div>
+                <div class="card-actions">
+                    <button class="action-btn btn-editar" onclick="clienteController.editarCliente('${cliente.cpf}')">
+                        <i class='bx bx-edit'></i>
+                    </button>
+                    <button class="action-btn btn-excluir" onclick="clienteController.confirmarExclusao('${cliente.cpf}', '${cliente.nome}')">
+                        <i class='bx bx-trash'></i>
+                    </button>
+                </div>
+            </div>
         `).join('');
     }
 
@@ -123,8 +152,9 @@ class ClienteController {
 
     applyFilters() {
         const filterText = document.getElementById('filter-text')?.value.toLowerCase() || '';
+        
+        // Filtrar tabela
         const rows = document.querySelectorAll('#clientes-table tbody tr');
-
         rows.forEach(row => {
             const nome = row.children[0]?.textContent.toLowerCase() || '';
             const email = row.children[1]?.textContent.toLowerCase() || '';
@@ -137,6 +167,18 @@ class ClienteController {
                             cpf.includes(filterText);
 
             row.style.display = matchText ? '' : 'none';
+        });
+
+        // Filtrar cards
+        const cards = document.querySelectorAll('.cliente-card');
+        cards.forEach(card => {
+            const nome = card.querySelector('.cliente-nome')?.textContent.toLowerCase() || '';
+            const infos = Array.from(card.querySelectorAll('.cliente-info p')).map(p => p.textContent.toLowerCase());
+            
+            const matchText = nome.includes(filterText) || 
+                            infos.some(info => info.includes(filterText));
+
+            card.style.display = matchText ? '' : 'none';
         });
     }
 

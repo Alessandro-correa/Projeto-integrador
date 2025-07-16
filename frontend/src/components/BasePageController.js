@@ -3,6 +3,7 @@ class BasePageController {
         this.baseURL = 'http://localhost:3000/api';
         this.subControllers = {};
         this.init();
+        this.setupLogoutHandler();
     }
 
     init() {
@@ -27,9 +28,10 @@ class BasePageController {
                 }
                 break;
             case 'usuarios':
-                this.subControllers.usuario = new UsuarioCadastroController();
                 if (currentPage.action === 'ajustar') {
                     this.subControllers.usuarioAjuste = new UsuarioAjusteController();
+                } else if (currentPage.action === 'cadastro') {
+                    this.subControllers.usuarioCadastro = new UsuarioCadastroController();
                 }
                 break;
             case 'motocicletas':
@@ -458,6 +460,26 @@ class BasePageController {
             }
             throw error;
         }
+    }
+
+    setupLogoutHandler() {
+        const logoutButton = document.querySelector('.profile-link a[href="#"]');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleLogout();
+            });
+        }
+    }
+
+    handleLogout() {
+        // Clear all authentication data
+        localStorage.removeItem('token');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userName');
+        
+        // Redirect to login page
+        window.location.href = '/frontend/views/login/login.html';
     }
 }
 

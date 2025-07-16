@@ -1,115 +1,126 @@
-class UsuarioCadastroController extends BasePageController {
+class UsuarioCadastroController {
     constructor() {
-        super();
-        this.baseURL = 'http://localhost:3000/api/usuarios';
+        this.form = document.getElementById('cadastroUsuarioForm');
+        this.cancelBtn = document.getElementById('cancelBtn');
+        this.apiUrl = 'http://localhost:3000/api/usuarios';
+        this.isSubmitting = false;
         this.init();
     }
 
     init() {
-        this.setupEventListeners();
-        this.applyMasks();
-        // this.generateUserCode(); // Código agora só no backend
-    }
-
-    setupEventListeners() {
-        const form = document.getElementById('register-form');
-        if (form) {
-            form.addEventListener('submit', (e) => this.handleSubmit(e));
+        if (this.form) {
+            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            this.setupValidations();
         }
-
-        const clearBtn = document.getElementById('btn-clear');
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => this.clearForm());
-        }
-
-        const generateCodeBtn = document.getElementById('btn-generate-code');
-        if (generateCodeBtn) {
-            generateCodeBtn.addEventListener('click', () => this.generateUserCode());
-        }
-
-        // Validação de senha em tempo real
-        const senhaInput = document.getElementById('register-senha');
-        const confirmSenhaInput = document.getElementById('register-confirm-senha');
-        
-        if (confirmSenhaInput) {
-            confirmSenhaInput.addEventListener('input', () => this.validatePasswordMatch());
-        }
-        
-        if (senhaInput) {
-            senhaInput.addEventListener('input', () => this.validatePasswordMatch());
+        if (this.cancelBtn) {
+            this.cancelBtn.addEventListener('click', () => {
+                window.location.href = 'usuarios-consulta.html';
+            });
         }
     }
 
-    applyMasks() {
-        const cpfInput = document.getElementById('register-cpf');
+    setupValidations() {
+        // Máscara e validação de CPF
+        const cpfInput = this.form.cpf;
         if (cpfInput) {
-            BasePageController.applyMask(cpfInput, 'cpf');
+            cpfInput.addEventListener('input', (e) => {
+                let v = e.target.value.replace(/\D/g, '');
+                v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = v;
+            });
+
+            cpfInput.addEventListener('blur', async () => {
+                const cpf = cpfInput.value.replace(/\D/g, '');
+                if (cpf.length === 11) {
+                    if (!this.validarCPF(cpf)) {
+                        alert('CPF inválido!');
+                        cpfInput.value = '';
+                        cpfInput.focus();
+                    }
+                }
+            });
         }
 
-        const telefoneInput = document.getElementById('register-telefone');
-        if (telefoneInput) {
-            BasePageController.applyMask(telefoneInput, 'phone');
+        // Máscara para telefone
+        const telInput = this.form.telefone;
+        if (telInput) {
+            telInput.addEventListener('input', (e) => {
+                let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+                if (v.length <= 10) {
+                    v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                } else {
+                    v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+                }
+                e.target.value = v.trim();
+            });
+        }
+
+        // Validação de senha
+        const senhaInput = this.form.senha;
+        const confirmarSenhaInput = this.form.confirmarSenha;
+        if (senhaInput && confirmarSenhaInput) {
+            confirmarSenhaInput.addEventListener('input', () => {
+                if (senhaInput.value !== confirmarSenhaInput.value) {
+                    confirmarSenhaInput.setCustomValidity('As senhas não coincidem');
+                } else {
+                    confirmarSenhaInput.setCustomValidity('');
+                }
+            });
         }
     }
 
-    generateUserCode() {
-        // Gerar código único para o usuário (timestamp + random)
-        const timestamp = Date.now().toString().slice(-6);
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        const codigo = `USR${timestamp}${random}`;
+    validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
         
-        const codigoInput = document.getElementById('register-codigo');
-        if (codigoInput) {
-            codigoInput.value = codigo;
-        }
-    }
-
-    validatePasswordMatch() {
-        const senha = document.getElementById('register-senha').value;
-        const confirmSenha = document.getElementById('register-confirm-senha').value;
-        const confirmInput = document.getElementById('register-confirm-senha');
+        if (cpf.length !== 11) return false;
         
-        if (confirmSenha && senha !== confirmSenha) {
-            confirmInput.setCustomValidity('As senhas não coincidem');
-            confirmInput.style.borderColor = '#e74c3c';
-        } else {
-            confirmInput.setCustomValidity('');
-            confirmInput.style.borderColor = '';
+        // Verifica se todos os dígitos são iguais
+        if (/^(\d)\1+$/.test(cpf)) return false;
+        
+        // Validação do primeiro dígito verificador
+        let soma = 0;
+        for (let i = 0; i < 9; i++) {
+            soma += parseInt(cpf.charAt(i)) * (10 - i);
         }
-    }
-
-    showLoading(button, isLoading, text) {
-        if (!button) return;
-        if (isLoading) {
-            button.disabled = true;
-            button.dataset.originalText = button.innerHTML;
-            button.innerHTML = text || 'Salvando...';
-        } else {
-            button.disabled = false;
-            if (button.dataset.originalText) {
-                button.innerHTML = button.dataset.originalText;
-                delete button.dataset.originalText;
-            }
+        let resto = 11 - (soma % 11);
+        let dv1 = resto > 9 ? 0 : resto;
+        
+        if (dv1 !== parseInt(cpf.charAt(9))) return false;
+        
+        // Validação do segundo dígito verificador
+        soma = 0;
+        for (let i = 0; i < 10; i++) {
+            soma += parseInt(cpf.charAt(i)) * (11 - i);
         }
+        resto = 11 - (soma % 11);
+        let dv2 = resto > 9 ? 0 : resto;
+        
+        if (dv2 !== parseInt(cpf.charAt(10))) return false;
+        
+        return true;
     }
 
     async handleSubmit(e) {
         e.preventDefault();
+        if (this.isSubmitting) return;
         
+        const submitButton = this.form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        this.isSubmitting = true;
+
         try {
             const formData = this.getFormData();
             
             if (!this.validateForm(formData)) {
+                this.isSubmitting = false;
+                submitButton.disabled = false;
                 return;
             }
 
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            this.showLoading(submitBtn, true, 'Salvando...');
-
-            console.log('📤 Enviando dados do usuário:', formData);
-
             const token = localStorage.getItem('token');
-            const response = await fetch(this.baseURL, {
+            const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -121,125 +132,63 @@ class UsuarioCadastroController extends BasePageController {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                BasePageController.showNotification('Usuário cadastrado com sucesso!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'usuarios-consulta.html';
-                }, 2000);
-            } else {
-                throw new Error(result.message || 'Erro ao cadastrar usuário');
-            }
-
+                window.location.href = 'usuarios-consulta.html';
+                setTimeout(() => alert('Usuário cadastrado com sucesso!'), 100);
+                return;
+            } 
+            
+            throw new Error(result.message || 'Erro ao cadastrar usuário');
         } catch (error) {
-            console.error('❌ Erro ao cadastrar usuário:', error);
-            BasePageController.showNotification(error.message || 'Erro ao cadastrar usuário', 'error');
+            console.error('Erro no cadastro:', error);
+            alert(error.message || 'Erro ao cadastrar usuário');
+            submitButton.disabled = false;
         } finally {
-            const submitBtn = document.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                this.showLoading(submitBtn, false, 'Salvar Usuário');
-            }
+            this.isSubmitting = false;
         }
     }
 
     getFormData() {
         return {
-            nome: document.getElementById('register-nome')?.value.trim() || '',
-            email: document.getElementById('register-email')?.value.trim() || '',
-            cpf: document.getElementById('register-cpf')?.value.trim() || '',
-            telefone: document.getElementById('register-telefone')?.value.trim() || '',
-            funcao: document.getElementById('register-funcao')?.value || '',
-            senha: document.getElementById('register-senha')?.value || '',
-            // código não é enviado, backend gera
-            observacoes: document.getElementById('register-observacoes')?.value.trim() || ''
+            nome: this.form.nome.value.trim(),
+            email: this.form.email.value.trim(),
+            cpf: this.form.cpf.value.trim(),
+            telefone: this.form.telefone.value.trim(),
+            funcao: this.form.funcao.value,
+            senha: this.form.senha.value
         };
     }
 
     validateForm(data) {
-        const requiredFields = ['nome', 'email', 'cpf', 'telefone', 'funcao', 'senha'];
-        
-        for (const field of requiredFields) {
-            if (!data[field]) {
-                BasePageController.showNotification(`O campo ${this.getFieldLabel(field)} é obrigatório`, 'error');
-                return false;
-            }
-        }
-
-        // Validar CPF
-        if (!this.validateCPF(data.cpf)) {
-            BasePageController.showNotification('CPF inválido', 'error');
+        if (!data.nome || !data.email || !data.cpf || !data.telefone || !data.funcao || !data.senha) {
+            alert('Preencha todos os campos obrigatórios!');
             return false;
         }
 
-        // Validar email
-        if (!this.validateEmail(data.email)) {
-            BasePageController.showNotification('E-mail inválido', 'error');
+        if (!this.validarCPF(data.cpf)) {
+            alert('CPF inválido!');
             return false;
         }
 
-        // Validar senha
         if (data.senha.length < 6) {
-            BasePageController.showNotification('A senha deve ter pelo menos 6 caracteres', 'error');
+            alert('A senha deve ter no mínimo 6 caracteres!');
             return false;
         }
 
-        // Validar confirmação de senha
-        const confirmSenha = document.getElementById('register-confirm-senha')?.value || '';
-        if (data.senha !== confirmSenha) {
-            BasePageController.showNotification('As senhas não coincidem', 'error');
+        if (data.senha !== this.form.confirmarSenha.value) {
+            alert('As senhas não coincidem!');
+            return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email)) {
+            alert('Email inválido!');
             return false;
         }
 
         return true;
     }
-
-    getFieldLabel(field) {
-        const labels = {
-            nome: 'Nome',
-            email: 'E-mail',
-            cpf: 'CPF',
-            telefone: 'Telefone',
-            funcao: 'Função',
-            senha: 'Senha',
-            codigo: 'Código'
-        };
-        return labels[field] || field;
-    }
-
-    async validateCPF(cpf) {
-        if (!cpf) return false;
-        
-        try {
-            return await ApiService.validateCPF(cpf);
-        } catch (error) {
-            console.error('Erro na validação do CPF:', error);
-            BasePageController.showNotification(error.message, 'error');
-            return false;
-        }
-    }
-
-    validateEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-
-    clearForm() {
-        const form = document.getElementById('register-form');
-        if (form) {
-            form.reset();
-            // this.generateUserCode(); // Código agora só no backend
-            
-            // Limpar validações customizadas
-            const confirmInput = document.getElementById('register-confirm-senha');
-            if (confirmInput) {
-                confirmInput.setCustomValidity('');
-                confirmInput.style.borderColor = '';
-            }
-            
-            BasePageController.showNotification('Formulário limpo', 'info');
-        }
-    }
 }
 
-// Inicializar o controller quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-    new UsuarioCadastroController();
+window.addEventListener('DOMContentLoaded', () => {
+    window.usuarioCadastroController = new UsuarioCadastroController();
 });

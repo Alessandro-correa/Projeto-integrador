@@ -5,21 +5,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/dashboard.css">
+	<link rel="stylesheet" href="../../assets/css/template.css">
+	<link rel="stylesheet" href="../../assets/css/forms.css">
+	<link rel="stylesheet" href="../../assets/css/ajuste.css">
 	<link rel="stylesheet" href="../../assets/css/usuarios.css">
 	<title>Sistema Campos Moto Peças - Ajustar Usuário</title>
 </head>
-
 <body>
-	<!-- Sidebar de navegação -->
+	<!-- Sidebar -->
 	<section id="sidebar">
-		<a href="../../index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
+		<a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
 		<ul class="side-menu">
-			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon'></i> Dashboard</a></li>
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
 			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon'></i> Ordem de Serviço</a></li>
-			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon'></i> Orçamentos</a></li>
-			<li class="divider" data-text="gestao">Gestão</li>
-			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon'></i> Clientes</a></li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
+			<li class="divider" data-text="gestão">Gestão</li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
 			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
 			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="../fornecedores/fornecedores-consulta.html"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
@@ -28,35 +31,24 @@
 		</ul>
 	</section>
 
+	<!-- Main Content -->
 	<section id="content">
-		<!-- Barra de navegação superior -->
 		<nav>
 			<i class='bx bx-menu toggle-sidebar'></i>
 			<div class="theme-toggle">
-				<input type="checkbox" id="themeToggleCheckbox">
-				<label for="themeToggleCheckbox" class="theme-toggle-label">
+				<input type="checkbox" id="theme-toggle-checkbox">
+				<label for="theme-toggle-checkbox" class="theme-toggle-label">
 					<i class='bx bxs-sun'></i>
 					<i class='bx bxs-moon'></i>
 				</label>
 			</div>
-			<a href="#" class="nav-link" style="margin-left: auto;">
-				<i class='bx bxs-bell icon'></i>
-			</a>
 			<span class="divider"></span>
 			<div class="profile">
-				<a href="#" class="nav-link">
-					<i class='bx bxs-cog icon' title="Configurações"></i>
-				</a>
-				<!-- Botão de logout pode ser implementado em JS -->
-				<a href="../../login.html" class="nav-link">
-					<i class='bx bxs-log-out-circle icon' title="Sair"></i>
-				</a>
+				<i class='bx bxs-user-circle icon'></i>
 			</div>
 		</nav>
-
 		<main>
-			<h1 class="title">Ajustar Usuário</h1>
-			<!-- Breadcrumbs de navegação -->
+			<h1 class="title">Ajuste de Usuário</h1>
 			<ul class="breadcrumbs">
 				<li><a href="../../index.html">Home</a></li>
 				<li class="divider">/</li>
@@ -64,132 +56,71 @@
 				<li class="divider">/</li>
 				<li><a href="#" class="active">Ajustar Usuário</a></li>
 			</ul>
-
 			<div class="data">
 				<div class="content-data">
-					<div class="head">
-						<h3><i class='bx bx-edit'></i> Ajustar Dados do Usuário</h3>
-						<div class="menu">
-							<a href="usuarios-consulta.html" class="btn-secondary">
-								<i class='bx bx-arrow-back'></i> Voltar
-							</a>
-						</div>
-					</div>
-
-					<!-- Seção de busca do usuário -->
-					<div class="search-section" id="searchSection">
-						<div class="search-card">
-							<h4><i class='bx bx-search'></i> Buscar Usuário para Ajustar</h4>
-							<div class="search-form">
-								<div class="form-row">
-									<div class="form-group">
-										<label for="searchEmail">E-mail do Usuário</label>
-										<input type="email" id="searchEmail" placeholder="usuario@exemplo.com" required>
-									</div>
-									<div class="form-group">
-										<button type="button" id="btnSearch" class="btn-primary">
-											<i class='bx bx-search'></i> Buscar
-										</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Seção de edição (oculta inicialmente) -->
-					<div class="edit-section" id="editSection" style="display: none;">
-						<div class="current-data-info">
-							<h4><i class='bx bx-user'></i> Dados Atuais do Usuário</h4>
-							<div id="currentUserData"></div>
-						</div>
-
-						<!-- Formulário de ajuste de usuário -->
-						<form id="adjustForm" class="adjust-form">
-							<h4><i class='bx bx-edit-alt'></i> Ajustar Informações</h4>
-							
+					<form id="ajusteUsuarioForm" class="form-container">
+						<div class="form-section">
+							<h3>Dados do Usuário</h3>
 							<div class="form-row">
 								<div class="form-group">
-									<label for="adjustNome">Nome Completo</label>
-									<input type="text" id="adjustNome" name="nome" required>
-									<small>Nome completo do usuário</small>
+									<label for="nome">Nome Completo <span class="required">*</span></label>
+									<input type="text" id="nome" name="nome" required maxlength="100">
 								</div>
 								<div class="form-group">
-									<label for="adjustEmail">E-mail</label>
-									<input type="email" id="adjustEmail" name="email" required>
-									<small>E-mail válido para login</small>
+									<label for="cpf">CPF <span class="required">*</span></label>
+									<input type="text" id="cpf" name="cpf" required maxlength="14" placeholder="000.000.000-00" readonly>
 								</div>
 							</div>
-
 							<div class="form-row">
 								<div class="form-group">
-									<label for="adjustCpf">CPF</label>
-									<input type="text" id="adjustCpf" name="cpf" required readonly>
-									<small>CPF do usuário</small>
+									<label for="email">Email <span class="required">*</span></label>
+									<input type="email" id="email" name="email" required maxlength="100">
 								</div>
 								<div class="form-group">
-									<label for="adjustTelefone">Telefone</label>
-									<input type="text" id="adjustTelefone" name="telefone">
-									<small>Telefone para contato (opcional)</small>
+									<label for="telefone">Telefone</label>
+									<input type="text" id="telefone" name="telefone" maxlength="15" placeholder="(99) 99999-9999">
 								</div>
 							</div>
-
 							<div class="form-row">
 								<div class="form-group">
-									<label for="adjustFuncao">Função</label>
-									<select id="adjustFuncao" name="funcao" required>
+									<label for="funcao">Função <span class="required">*</span></label>
+									<select id="funcao" name="funcao" required>
 										<option value="Administrador">Administrador</option>
 										<option value="Mecanico">Mecânico</option>
 										<option value="Secretaria">Secretária</option>
 									</select>
-									<small>Função do usuário no sistema</small>
 								</div>
 								<div class="form-group">
-									<label for="adjustStatus">Status</label>
-									<select id="adjustStatus" name="status">
+									<label for="status">Status <span class="required">*</span></label>
+									<select id="status" name="status" required>
 										<option value="Ativo">Ativo</option>
 										<option value="Inativo">Inativo</option>
 									</select>
-									<small>Status do usuário no sistema</small>
 								</div>
 							</div>
-
-							<!-- Seção de alteração de senha -->
 							<div class="form-row">
-								<div class="form-group full-width">
-									<label for="adjustSenha">Nova Senha (opcional)</label>
-									<input type="password" id="adjustSenha" name="senha" minlength="6">
-									<small>Deixe em branco para manter a senha atual. Mínimo 6 caracteres.</small>
+								<div class="form-group">
+									<label for="senha">Nova Senha</label>
+									<input type="password" id="senha" name="senha" minlength="6" placeholder="Deixe em branco para manter a senha atual">
+									<small>Mínimo 6 caracteres</small>
 								</div>
 							</div>
-
-							<!-- Seção de observações -->
-							<div class="form-row">
-								<div class="form-group full-width">
-									<label for="adjustObservacoes">Observações do Ajuste</label>
-									<textarea id="adjustObservacoes" name="observacoes" rows="3" placeholder="Digite as observações sobre este ajuste (opcional)"></textarea>
-									<small>Observações sobre as alterações realizadas</small>
-								</div>
-							</div>
-
-							<div class="form-actions">
-								<button type="submit" class="btn-primary">
-									<i class='bx bx-save'></i> Salvar Ajustes
-								</button>
-								<button type="button" id="btnCancel" class="btn-secondary">
-									<i class='bx bx-x'></i> Cancelar
-								</button>
-								<button type="button" id="btnReset" class="btn-warning">
-									<i class='bx bx-reset'></i> Restaurar Dados Originais
-								</button>
-							</div>
-						</form>
-					</div>
+						</div>
+						<div class="form-actions">
+							<button type="button" id="cancelBtn" class="btn btn-secondary">
+								<i class='bx bx-x'></i> Cancelar
+							</button>
+							<button type="submit" id="saveBtn" class="btn btn-primary">
+								<i class='bx bx-check'></i> Salvar Alterações
+							</button>
+						</div>
+					</form>
 				</div>
 			</div>
 		</main>
 	</section>
 
-	<!-- Scripts principais -->
+	<!-- Scripts -->
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script type="module" src="../../assets/js/main.js"></script>
 	<script src="../../src/components/BasePageController.js"></script>

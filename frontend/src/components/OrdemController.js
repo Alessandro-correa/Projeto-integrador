@@ -256,8 +256,27 @@ class OrdemController {
 
         // Add actions
         const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'mobile-card-actions';
-        actionsDiv.innerHTML = '<div class="actions">' + this.getActionsForStatus(ordem) + '</div>';
+        actionsDiv.className = 'card-actions';
+        
+        // Visualizar é sempre permitido
+        actionsDiv.innerHTML = `
+            <button class="action-btn" onclick="window.location.href='os-visualizar.html?cod=${ordem.cod}'" title="Visualizar">
+                <i class='bx bx-show'></i>
+            </button>
+        `;
+        
+        // Editar e excluir só são permitidos se não estiver validada ou rejeitada
+        if (!['Validada', 'Rejeitada'].includes(ordem.status)) {
+            actionsDiv.innerHTML += `
+                <button class="action-btn" onclick="window.location.href='os-ajustar.html?cod=${ordem.cod}'" title="Editar">
+                    <i class='bx bx-edit'></i>
+                </button>
+                <button class="action-btn excluir-ordem" data-id="${ordem.cod}" title="Excluir">
+                    <i class='bx bx-trash'></i>
+                </button>
+            `;
+        }
+        
         card.appendChild(actionsDiv);
 
         return card;
@@ -293,12 +312,22 @@ class OrdemController {
         const actions = [];
         
         // Visualizar é sempre permitido
-        actions.push('<a href="#" class="action-icon" data-id="' + ordem.cod + '" title="Visualizar"><i class="bx bx-show"></i></a>');
+        actions.push(`
+            <button class="action-btn" onclick="window.location.href='os-visualizar.html?cod=${ordem.cod}'" title="Visualizar">
+                <i class='bx bx-show'></i>
+            </button>
+        `);
         
         // Editar e excluir só são permitidos se não estiver validada ou rejeitada
         if (!['Validada', 'Rejeitada'].includes(ordem.status)) {
-            actions.push('<a href="os-ajustar.html?cod=' + ordem.cod + '" class="action-icon" title="Editar"><i class="bx bx-edit"></i></a>');
-            actions.push('<a href="#" class="action-icon excluir-ordem" data-id="' + ordem.cod + '" title="Excluir Ordem de Serviço"><i class="bx bx-trash"></i></a>');
+            actions.push(`
+                <button class="action-btn" onclick="window.location.href='os-ajustar.html?cod=${ordem.cod}'" title="Editar">
+                    <i class='bx bx-edit'></i>
+                </button>
+                <button class="action-btn excluir-ordem" data-id="${ordem.cod}" title="Excluir">
+                    <i class='bx bx-trash'></i>
+                </button>
+            `);
         }
         
         return actions.join('');

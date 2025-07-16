@@ -74,7 +74,7 @@ class OrcamentoApiController {
   }
 
   // Criar orçamento
-  async create(req, res) {
+  static async create(req, res) {
     try {
 
       const { validade, clienteCpf, status, descricao } = req.body;
@@ -149,7 +149,7 @@ class OrcamentoApiController {
   }
 
   // Listar todos os orçamentos
-  async findAll(req, res) {
+  static async findAll(req, res) {
     try {
       const orcamentos = await db.any(`
         SELECT 
@@ -238,7 +238,7 @@ class OrcamentoApiController {
   }
 
   // Buscar orçamento por ID
-  async findOne(req, res) {
+  static async findOne(req, res) {
     try {
       const { id } = req.params;
 
@@ -335,7 +335,7 @@ class OrcamentoApiController {
   }
 
   // Atualizar orçamento
-  async update(req, res) {
+  static async update(req, res) {
     try {
       const { id } = req.params;
       const { validade, status, valor, itens, observacoes, motocicletaPlaca } = req.body;
@@ -526,7 +526,7 @@ class OrcamentoApiController {
   }
 
   // Remover orçamento
-  async delete(req, res) {
+  static async delete(req, res) {
     try {
       const { id } = req.params;
 
@@ -555,283 +555,167 @@ class OrcamentoApiController {
     }
   }
 
-  // Aprovar orçamento (validar e gerar OS automaticamente)
-  async validarOrcamento(req, res) {
-    try {
-      const { id } = req.params;
-
-      console.log(`Iniciando aprovação do orçamento ${id}`);
-
-      // Buscar orçamento completo
-      const orcamento = await db.oneOrNone(`
-        SELECT 
-          o.id,
-          o.valor,
-          o.validade,
-          o.ordem_servico_cod,
-          o.cliente_cpf,
-          o.status,
-          o.descricao,
-          c.nome AS cliente_nome,
-          c.telefone AS cliente_telefone,
-          c.email AS cliente_email
-        FROM Orcamento o
-        JOIN Cliente c ON o.cliente_cpf = c.cpf
-        WHERE o.id = $1
-      `, [id]);
-
-      if (!orcamento) {
-        return res.status(404).json({
-          success: false,
-          message: 'Orçamento não encontrado'
-        });
-      }
-
-      console.log(`Orçamento encontrado:`, orcamento);
-
-      // Verificar se já foi validado/aprovado
-      if (orcamento.status === 'A') {
-        return res.status(400).json({
-          success: false,
-          message: 'Orçamento já foi aprovado anteriormente'
-        });
-      }
-
-      // Se orçamento já tem ordem de serviço, apenas atualizar status
-      if (orcamento.ordem_servico_cod) {
-        await db.none('UPDATE Orcamento SET status = $1 WHERE id = $2', ['A', id]);
-        console.log(`Orçamento ${id} já possuía OS, apenas atualizou status`);
-        
-        return res.json({
-          success: true,
-          message: 'Orçamento aprovado com sucesso!',
-          data: {
-            orcamento_id: id,
-            ordem_servico_cod: orcamento.ordem_servico_cod,
-            message: 'Orçamento aprovado! Ordem de serviço já existente foi mantida.'
-          }
-        });
-      }
-
-      // Buscar primeira motocicleta do cliente
-      const motocicleta = await db.oneOrNone(`
-        SELECT placa, modelo, ano, cor 
-        FROM Motocicleta 
-        WHERE cliente_cpf = $1 
-        ORDER BY placa 
-        LIMIT 1
-      `, [orcamento.cliente_cpf]);
-
-      if (!motocicleta) {
-        return res.status(400).json({
-          success: false,
-          message: 'Cliente não possui motocicleta cadastrada. Cadastre uma motocicleta antes de validar o orçamento.'
-        });
-      }
-
-      console.log(`Motocicleta selecionada: ${motocicleta.placa}`);
-
-      // Iniciar transação para criar OS
-      const resultado = await db.tx(async t => {
-        // Usuário padrão (secretária) para criar a OS
-        const usuarioPadrao = '111.111.111-11'; // Maria Fernanda - Secretária
-        
-        // Preparar descrição simplificada com itens do orçamento
-        let descricaoCompleta = `ORDEM DE SERVICO GERADA AUTOMATICAMENTE\n`;
-        descricaoCompleta += `===============================================\n\n`;
-        
-        // Adicionar itens do orçamento à descrição (formatados)
-        if (orcamento.descricao) {
-          try {
-            const dadosOrcamento = JSON.parse(orcamento.descricao);
+  static async validar(req, res) {
+        try {
+            const { id } = req.params;
             
-            // Adicionar peças
-            if (dadosOrcamento.pecas && dadosOrcamento.pecas.length > 0) {
-              descricaoCompleta += `PECAS ORCADAS:\n`;
-              dadosOrcamento.pecas.forEach((peca, index) => {
-                const valorUnitario = parseFloat(peca.valor_unitario || 0).toFixed(2);
-                const valorTotal = parseFloat(peca.valor_total || 0).toFixed(2);
-                descricaoCompleta += `${index + 1}. ${peca.nome}\n`;
-                descricaoCompleta += `   • Quantidade: ${peca.quantidade || 1}\n`;
-                descricaoCompleta += `   • Valor Unitario: R$ ${valorUnitario}\n`;
-                descricaoCompleta += `   • Valor Total: R$ ${valorTotal}\n\n`;
-              });
+            // Verificar se o orçamento existe e está pendente
+            const orcamento = await db.oneOrNone(`
+                SELECT 
+                    o.*,
+                    c.nome as cliente_nome,
+                    c.telefone as cliente_telefone,
+                    c.email as cliente_email
+                FROM Orcamento o
+                JOIN Cliente c ON o.cliente_cpf = c.cpf
+                WHERE o.id = $1 AND o.status = $2
+            `, [id, 'P']);
+
+            if (!orcamento) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Orçamento não encontrado ou não está pendente'
+                });
             }
-            
-            // Adicionar serviços
-            if (dadosOrcamento.servicos && dadosOrcamento.servicos.length > 0) {
-              descricaoCompleta += `SERVICOS ORCADOS:\n`;
-              dadosOrcamento.servicos.forEach((servico, index) => {
-                const valorServico = parseFloat(servico.valor || 0).toFixed(2);
-                descricaoCompleta += `${index + 1}. ${servico.descricao}\n`;
-                if (servico.valor && servico.valor > 0) {
-                  descricaoCompleta += `   • Valor: R$ ${valorServico}\n`;
+
+            // Buscar a primeira motocicleta do cliente
+            const motocicleta = await db.oneOrNone(`
+                SELECT m.* 
+                FROM Motocicleta m
+                JOIN Possui p ON m.placa = p.motocicleta_placa
+                WHERE p.cliente_cpf = $1
+                LIMIT 1
+            `, [orcamento.cliente_cpf]);
+
+            if (!motocicleta) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Cliente não possui motocicleta cadastrada. Cadastre uma motocicleta antes de validar o orçamento.'
+                });
+            }
+
+            // Iniciar transação
+            const ordemServico = await db.tx(async t => {
+                // Atualizar status do orçamento para Aprovado
+                await t.none(
+                    'UPDATE Orcamento SET status = $1 WHERE id = $2',
+                    ['A', id]
+                );
+
+                // Criar ordem de serviço
+                const os = await t.one(
+                    `INSERT INTO Ordem_de_servico 
+                    (titulo, data, descricao, status, observacao, valor, valor_mao_de_obra, validada, cliente_cpf, motocicleta_placa)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                    RETURNING cod`,
+                    [
+                        `OS-ORC-${id} - ${orcamento.cliente_nome}`,
+                        new Date(),
+                        orcamento.descricao,
+                        'Em Andamento', // Status inicial
+                        'Ordem de serviço gerada a partir de orçamento',
+                        orcamento.valor,
+                        0.00, // Valor mão de obra inicial
+                        false, // Não validada inicialmente
+                        orcamento.cliente_cpf,
+                        motocicleta.placa
+                    ]
+                );
+
+                // Atualizar o orçamento com o código da OS
+                await t.none(
+                    'UPDATE Orcamento SET ordem_servico_cod = $1 WHERE id = $2',
+                    [os.cod, id]
+                );
+
+                return os;
+            });
+
+            res.json({
+                success: true,
+                message: 'Orçamento validado e Ordem de Serviço criada com sucesso',
+                data: {
+                    orcamento_id: id,
+                    ordem_servico_cod: ordemServico.cod
                 }
-                descricaoCompleta += `\n`;
-              });
-            }
-            
-            // Adicionar observações se houver
-            if (dadosOrcamento.observacoes && dadosOrcamento.observacoes.trim()) {
-              descricaoCompleta += `OBSERVACOES DO ORCAMENTO:\n`;
-              descricaoCompleta += `${dadosOrcamento.observacoes}\n\n`;
-            }
-            
-          } catch (parseError) {
-            // Se não conseguir fazer parse do JSON, mostrar como texto simples
-            descricaoCompleta += `DADOS DO ORCAMENTO:\n`;
-            descricaoCompleta += `${orcamento.descricao}\n\n`;
-          }
+            });
+
+        } catch (error) {
+            console.error('Erro ao validar orçamento:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao validar orçamento',
+                error: error.message
+            });
         }
-        
-        descricaoCompleta += `OBSERVACOES:\n`;
-        descricaoCompleta += `Data de criacao: ${new Date().toLocaleDateString('pt-BR')} as ${new Date().toLocaleTimeString('pt-BR')}\n`;
-
-        // Criar ordem de serviço
-        const novaOrdem = await t.one(`
-          INSERT INTO Ordem_de_servico (
-            titulo, 
-            data, 
-            descricao, 
-            status, 
-            observacao, 
-            valor,
-            validada,
-            cliente_cpf, 
-            motocicleta_placa
-          )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-          RETURNING *
-        `, [
-          `OS-ORC-${orcamento.id} - ${orcamento.cliente_nome}`,
-          new Date(),
-          descricaoCompleta,
-          'Em Andamento',
-          `Ordem de serviço criada a partir da aprovação do orçamento #${orcamento.id}`,
-          parseFloat(orcamento.valor),
-          true,
-          orcamento.cliente_cpf,
-          motocicleta.placa
-        ]);
-
-        console.log(`� Nova OS criada com código ${novaOrdem.cod}`);
-
-        // Atualizar orçamento com a nova ordem de serviço e status aprovado
-        await t.none(`
-          UPDATE Orcamento 
-          SET status = $1, ordem_servico_cod = $2 
-          WHERE id = $3
-        `, ['A', novaOrdem.cod, id]);
-
-        console.log(`Orçamento ${id} aprovado e vinculado à OS ${novaOrdem.cod}`);
-
-        return novaOrdem;
-      });
-
-      res.json({
-        success: true,
-        message: 'Orçamento aprovado e ordem de serviço criada com sucesso!',
-        data: {
-          orcamento_id: id,
-          ordem_servico_cod: resultado.cod,
-          motocicleta_placa: motocicleta.placa,
-          message: `Ordem de serviço #${resultado.cod} criada automaticamente`
-        }
-      });
-
-    } catch (error) {
-      console.error('Erro ao aprovar orçamento:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor',
-        error: error.message
-      });
     }
-  }
 
-  // Rejeitar orçamento
-  async rejeitarOrcamento(req, res) {
-    try {
-      const { id } = req.params;
-      const { motivo, observacao } = req.body;
+    static async rejeitar(req, res) {
+        try {
+            const { id } = req.params;
+            const { motivo } = req.body;
 
-      console.log(`🚫 Iniciando rejeição do orçamento ${id}`);
-      console.log('Parâmetros recebidos:', { motivo, observacao });
+            if (!motivo) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Motivo da rejeição é obrigatório'
+                });
+            }
 
-      // Verificar se orçamento existe
-      const orcamento = await db.oneOrNone('SELECT * FROM Orcamento WHERE id = $1', [id]);
-      if (!orcamento) {
-        return res.status(404).json({
-          success: false,
-          message: 'Orçamento não encontrado'
-        });
-      }
+            // Verificar se o orçamento existe e está pendente
+            const orcamento = await db.oneOrNone(
+                'SELECT * FROM Orcamento WHERE id = $1 AND status = $2',
+                [id, 'P']
+            );
 
-      // Verificar se já foi processado
-      if (orcamento.status === 'R') {
-        return res.status(400).json({
-          success: false,
-          message: 'Orçamento já foi rejeitado anteriormente'
-        });
-      }
+            if (!orcamento) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Orçamento não encontrado ou não está pendente'
+                });
+            }
 
-      if (orcamento.status === 'V') {
-        return res.status(400).json({
-          success: false,
-          message: 'Não é possível rejeitar um orçamento já validado'
-        });
-      }
+            // Atualizar status e adicionar motivo da rejeição
+            let descricaoAtual = {};
+            try {
+                descricaoAtual = JSON.parse(orcamento.descricao);
+            } catch (e) {
+                descricaoAtual = {
+                    pecas: [],
+                    servicos: [],
+                    observacoes: orcamento.descricao || ''
+                };
+            }
 
-      // Preparar dados da rejeição
-      const dadosRejeicao = {
-        motivo_rejeicao: motivo || 'Não especificado',
-        observacao_rejeicao: observacao || '',
-        data_rejeicao: new Date()
-      };
+            const descricaoAtualizada = {
+                ...descricaoAtual,
+                motivo_rejeicao: motivo,
+                data_rejeicao: new Date().toISOString()
+            };
 
-      // Atualizar status para rejeitado (não cria ordem de serviço)
-      const orcamentoAtualizado = await db.one(`
-        UPDATE Orcamento 
-        SET 
-          status = $1,
-          motivo_rejeicao = $2,
-          observacao_rejeicao = $3,
-          data_rejeicao = $4
-        WHERE id = $5 
-        RETURNING *
-      `, [
-        'R', // Status rejeitado
-        dadosRejeicao.motivo_rejeicao,
-        dadosRejeicao.observacao_rejeicao,
-        dadosRejeicao.data_rejeicao,
-        id
-      ]);
+            await db.none(
+                'UPDATE Orcamento SET status = $1, descricao = $2 WHERE id = $3',
+                ['R', JSON.stringify(descricaoAtualizada), id]
+            );
 
-      console.log(`✅ Orçamento ${id} rejeitado com sucesso`);
+            res.json({
+                success: true,
+                message: 'Orçamento rejeitado com sucesso',
+                data: { id }
+            });
 
-      res.json({
-        success: true,
-        message: 'Orçamento rejeitado com sucesso!',
-        data: {
-          orcamento_id: id,
-          motivo: dadosRejeicao.motivo_rejeicao,
-          data_rejeicao: dadosRejeicao.data_rejeicao,
-          orcamento: orcamentoAtualizado
+        } catch (error) {
+            console.error('Erro ao rejeitar orçamento:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao rejeitar orçamento',
+                error: error.message
+            });
         }
-      });
-
-    } catch (error) {
-      console.error('❌ Erro ao rejeitar orçamento:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Erro interno do servidor',
-        error: error.message
-      });
     }
-  }
 
   // Converter orçamento em ordem de serviço
-  async converterParaOrdemServico(req, res) {
+  static async converterParaOrdemServico(req, res) {
     try {
       const { id } = req.params;
       const { usuarioCpf, titulo, observacoesAdicionais } = req.body;
@@ -986,4 +870,4 @@ class OrcamentoApiController {
   }
 }
 
-module.exports = new OrcamentoApiController();
+module.exports = OrcamentoApiController;

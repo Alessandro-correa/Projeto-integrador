@@ -1,0 +1,113 @@
+/* Estilos específicos para a página de marcas */
+
+/* Container de cards (visível apenas em mobile) */
+.cards-container {
+    display: none;
+}
+
+.cards-grid {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+/* Card individual */
+.marca-card {
+    background: var(--light);
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--grey);
+}
+
+.marca-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.marca-card .marca-nome {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin: 0;
+}
+
+.marca-card .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--grey);
+}
+
+.marca-card .action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.marca-card .btn-editar {
+    background-color: var(--blue);
+    color: white;
+}
+
+.marca-card .btn-excluir {
+    background-color: var(--red);
+    color: white;
+}
+
+/* Responsividade */
+@media screen and (max-width: 768px) {
+    .table-container {
+        display: none;
+    }
+
+    .cards-container {
+        display: block;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .head {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .head .btn-primary {
+        text-align: center;
+    }
+}
+
+/* Dark mode */
+[data-theme="dark"] .marca-card {
+    background: var(--dark-grey);
+    border-color: var(--grey);
+}
+
+[data-theme="dark"] .marca-card .marca-nome {
+    color: var(--light);
+}
+
+[data-theme="dark"] .marca-card .card-actions {
+    border-top-color: var(--grey);
+} 

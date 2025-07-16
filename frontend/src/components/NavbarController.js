@@ -3,6 +3,7 @@ class NavbarController {
         this.profile = document.querySelector('nav .profile');
         this.allMenu = document.querySelectorAll('main .content-data .head .menu');
         this.init();
+        this.setupProfileMenu();
     }
 
     init() {
@@ -10,6 +11,39 @@ class NavbarController {
         this.setupMenuDropdowns();
         this.setupGlobalClickHandlers();
         this.setupDocsButton();
+    }
+
+    setupProfileMenu() {
+        // Remove notification icon if it exists
+        const notification = document.querySelector('nav .notification');
+        if (notification) {
+            notification.remove();
+        }
+
+        // Update profile menu with user info
+        const userName = localStorage.getItem('userName') || 'Usuário';
+        const userType = localStorage.getItem('userType') || 'Não definido';
+        
+        if (this.profile) {
+            // Update profile icon and text
+            const profileContent = `
+                <i class='bx bxs-user-circle icon'></i>
+                <span class="profile-name">${userName}</span>
+            `;
+            this.profile.innerHTML = profileContent + this.profile.innerHTML;
+
+            // Update dropdown menu
+            const dropdownProfile = this.profile.querySelector('.profile-link');
+            if (dropdownProfile) {
+                dropdownProfile.innerHTML = `
+                    <div class="profile-info">
+                        <div class="name">${userName}</div>
+                        <div class="role">${userType}</div>
+                    </div>
+                    <a href="#"><i class='bx bx-log-out'></i> Sair</a>
+                `;
+            }
+        }
     }
 
     setupDocsButton() {

@@ -60,53 +60,18 @@ const { authorizeRoles } = require('../controllers/usuarioApiController');
  *       403:
  *         description: Acesso negado
  */
-router.post('/', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), OrcamentoApiController.create);
+// Rotas principais
+router.post('/', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), (req, res) => OrcamentoApiController.create(req, res));
+router.get('/', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), (req, res) => OrcamentoApiController.findAll(req, res));
+router.get('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), (req, res) => OrcamentoApiController.findOne(req, res));
+router.put('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), (req, res) => OrcamentoApiController.update(req, res));
+router.delete('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), (req, res) => OrcamentoApiController.delete(req, res));
 
 /**
  * @swagger
- * /orcamentos:
- *   get:
- *     summary: Listar todos os orçamentos
- *     tags: [Orçamentos]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de orçamentos
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   valor:
- *                     type: number
- *                   validade:
- *                     type: string
- *                     format: date
- *                   status:
- *                     type: string
- *                   descricao:
- *                     type: string
- *                   ordem_servico_cod:
- *                     type: integer
- *                   cliente_cpf:
- *                     type: string
- *       401:
- *         description: Não autorizado
- *       403:
- *         description: Acesso negado
- */
-router.get('/', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), OrcamentoApiController.findAll);
-
-/**
- * @swagger
- * /orcamentos/{id}:
- *   get:
- *     summary: Buscar orçamento por ID
+ * /orcamentos/{id}/validar:
+ *   post:
+ *     summary: Validar orçamento e criar ordem de serviço
  *     tags: [Orçamentos]
  *     security:
  *       - bearerAuth: []
@@ -119,27 +84,7 @@ router.get('/', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), Orc
  *         description: ID do orçamento
  *     responses:
  *       200:
- *         description: Orçamento encontrado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                 valor:
- *                   type: number
- *                 validade:
- *                   type: string
- *                   format: date
- *                 status:
- *                   type: string
- *                 descricao:
- *                   type: string
- *                 ordem_servico_cod:
- *                   type: integer
- *                 cliente_cpf:
- *                   type: string
+ *         description: Orçamento validado com sucesso
  *       401:
  *         description: Não autorizado
  *       403:
@@ -147,13 +92,14 @@ router.get('/', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), Orc
  *       404:
  *         description: Orçamento não encontrado
  */
-router.get('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), OrcamentoApiController.findOne);
+// Rotas de validação e rejeição
+router.post('/:id/validar', authorizeRoles('Administrador', 'Secretária'), (req, res) => OrcamentoApiController.validar(req, res));
 
 /**
  * @swagger
- * /orcamentos/{id}:
- *   put:
- *     summary: Atualizar orçamento
+ * /orcamentos/{id}/rejeitar:
+ *   post:
+ *     summary: Rejeitar orçamento
  *     tags: [Orçamentos]
  *     security:
  *       - bearerAuth: []
@@ -170,27 +116,18 @@ router.get('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), 
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - motivo
  *             properties:
- *               valor:
- *                 type: number
- *                 format: float
- *               validade:
+ *               motivo:
  *                 type: string
- *                 format: date
- *               status:
+ *                 description: Motivo da rejeição
+ *               observacao:
  *                 type: string
- *                 enum: [P, A, R]
- *               descricao:
- *                 type: string
- *               ordem_servico_cod:
- *                 type: integer
- *               cliente_cpf:
- *                 type: string
+ *                 description: Observações adicionais
  *     responses:
  *       200:
- *         description: Orçamento atualizado com sucesso
- *       400:
- *         description: Dados inválidos
+ *         description: Orçamento rejeitado com sucesso
  *       401:
  *         description: Não autorizado
  *       403:
@@ -198,33 +135,6 @@ router.get('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), 
  *       404:
  *         description: Orçamento não encontrado
  */
-router.put('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), OrcamentoApiController.update);
-
-/**
- * @swagger
- * /orcamentos/{id}:
- *   delete:
- *     summary: Excluir orçamento
- *     tags: [Orçamentos]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID do orçamento
- *     responses:
- *       200:
- *         description: Orçamento excluído com sucesso
- *       401:
- *         description: Não autorizado
- *       403:
- *         description: Acesso negado
- *       404:
- *         description: Orçamento não encontrado
- */
-router.delete('/:id', authorizeRoles('Administrador', 'Secretária', 'Mecânico'), OrcamentoApiController.delete);
+router.post('/:id/rejeitar', authorizeRoles('Administrador', 'Secretária'), (req, res) => OrcamentoApiController.rejeitar(req, res));
 
 module.exports = router; 

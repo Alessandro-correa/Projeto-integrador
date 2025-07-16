@@ -2,6 +2,7 @@ class OrcamentoController {
     constructor() {
         this.apiUrl = 'http://localhost:3000/api/orcamentos';
         this.tableBody = document.querySelector('#orcamentos-table tbody');
+        this.mobileCards = document.getElementById('mobile-cards');
         this.filterText = document.getElementById('filter-text');
         this.filterStatus = document.getElementById('filter-status');
         this.clearFiltersBtn = document.getElementById('clear-filters');
@@ -18,7 +19,7 @@ class OrcamentoController {
         };
         
         // Só inicializa se estiver na página de consulta
-        if (this.tableBody && this.filterText && this.filterStatus && this.clearFiltersBtn) {
+        if ((this.tableBody || this.mobileCards) && this.filterText && this.filterStatus && this.clearFiltersBtn) {
             this.init();
         }
     }
@@ -176,31 +177,72 @@ class OrcamentoController {
                 match = codigo.includes(text) || cliente.includes(text) || placa.includes(text);
             }
             if (status) {
-                
                 match = match && (o.status_descricao === status || this.getStatusLabel(o.status) === status);
             }
             return match;
         });
         
         if (filtered.length === 0) {
-            this.tableBody.innerHTML = '<tr><td colspan="6">Nenhum orçamento encontrado</td></tr>';
+            if (this.tableBody) {
+                this.tableBody.innerHTML = '<tr><td colspan="6">Nenhum orçamento encontrado</td></tr>';
+            }
+            if (this.mobileCards) {
+                this.mobileCards.innerHTML = '<div class="mobile-card"><div class="mobile-card-row"><div class="mobile-card-value">Nenhum orçamento encontrado</div></div></div>';
+            }
             return;
         }
 
         const sorted = this.sortOrcamentos(filtered);
         
-        this.tableBody.innerHTML = sorted.map(o => `
-            <tr>
-                <td><p>ORC-${String(o.id).padStart(3, '0')}</p></td>
-                <td><p>${o.cliente_nome ? o.cliente_nome : 'N/A'}</p></td>
-                <td><p>${o.placa ? o.placa : 'N/A'}</p></td>
-                <td>R$ ${(isNaN(parseFloat(o.valor)) ? 0 : parseFloat(o.valor)).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                <td><span class="status-${this.getStatusClass(o.status)}">${o.status_descricao ? o.status_descricao : this.getStatusLabel(o.status)}</span></td>
-                <td>
-                    ${this.getActionsForStatus(o)}
-                </td>
-            </tr>
-        `).join('');
+        // Render table view
+        if (this.tableBody) {
+            this.tableBody.innerHTML = sorted.map(o => `
+                <tr>
+                    <td><p>ORC-${String(o.id).padStart(3, '0')}</p></td>
+                    <td><p>${o.cliente_nome ? o.cliente_nome : 'N/A'}</p></td>
+                    <td><p>${o.placa ? o.placa : 'N/A'}</p></td>
+                    <td>R$ ${(isNaN(parseFloat(o.valor)) ? 0 : parseFloat(o.valor)).toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                    <td><span class="status-${this.getStatusClass(o.status)}">${o.status_descricao ? o.status_descricao : this.getStatusLabel(o.status)}</span></td>
+                    <td>
+                        ${this.getActionsForStatus(o)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Render mobile cards
+        if (this.mobileCards) {
+            this.mobileCards.innerHTML = sorted.map(o => `
+                <div class="mobile-card">
+                    <div class="mobile-card-row">
+                        <div class="mobile-card-label">Código:</div>
+                        <div class="mobile-card-value">ORC-${String(o.id).padStart(3, '0')}</div>
+                    </div>
+                    <div class="mobile-card-row">
+                        <div class="mobile-card-label">Cliente:</div>
+                        <div class="mobile-card-value">${o.cliente_nome ? o.cliente_nome : 'N/A'}</div>
+                    </div>
+                    <div class="mobile-card-row">
+                        <div class="mobile-card-label">Placa:</div>
+                        <div class="mobile-card-value">${o.placa ? o.placa : 'N/A'}</div>
+                    </div>
+                    <div class="mobile-card-row">
+                        <div class="mobile-card-label">Valor Total:</div>
+                        <div class="mobile-card-value">R$ ${(isNaN(parseFloat(o.valor)) ? 0 : parseFloat(o.valor)).toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+                    </div>
+                    <div class="mobile-card-row">
+                        <div class="mobile-card-label">Status:</div>
+                        <div class="mobile-card-value">
+                            <span class="status-${this.getStatusClass(o.status)}">${o.status_descricao ? o.status_descricao : this.getStatusLabel(o.status)}</span>
+                        </div>
+                    </div>
+                    <div class="mobile-card-actions">
+                        ${this.getActionsForStatus(o)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
         this.addActionListeners();
     }
 
@@ -210,28 +252,23 @@ class OrcamentoController {
         const isSecretaria = this.currentUser.tipo === 'Atendente';
 
         switch(orcamento.status) {
-            case 'P': 
-                
+            case 'P': // Pendente
                 actions.push(`<a href="#" class="action-icon visualizar-orcamento" data-id="${orcamento.id}" title="Visualizar"><i class='bx bx-show'></i></a>`);
-
                 actions.push(`<a href="orcamentos-ajustar.html?id=${orcamento.id}" class="action-icon" title="Editar Orçamento"><i class='bx bx-edit'></i></a>`);
 
                 if (isSecretaria) {
                     actions.push(`<a href="#" class="action-icon validar-orcamento" data-id="${orcamento.id}" title="Validar Orçamento (Gerar OS)"><i class='bx bx-check-shield'></i></a>`);
                     actions.push(`<a href="#" class="action-icon rejeitar-orcamento" data-id="${orcamento.id}" title="Rejeitar Orçamento"><i class='bx bx-x-circle'></i></a>`);
                 }
-                // Adicionar botão de excluir para pendente
                 actions.push(`<a href="#" class="action-icon excluir-orcamento" data-id="${orcamento.id}" title="Excluir Orçamento"><i class='bx bx-trash'></i></a>`);
                 break;
                 
-            case 'A': 
-            case 'R': 
-                
+            case 'A': // Aprovado
+            case 'R': // Rejeitado
                 actions.push(`<a href="#" class="action-icon visualizar-orcamento" data-id="${orcamento.id}" title="Visualizar"><i class='bx bx-show'></i></a>`);
                 break;
                 
             default:
-                
                 actions.push(`<a href="#" class="action-icon visualizar-orcamento" data-id="${orcamento.id}" title="Visualizar"><i class='bx bx-show'></i></a>`);
                 break;
         }
@@ -274,58 +311,113 @@ class OrcamentoController {
     }
 
     addActionListeners() {
-        
-        this.tableBody.querySelectorAll('.visualizar-orcamento').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                await this.visualizarOrcamento(id);
+        // Adicionar listeners para a tabela
+        if (this.tableBody) {
+            this.tableBody.querySelectorAll('.visualizar-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    await this.visualizarOrcamento(id);
+                });
             });
-        });
 
-        this.tableBody.querySelectorAll('.validar-orcamento').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                
-                const confirmar = confirm(
-                    `🔍 VALIDAR ORÇAMENTO #${id}\n\n` +
-                    `✅ Confirma a validação deste orçamento?\n\n` +
-                    `• O orçamento será transformado em uma Ordem de Serviço\n` +
-                    `• Status será alterado para VALIDADO\n` +
-                    `• Uma nova OS será criada automaticamente\n` +
-                    `• Todos os itens serão incluídos na descrição da OS\n\n` +
-                    `⚠️ Esta ação não pode ser desfeita.`
-                );
-                
-                if (confirmar) {
-                    await this.validarOrcamento(id);
-                }
+            // Botões de validação
+            this.tableBody.querySelectorAll('.validar-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    
+                    const confirmar = confirm(
+                        `🔍 VALIDAR ORÇAMENTO #${id}\n\n` +
+                        `✅ Confirma a validação deste orçamento?\n\n` +
+                        `• O orçamento será transformado em uma Ordem de Serviço\n` +
+                        `• Status será alterado para VALIDADO\n` +
+                        `• Uma nova OS será criada automaticamente\n\n` +
+                        `⚠️ Esta ação não pode ser desfeita.`
+                    );
+                    
+                    if (confirmar) {
+                        await this.validarOrcamento(id);
+                    }
+                });
             });
-        });
 
-        this.tableBody.querySelectorAll('.rejeitar-orcamento').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const confirmar = confirm('Tem certeza que deseja rejeitar este orçamento? Esta ação não pode ser desfeita.');
-                if (confirmar) {
-                    await this.rejeitarOrcamentoComMotivo(id, { motivo: 'Rejeitado pelo usuário', observacao: '' });
-                }
+            this.tableBody.querySelectorAll('.rejeitar-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    const motivo = prompt('Por favor, informe o motivo da rejeição:');
+                    if (motivo) {
+                        await this.rejeitarOrcamentoComMotivo(id, { motivo, observacao: '' });
+                    }
+                });
             });
-        });
 
-        // Excluir orçamento
-        this.tableBody.querySelectorAll('.excluir-orcamento').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const confirmar = confirm('Tem certeza que deseja excluir este orçamento? Esta ação não pode ser desfeita.');
-                if (confirmar) {
-                    await this.excluirOrcamento(id);
-                }
+            this.tableBody.querySelectorAll('.excluir-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    const confirmar = confirm('Tem certeza que deseja excluir este orçamento? Esta ação não pode ser desfeita.');
+                    if (confirmar) {
+                        await this.excluirOrcamento(id);
+                    }
+                });
             });
-        });
+        }
+
+        // Adicionar listeners para os cards móveis
+        if (this.mobileCards) {
+            this.mobileCards.querySelectorAll('.visualizar-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    await this.visualizarOrcamento(id);
+                });
+            });
+
+            // Botões de validação (mobile)
+            this.mobileCards.querySelectorAll('.validar-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    
+                    const confirmar = confirm(
+                        `🔍 VALIDAR ORÇAMENTO #${id}\n\n` +
+                        `✅ Confirma a validação deste orçamento?\n\n` +
+                        `• O orçamento será transformado em uma Ordem de Serviço\n` +
+                        `• Status será alterado para VALIDADO\n` +
+                        `• Uma nova OS será criada automaticamente\n\n` +
+                        `⚠️ Esta ação não pode ser desfeita.`
+                    );
+                    
+                    if (confirmar) {
+                        await this.validarOrcamento(id);
+                    }
+                });
+            });
+
+            this.mobileCards.querySelectorAll('.rejeitar-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    const motivo = prompt('Por favor, informe o motivo da rejeição:');
+                    if (motivo) {
+                        await this.rejeitarOrcamentoComMotivo(id, { motivo, observacao: '' });
+                    }
+                });
+            });
+
+            this.mobileCards.querySelectorAll('.excluir-orcamento').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    const confirmar = confirm('Tem certeza que deseja excluir este orçamento? Esta ação não pode ser desfeita.');
+                    if (confirmar) {
+                        await this.excluirOrcamento(id);
+                    }
+                });
+            });
+        }
     }
 
     async visualizarOrcamento(id) {
@@ -543,22 +635,10 @@ class OrcamentoController {
 
             if (result.success) {
                 this.showNotification(
-                    `✅ ${result.message}`,
+                    `✅ Orçamento validado com sucesso!`,
                     'success'
                 );
-                
-                // Perguntar se deseja visualizar a OS criada
-                const visualizarOS = confirm(
-                    `Orçamento validado com sucesso!\n\n` +
-                    `📋 Ordem de Serviço #${result.data.ordem_servico_cod} criada\n\n` +
-                    `🔄 Deseja visualizar as Ordens de Serviço agora?`
-                );
-                
-                if (visualizarOS) {
-                    window.location.href = '../os/os-consulta.html';
-                } else {
-                    this.loadOrcamentos(); // Recarregar lista
-                }
+                this.loadOrcamentos(); // Recarregar lista
             } else {
                 throw new Error(result.message || 'Erro desconhecido');
             }
@@ -581,8 +661,7 @@ class OrcamentoController {
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    motivo: parametros.motivo,
-                    observacao: parametros.observacao
+                    motivo: parametros.motivo
                 })
             });
             
@@ -608,7 +687,6 @@ class OrcamentoController {
                 `❌ Erro ao rejeitar orçamento: ${error.message}`,
                 'error'
             );
-            throw error;
         }
     }
 
@@ -622,7 +700,9 @@ class OrcamentoController {
                     Authorization: `Bearer ${token}`
                 }
             });
+            
             if (!response.ok) throw new Error('Erro ao excluir orçamento');
+            
             const result = await response.json();
             if (result.success) {
                 this.showNotification('Orçamento excluído com sucesso!', 'success');
@@ -836,7 +916,7 @@ class OrcamentoController {
             btnConfirmar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processando...';
 
             try {
-                await this.validarOrcamentoComParametros(orcamentoId, {
+                await this.validarOrcamento(orcamentoId, {
                     motocicletaPlaca,
                     titulo,
                     observacao,

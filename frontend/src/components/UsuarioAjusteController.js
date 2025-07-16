@@ -1,146 +1,122 @@
-class UsuarioAjusteController extends BaseAjusteController {
+class UsuarioAjusteController {
     constructor() {
-        super('Usuário', 'http://localhost:3000/api/usuarios');
-        this.searchField = 'email';
+        this.form = document.getElementById('ajusteUsuarioForm');
+        this.cancelBtn = document.getElementById('cancelBtn');
+        this.apiUrl = 'http://localhost:3000/api/usuarios';
+        this.isSubmitting = false;
+        this.cpf = this.getCpfFromUrl();
+        this.init();
     }
 
-    applyMasks() {
-        
-        const cpfInput = document.getElementById('adjust-cpf');
-        if (cpfInput) {
-            BasePageController.applyMask(cpfInput, 'cpf');
+    getCpfFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id'); // mantém 'id' na URL para consistência, mas é o CPF
+    }
+
+    init() {
+        if (this.form && this.cpf) {
+            this.loadUsuario();
+            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            
+            // Máscara para telefone
+            const telInput = this.form.telefone;
+            if (telInput) {
+                telInput.addEventListener('input', (e) => {
+                    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    if (v.length <= 10) {
+                        v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                    } else {
+                        v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+                    }
+                    e.target.value = v.trim();
+                });
+            }
         }
-
-        const telefoneInput = document.getElementById('adjust-telefone');
-        if (telefoneInput) {
-            BasePageController.applyMask(telefoneInput, 'phone');
+        if (this.cancelBtn) {
+            this.cancelBtn.addEventListener('click', () => {
+                window.location.href = 'usuarios-consulta.html';
+            });
         }
     }
 
-    formatSearchValue(value) {
-        return value; 
+    async loadUsuario() {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${this.apiUrl}/${this.cpf}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Erro ao buscar usuário');
+            const json = await res.json();
+            const u = json.data;
+            this.form.nome.value = u.nome;
+            this.form.cpf.value = u.cpf;
+            this.form.email.value = u.email;
+            this.form.telefone.value = u.telefone || '';
+            this.form.funcao.value = u.funcao;
+            this.form.status.value = u.status;
+        } catch (e) {
+            alert('Erro ao carregar usuário: ' + e.message);
+            window.location.href = 'usuarios-consulta.html';
+        }
     }
 
-    async buscarItem() {
-        const emailInput = document.getElementById('search-email');
-        const email = emailInput.value.trim();
+    async handleSubmit(e) {
+        e.preventDefault();
+        if (this.isSubmitting) return;
+        this.isSubmitting = true;
 
-        if (!email || !email.includes('@')) {
-            BasePageController.showNotification('Digite um e-mail válido', 'error');
+        const nome = this.form.nome.value.trim();
+        const email = this.form.email.value.trim();
+        const telefone = this.form.telefone.value.trim();
+        const funcao = this.form.funcao.value;
+        const status = this.form.status.value;
+        const senha = this.form.senha.value;
+
+        if (!nome || !email || !funcao || !status) {
+            alert('Preencha todos os campos obrigatórios!');
+            this.isSubmitting = false;
             return;
         }
 
         try {
-            const searchBtn = document.getElementById('btn-search');
-            BasePageController.showLoading(searchBtn, true, '<i class="bx bx-search"></i> Buscar');
-            
             const token = localStorage.getItem('token');
-            const response = await fetch(`${this.baseURL}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const userData = {
+                nome,
+                email,
+                telefone,
+                funcao,
+                status
+            };
+
+            // Adiciona senha apenas se foi preenchida
+            if (senha) {
+                userData.senha = senha;
+            }
+
+            const res = await fetch(`${this.apiUrl}/${this.cpf}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(userData)
             });
-            if (!response.ok) throw new Error('Erro ao buscar usuários');
-            
-            const usuarios = await response.json();
-            const usuario = usuarios.find(u => u.email.toLowerCase() === email.toLowerCase());
 
-            if (!usuario) {
-                BasePageController.showNotification('Usuário não encontrado', 'error');
-                return;
+            const json = await res.json();
+            if (res.ok && json.success) {
+                alert('Usuário atualizado com sucesso!');
+                window.location.href = 'usuarios-consulta.html';
+            } else {
+                alert(json.message || 'Erro ao atualizar usuário');
             }
-
-            this.currentItem = usuario;
-            this.originalData = { ...usuario };
-            this.preencherFormulario(usuario);
-            this.mostrarSecaoEdicao();
-            BasePageController.showNotification('Usuário encontrado com sucesso!', 'success');
-
-        } catch (error) {
-            console.error('Erro ao buscar usuário:', error);
-            BasePageController.showNotification('Erro ao buscar usuário', 'error');
+        } catch (e) {
+            alert('Erro ao atualizar usuário: ' + e.message);
         } finally {
-            const searchBtn = document.getElementById('btn-search');
-            BasePageController.showLoading(searchBtn, false, '<i class="bx bx-search"></i> Buscar');
+            this.isSubmitting = false;
         }
-    }
-
-    preencherFormulario(usuario) {
-        
-        const currentDataDiv = document.getElementById('current-user-data');
-        currentDataDiv.innerHTML = `
-            <div class="current-info-grid">
-                <div class="info-row">
-                    <span class="label">Nome:</span>
-                    <span class="value">${usuario.nome}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">E-mail:</span>
-                    <span class="value">${usuario.email}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">CPF:</span>
-                    <span class="value">${BasePageController.formatCPF(usuario.cpf)}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Telefone:</span>
-                    <span class="value">${usuario.telefone || 'Não informado'}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Tipo:</span>
-                    <span class="badge badge-${usuario.tipo === 'admin' ? 'primary' : 'secondary'}">${usuario.tipo}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Status:</span>
-                    <span class="badge badge-${usuario.status === 'Ativo' ? 'success' : 'error'}">${usuario.status || 'Ativo'}</span>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('adjust-nome').value = usuario.nome || '';
-        document.getElementById('adjust-email').value = usuario.email || '';
-        document.getElementById('adjust-cpf').value = BasePageController.formatCPF(usuario.cpf) || '';
-        document.getElementById('adjust-telefone').value = usuario.telefone || '';
-        document.getElementById('adjust-tipo').value = usuario.tipo || 'funcionario';
-        document.getElementById('adjust-status').value = usuario.status || 'Ativo';
-    }
-
-    extrairDadosFormulario(formData) {
-        const dados = {
-            nome: formData.get('nome'),
-            email: formData.get('email'),
-            cpf: formData.get('cpf'),
-            telefone: formData.get('telefone'),
-            tipo: formData.get('tipo'),
-            status: formData.get('status')
-        };
-
-        const senha = formData.get('senha');
-        if (senha && senha.trim()) {
-            dados.senha = senha;
-        }
-
-        return dados;
-    }
-
-    verificarMudancas(dadosNovos) {
-        const camposParaComparar = ['nome', 'email', 'cpf', 'telefone', 'tipo', 'status'];
-        
-        for (const campo of camposParaComparar) {
-            const valorOriginal = this.originalData[campo] || '';
-            const valorNovo = dadosNovos[campo] || '';
-            
-            if (valorOriginal !== valorNovo) {
-                return true;
-            }
-        }
-
-        if (dadosNovos.senha) {
-            return true;
-        }
-
-        return false;
-    }
-
-    getItemDisplayName() {
-        return this.currentItem.nome;
     }
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    window.usuarioAjusteController = new UsuarioAjusteController();
+});
