@@ -74,17 +74,14 @@ Certifique-se de ter os seguintes itens instalados:
 
 ---
 
-### 🛠️ Instalação e Execução do Backend
+### Iniciar o projeto
 
 1. Acesse a pasta do backend:
-
 cd backend
 
 2. Instale as dependências:
-
 npm install
 
 3. Inicie o servidor:
-
 npm start
 
