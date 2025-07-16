@@ -91,7 +91,15 @@
 			</div>
 		</main>
 	</section>
+
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/BasePageController.js"></script>
+    <script src="../../src/components/MarcaController.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.marcaController = new MarcaController();
+        });
+    </script>
 </body>
 </html>

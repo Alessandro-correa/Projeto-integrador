@@ -121,16 +121,38 @@ class PecaController {
 
   async visualizarPeca(id) {
     try {
+      console.log(`[PecaController] Iniciando visualização da peça ID: ${id}`);
       const token = localStorage.getItem('token');
+      
+      console.log(`[PecaController] Fazendo requisição para: ${this.apiUrl}/${id}`);
       const res = await fetch(`${this.apiUrl}/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Erro ao buscar peça');
+
+      console.log(`[PecaController] Status da resposta: ${res.status}`);
+      if (!res.ok) {
+        console.error('[PecaController] Erro na resposta:', await res.text());
+        throw new Error('Erro ao buscar peça');
+      }
+
       const json = await res.json();
+      console.log('[PecaController] Dados recebidos:', json);
+
       const p = json.data;
+
       // Remove modal anterior se existir
       const modalExistente = document.getElementById('modal-visualizar-peca');
-      if (modalExistente) modalExistente.remove();
+      if (modalExistente) {
+        console.log('[PecaController] Removendo modal existente');
+        modalExistente.remove();
+      }
+
+      // Formatar o valor como moeda brasileira
+      const valorFormatado = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(parseFloat(p.valor) || 0);
+
       const modalHtml = `
         <div id="modal-visualizar-peca" class="modal-overlay">
           <div class="modal-content">
@@ -139,28 +161,38 @@ class PecaController {
               <button class="modal-close" id="close-modal-peca">&times;</button>
             </div>
             <div class="modal-body">
-              <div class="basic-info">
+              <div class="basic-info" style="background: white;">
+                <p><strong>Código:</strong> <span>PEC-${String(p.id).padStart(3, '0')}</span></p>
                 <p><strong>Nome:</strong> <span>${p.nome || 'N/A'}</span></p>
                 <p><strong>Descrição:</strong> <span>${p.descricao || 'N/A'}</span></p>
+                <p><strong>Valor:</strong> <span>${valorFormatado}</span></p>
                 <p><strong>Fornecedor:</strong> <span>${p.fornecedor || 'N/A'}</span></p>
-                <p><strong>Valor:</strong> <span>R$ ${(parseFloat(p.valor) || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</span></p>
-                <p><strong>Quantidade em Estoque:</strong> <span>${p.quantidade || 'N/A'}</span></p>
-                <p><strong>Categoria:</strong> <span>${p.categoria || 'N/A'}</span></p>
-                <p><strong>Marca:</strong> <span>${p.marca || 'N/A'}</span></p>
-                <p><strong>ID da Aquisição:</strong> <span>${p.aquisicaoId || 'N/A'}</span></p>
               </div>
             </div>
           </div>
         </div>
       `;
+
+      console.log('[PecaController] Inserindo novo modal no DOM');
       document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+      // Fechar ao clicar fora do modal ou no botão de fechar
       document.getElementById('modal-visualizar-peca').addEventListener('click', function(e) {
-        if (e.target === this) this.remove();
+        if (e.target === this) {
+          console.log('[PecaController] Fechando modal (clique fora)');
+          this.remove();
+        }
       });
+
       document.getElementById('close-modal-peca').onclick = function() {
+        console.log('[PecaController] Fechando modal (botão fechar)');
         document.getElementById('modal-visualizar-peca').remove();
       };
+
+      console.log('[PecaController] Modal criado e exibido com sucesso');
     } catch (e) {
+      console.error('[PecaController] Erro ao visualizar peça:', e);
+      console.error('[PecaController] Stack trace:', e.stack);
       this.showNotification('Erro ao visualizar peça: ' + e.message, 'error');
     }
   }

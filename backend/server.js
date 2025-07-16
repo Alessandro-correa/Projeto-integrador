@@ -2,12 +2,15 @@
  * SERVIDOR PRINCIPAL - OFICINA MOTOCICLETAS
  * Estrutura MVC organizada com separação clara entre backend e frontend
  */
-console.log('JWT_SECRET:', process.env.JWT_SECRET);
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+
+// Log para debug da configuração
+console.log('JWT_SECRET configurado:', process.env.JWT_SECRET ? 'Sim' : 'Não');
+
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 
@@ -56,18 +59,33 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Middleware global de autenticação JWT para rotas /api (exceto login)
 app.use('/api', (req, res, next) => {
-    if (req.path === '/usuarios/login') return next(); // Login é público
+    console.log(`[AUTH] Rota acessada: ${req.method} ${req.path}`);
+    
+    if (req.path === '/usuarios/login') {
+        console.log('[AUTH] Rota de login - pulando autenticação');
+        return next();
+    }
+
     const authHeader = req.headers.authorization;
+    console.log('[AUTH] Header de autorização:', authHeader ? 'Presente' : 'Ausente');
+
     if (!authHeader) {
+        console.log('[AUTH] Token não fornecido');
         return res.status(401).json({ message: 'Token não fornecido' });
     }
+
     const token = authHeader.split(' ')[1];
+    console.log('[AUTH] Token extraído:', token ? 'Presente' : 'Ausente');
+
     try {
+        console.log('[AUTH] Tentando verificar token com JWT_SECRET:', process.env.JWT_SECRET ? 'Configurado' : 'Não configurado');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('[AUTH] Token decodificado:', decoded);
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({ message: 'Token inválido' });
+        console.error('[AUTH] Erro ao verificar token:', err.message);
+        return res.status(401).json({ message: 'Token inválido', error: err.message });
     }
 });
 

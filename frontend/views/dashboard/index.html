@@ -6,6 +6,7 @@
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
 	<link rel="stylesheet" href="../../assets/css/dashboard.css">
+	<script src="../../src/services/ApiService.js"></script>
 	<title>Sistema Campos Moto Peças - Dashboard</title>
 </head>
 <body>
@@ -217,6 +218,21 @@
 				this.charts = {};
 				this.isLoading = false;
 				console.log('DashboardController: Inicializando...');
+				
+				// Verificar autenticação
+				const token = localStorage.getItem('token');
+				const userType = localStorage.getItem('userType');
+				console.log('Estado da autenticação:', { 
+					token: token ? 'Presente' : 'Ausente',
+					userType
+				});
+				
+				if (!token) {
+					console.error('Token não encontrado, redirecionando para login...');
+					window.location.href = '../../views/login/login.html';
+					return;
+				}
+				
 				this.bindEvents();
 				this.handleOrientationChange();
 				
@@ -250,7 +266,13 @@
 					
 				} catch (error) {
 					console.error('Erro ao carregar dashboard:', error);
-					this.showError('Erro ao carregar dados do dashboard: ' + error.message);
+					this.showError('Erro ao carregar dados do dashboard');
+					
+					// Se o erro for de autenticação, redirecionar para login
+					if (error.message.includes('401')) {
+						console.log('Erro de autenticação, redirecionando...');
+						window.location.href = '../../views/login/login.html';
+					}
 				} finally {
 					this.isLoading = false;
 					this.hideLoading();
@@ -260,19 +282,12 @@
 			async loadStats() {
 				try {
 					console.log('DashboardController: Carregando estatísticas...');
-					const response = await fetch(`${this.API_BASE_URL}/dashboard/stats`);
+					const data = await window.apiService.getDashboardStats();
 					
-					if (!response.ok) {
-						throw new Error(`Erro HTTP: ${response.status}`);
-					}
-					
-					const data = await response.json();
-					console.log('DashboardController: Dados de estatísticas recebidos:', data);
-
 					if (data.success) {
 						this.updateStatsCards(data.data);
 					} else {
-						throw new Error(data.message);
+						throw new Error(data.message || 'Erro ao carregar estatísticas');
 					}
 				} catch (error) {
 					console.error('DashboardController: Erro ao carregar estatísticas:', error);
@@ -336,15 +351,8 @@
 			async loadCharts() {
 				try {
 					console.log('DashboardController: Carregando gráficos...');
-					const response = await fetch(`${this.API_BASE_URL}/dashboard/charts`);
+					const data = await window.apiService.getDashboardCharts();
 					
-					if (!response.ok) {
-						throw new Error(`Erro HTTP: ${response.status}`);
-					}
-					
-					const data = await response.json();
-					console.log('DashboardController: Dados de gráficos recebidos:', data);
-
 					if (data.success) {
 						const chartsData = data.data;
 						
@@ -356,7 +364,7 @@
 						
 						console.log('DashboardController: Gráficos criados com sucesso');
 					} else {
-						throw new Error(data.message);
+						throw new Error(data.message || 'Erro ao carregar gráficos');
 					}
 				} catch (error) {
 					console.error('DashboardController: Erro ao carregar gráficos:', error);

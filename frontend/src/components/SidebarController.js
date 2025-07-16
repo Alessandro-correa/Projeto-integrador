@@ -18,6 +18,7 @@ class SidebarController {
         this.handleResize();
         this.setupEventListeners();
         this.restrictMenuByRole();
+        this.hideMenuItemsByPage(); // Add this line
     }
 
     createOverlay() {
@@ -193,16 +194,26 @@ class SidebarController {
             return;
         }
         if (userType === 'mecânico') {
-            // Mecânico só vê páginas de Ordem de Serviço e Orçamentos
+            // Mecânico só vê páginas principais de Ordem de Serviço e Orçamentos
+            const allowedPages = [
+                'os-consulta.html',
+                'os-cadastro.html',
+                'os-ajustar.html',
+                'os-efetivar.html',
+                'os-validar.html',
+                'orcamentos-consulta.html',
+                'orcamentos-cadastro.html',
+                'orcamentos-ajustar.html'
+            ];
             const allLinks = Array.from(document.querySelectorAll('#sidebar .side-menu li'));
-            console.log('[SidebarController] Links encontrados:', allLinks.map(li => li.innerText || li.textContent));
             allLinks.forEach(li => {
                 const link = li.querySelector('a');
                 if (link) {
                     const href = link.getAttribute('href') || '';
-                    const isAllowed = href.includes('os/') || href.includes('orcamentos/');
+                    const fileName = href.split('/').pop();
+                    const isAllowed = allowedPages.includes(fileName);
+                    console.log('[SidebarController] href analisado:', href, 'fileName:', fileName, 'isAllowed:', isAllowed);
                     if (!isAllowed) {
-                        console.log('[SidebarController] Removendo link para mecânico:', href, li.innerText || li.textContent);
                         li.remove();
                     }
                 } else if (!li.classList.contains('divider')) {
@@ -221,22 +232,57 @@ class SidebarController {
                     next = next.nextElementSibling;
                 }
                 if (!hasLink) {
-                    console.log('[SidebarController] Removendo divider órfão:', divider.textContent);
                     divider.remove();
                 }
             });
             return;
         }
-        // Para todos os outros perfis, remove Dashboard e Usuários
-        const dashboardLink = document.querySelector('#sidebar .side-menu a[href*="dashboard"]');
-        if (dashboardLink && dashboardLink.parentElement) {
-            console.log('[SidebarController] Removendo Dashboard para perfil não admin:', dashboardLink.innerText || dashboardLink.textContent);
-            dashboardLink.parentElement.remove();
+        if (userType === 'secretária') {
+            // Secretária não pode ver Dashboard nem Usuários
+            const dashboardLink = document.querySelector('#sidebar .side-menu a[href*="dashboard"]');
+            if (dashboardLink && dashboardLink.parentElement) {
+                dashboardLink.parentElement.remove();
+            }
+            const usuariosLink = document.querySelector('#sidebar .side-menu a[href*="usuarios"]');
+            if (usuariosLink && usuariosLink.parentElement) {
+                usuariosLink.parentElement.remove();
+            }
+            return;
         }
-        const usuariosLink = document.querySelector('#sidebar .side-menu a[href*="usuarios"]');
-        if (usuariosLink && usuariosLink.parentElement) {
-            console.log('[SidebarController] Removendo Usuários para perfil não admin:', usuariosLink.innerText || usuariosLink.textContent);
-            usuariosLink.parentElement.remove();
+    }
+
+    hideMenuItemsByPage() {
+        const currentPath = window.location.pathname.toLowerCase();
+        
+        // Check if we're on motorcycle registration or editing pages
+        if (currentPath.includes('motos-cadastro.html') || currentPath.includes('motos-ajustar.html')) {
+            // Hide dashboard link
+            const dashboardLink = document.querySelector('#sidebar .side-menu a[href*="dashboard"]');
+            if (dashboardLink && dashboardLink.parentElement) {
+                dashboardLink.parentElement.remove();
+            }
+            
+            // Hide users link
+            const usuariosLink = document.querySelector('#sidebar .side-menu a[href*="usuarios"]');
+            if (usuariosLink && usuariosLink.parentElement) {
+                usuariosLink.parentElement.remove();
+            }
+
+            // Remove empty dividers
+            document.querySelectorAll('#sidebar .side-menu .divider').forEach(divider => {
+                let next = divider.nextElementSibling;
+                let hasLink = false;
+                while (next && !next.classList.contains('divider')) {
+                    if (next.querySelector('a')) {
+                        hasLink = true;
+                        break;
+                    }
+                    next = next.nextElementSibling;
+                }
+                if (!hasLink) {
+                    divider.remove();
+                }
+            });
         }
     }
 }

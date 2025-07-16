@@ -342,43 +342,16 @@ class ClienteCadastroController extends BasePageController {
         }
     }
 
-    validateCPF(cpf) {
+    async validateCPF(cpf) {
         if (!cpf) return false;
         
-        // Remove formatação e espaços
-        const cleanCPF = cpf.replace(/\D/g, '');
-        
-        // Verifica se tem exatamente 11 dígitos
-        if (cleanCPF.length !== 11) return false;
-        
-        // Verifica se não são todos os dígitos iguais (ex: 111.111.111-11)
-        if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
-        
-        // Lista de CPFs inválidos conhecidos
-        const invalidCPFs = [
-            '00000000000', '11111111111', '22222222222', '33333333333',
-            '44444444444', '55555555555', '66666666666', '77777777777',
-            '88888888888', '99999999999'
-        ];
-        
-        if (invalidCPFs.includes(cleanCPF)) return false;
-        
-        // Validação do algoritmo dos dígitos verificadores
-        let sum = 0;
-        for (let i = 0; i < 9; i++) {
-            sum += parseInt(cleanCPF.charAt(i)) * (10 - i);
+        try {
+            return await ApiService.validateCPF(cpf);
+        } catch (error) {
+            console.error('Erro na validação do CPF:', error);
+            this.showNotification(error.message, 'error', 'Erro na Validação!', 8000);
+            return false;
         }
-        let digit1 = 11 - (sum % 11);
-        if (digit1 > 9) digit1 = 0;
-        
-        sum = 0;
-        for (let i = 0; i < 10; i++) {
-            sum += parseInt(cleanCPF.charAt(i)) * (11 - i);
-        }
-        let digit2 = 11 - (sum % 11);
-        if (digit2 > 9) digit2 = 0;
-        
-        return (parseInt(cleanCPF.charAt(9)) === digit1 && parseInt(cleanCPF.charAt(10)) === digit2);
     }
 
     validateEmail(email) {

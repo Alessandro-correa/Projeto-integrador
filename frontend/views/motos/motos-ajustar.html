@@ -144,15 +144,17 @@
     </section>
 
     <!-- Scripts -->
-    <script src="../../src/components/SidebarController.js"></script>
-    <script src="../../src/components/ThemeController.js"></script>
-    <script src="../../src/components/BasePageController.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/services/ApiService.js"></script>
     <script src="../../src/components/MotocicletaAjusteController.js"></script>
     <script>
-        if (!window.motocicletaAjusteController) {
-            window.motocicletaAjusteController = new MotocicletaAjusteController();
-            console.log('[MotocicletaAjusteController] Instanciado via window!');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.motocicletaAjusteController) {
+                window.motocicletaAjusteController = new MotocicletaAjusteController();
+                console.log('[MotocicletaAjusteController] Instanciado via window!');
+            }
+        });
     </script>
 </body>
 </html>

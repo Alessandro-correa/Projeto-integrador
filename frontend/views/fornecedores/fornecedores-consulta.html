@@ -6,6 +6,8 @@
   <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="stylesheet" href="../../assets/css/consulta.css">
+  <link rel="stylesheet" href="../../assets/css/modal.css">
+  <link rel="stylesheet" href="../../assets/css/ajuste.css">
   <title>Sistema Campos Moto Peças - Fornecedores</title>
 </head>
 <body>
@@ -61,15 +63,24 @@
         <div class="content-data">
           <div class="head">
             <h3>Lista de Fornecedores</h3>
-            <a href="fornecedores-cadastro.html" class="btn-primary">Novo Fornecedor</a>
+            <a href="fornecedores-cadastro.html" class="btn-primary">Novo Fornecedor <i class='bx bx-plus'></i></a>
           </div>
           <div class="orders">
             <table id="fornecedores-table">
               <thead>
                 <tr>
-                  <th class="sortable">Nome <span class="sort-icon"></span></th>
-                  <th class="sortable">CNPJ <span class="sort-icon"></span></th>
-                  <th class="sortable">Email <span class="sort-icon"></span></th>
+                  <th class="sortable">
+                    Nome
+                    <i class='bx bx-sort-alt-2 sort-icon'></i>
+                  </th>
+                  <th class="sortable">
+                    CNPJ
+                    <i class='bx bx-sort-alt-2 sort-icon'></i>
+                  </th>
+                  <th class="sortable">
+                    Email
+                    <i class='bx bx-sort-alt-2 sort-icon'></i>
+                  </th>
                   <th>Telefone</th>
                   <th>Endereço</th>
                   <th>Ações</th>
@@ -84,6 +95,19 @@
       </div>
     </main>
   </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script type="module" src="../../assets/js/main.js"></script>
+  <script src="../../src/components/BasePageController.js"></script>
   <script src="../../src/components/FornecedorController.js"></script>
+  <script src="../../src/components/SidebarController.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!window.sidebarController) {
+        window.sidebarController = new SidebarController();
+        console.log('[SidebarController] Instanciado manualmente em fornecedores-consulta.html');
+      }
+    });
+  </script>
 </body>
 </html>

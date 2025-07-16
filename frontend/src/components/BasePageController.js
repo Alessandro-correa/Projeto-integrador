@@ -22,7 +22,6 @@ class BasePageController {
         
         switch(currentPage.module) {
             case 'clientes':
-                this.subControllers.cliente = new ClienteController();
                 if (currentPage.action === 'ajustar') {
                     this.subControllers.clienteAjuste = new ClienteAjusteController();
                 }

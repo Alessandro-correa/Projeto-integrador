@@ -275,12 +275,194 @@
         padding: 15px;
         margin-bottom: 15px;
     }
-    
+
     .btn-sm {
-        padding: 4px 8px;
-        font-size: 12px;
-        min-width: 70px;
+        padding: 8px 12px;
+        font-size: 14px;
+        width: 100%;
+        margin-bottom: 8px;
     }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .pecas-container {
+        margin: 0 -15px;
+        padding: 0 15px;
+        overflow-x: hidden;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .peca-row,
+    .pecas-container .row {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .btn-sm {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .form-control {
+        font-size: 15px;
+        padding: 8px;
+    }
+
+    .form-label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .pecas-container {
+        margin: 0 -12px;
+        padding: 0 12px;
+    }
+
+    .row {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+
+    .col {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+    .peca-row:hover,
+    .pecas-container .row:hover {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-color: #e0e6ed;
+    }
+
+    .btn:hover {
+        transform: none !important;
+    }
+
+    .btn-sm,
+    .form-control {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* Improved form controls for mobile */
+@media (max-width: 768px) {
+    .form-control {
+        -webkit-appearance: none;
+        border-radius: 8px;
+    }
+
+    select.form-control {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 16px;
+        padding-right: 32px;
+    }
+
+    input[type="date"].form-control {
+        min-height: 40px;
+    }
+
+    .btn {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Improved spacing and layout for small screens */
+@media (max-width: 480px) {
+    .peca-row,
+    .pecas-container .row {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .btn-sm {
+        padding: 6px;
+        font-size: 12px;
+        min-height: 36px;
+    }
+
+    .form-control {
+        font-size: 14px;
+        padding: 6px;
+    }
+
+    .form-label {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .pecas-container {
+        margin: 0 -10px;
+        padding: 0 10px;
+    }
+
+    .row {
+        margin-left: -6px;
+        margin-right: -6px;
+    }
+
+    .col {
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    .btn-group {
+        gap: 6px;
+    }
+}
+
+/* Prevent zoom on input focus for iOS */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    select,
+    textarea,
+    input {
+        font-size: 16px !important;
+    }
+}
+
+/* Improved button feedback on touch devices */
+.btn:active {
+    transform: scale(0.98) !important;
+}
+
+/* Prevent text selection on buttons */
+.btn {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 body.dark .peca-row,

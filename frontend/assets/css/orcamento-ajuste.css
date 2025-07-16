@@ -262,25 +262,244 @@
     box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
 }
 
-@media (max-width: 1024px) {
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
     .item-fields {
-        grid-template-columns: 1fr 2fr 80px 1fr;
+        grid-template-columns: 100px 1.5fr 80px 120px 100px;
         gap: 15px;
+    }
+
+    .field-group label {
+        font-size: 12px;
+    }
+
+    .field-group .form-control {
+        font-size: 13px;
+        padding: 6px 10px;
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 992px) {
     .item-fields {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 15px;
     }
-    
-    .item-buttons, .item-actions {
-        justify-content: center;
-        flex-wrap: wrap;
+
+    .field-group {
+        margin-bottom: 10px;
     }
-    
+
     .item-row {
         padding: 15px;
     }
+
+    .form-section {
+        padding: 15px;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .item-buttons, .item-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .item-fields {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .item-row {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .field-group .form-control {
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    .field-group label {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .item-buttons, .item-actions {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .btn-sm {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-actions button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    /* Improved touch targets */
+    select, input[type="date"], input[type="number"] {
+        min-height: 44px;
+        font-size: 16px !important;
+    }
+
+    /* Prevent iOS zoom */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .item-row {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+
+    .field-group label {
+        font-size: 13px;
+    }
+
+    .field-group .form-control {
+        padding: 8px;
+    }
+
+    .item-buttons, .item-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-sm {
+        width: 100%;
+        margin: 0;
+    }
+
+    .page-title h2 {
+        font-size: 1.2rem;
+    }
+
+    .form-section h3 {
+        font-size: 1rem;
+    }
+
+    .breadcrumbs {
+        font-size: 12px;
+    }
+
+    /* Stack buttons vertically on very small screens */
+    .item-buttons .btn,
+    .item-actions .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .item-row {
+        background-color: var(--dark-surface, #2d2d2d);
+        border-color: var(--dark-border, #444);
+    }
+
+    .field-group label {
+        color: var(--dark-text-primary, #e0e0e0);
+    }
+
+    .field-group .form-control {
+        background-color: var(--dark-bg, #1a1a1a);
+        border-color: var(--dark-border, #444);
+        color: var(--dark-text-primary, #e0e0e0);
+    }
+
+    .field-group .form-control[readonly] {
+        background-color: var(--dark-bg-lighter, #2d2d2d);
+        color: var(--dark-text-secondary, #aaa);
+    }
+
+    .field-group .form-control.bg-light {
+        background-color: rgba(0, 149, 105, 0.1) !important;
+        color: #34d399 !important;
+        border-color: rgba(0, 149, 105, 0.2);
+    }
+
+    .no-items {
+        background-color: var(--dark-surface, #2d2d2d);
+        color: var(--dark-text-secondary, #aaa);
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+    .item-row:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn:hover {
+        transform: none !important;
+    }
+
+    .btn:active {
+        transform: scale(0.98) !important;
+    }
+
+    /* Improved scroll handling */
+    .form-container {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Larger touch targets */
+    .btn, 
+    .form-control,
+    select,
+    input[type="date"],
+    input[type="number"] {
+        min-height: 44px;
+    }
+}
+
+/* Prevent content shift when scrollbar appears */
+html {
+    scrollbar-gutter: stable;
+}
+
+/* Improved scrollbar styling */
+.form-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--dark-grey) transparent;
+}
+
+.form-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+    background-color: var(--dark-grey);
+    border-radius: 3px;
 }

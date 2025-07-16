@@ -132,18 +132,16 @@ class FormController {
             
             if (entity === 'motocicletas') {
                 let cpf = formData['clienteCpf'];
-                const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-                if (!cpfRegex.test(cpf)) {
-                    this.showError('CPF inválido. Use o formato XXX.XXX.XXX-XX');
+                if (!(await ApiService.validateCPF(cpf))) {
+                    this.showError('CPF inválido. Verifique o número informado.');
                     return;
                 }
             }
 
             if (entity === 'clientes') {
                 let cpf = formData['cpf'];
-                const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-                if (!cpfRegex.test(cpf)) {
-                    this.showError('CPF inválido. Use o formato XXX.XXX.XXX-XX');
+                if (!(await ApiService.validateCPF(cpf))) {
+                    this.showError('CPF inválido. Verifique o número informado.');
                     return;
                 }
             }
@@ -165,11 +163,9 @@ class FormController {
             }
 
             if (entity === 'usuarios') {
-                
                 let cpf = formData['cpf'];
-                const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-                if (!cpfRegex.test(cpf)) {
-                    this.showError('CPF inválido. Use o formato XXX.XXX.XXX-XX');
+                if (!(await ApiService.validateCPF(cpf))) {
+                    this.showError('CPF inválido. Verifique o número informado.');
                     return;
                 }
                 
@@ -209,7 +205,7 @@ class FormController {
             }
             
         } catch (error) {
-            console.error('Erro ao processar formulário:', error);
+            console.error('Erro ao enviar formulário:', error);
             this.showError('Erro ao processar formulário: ' + error.message);
         }
     }

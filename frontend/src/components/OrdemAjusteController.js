@@ -226,7 +226,7 @@ class OrdemAjusteController {
 
     async loadOrdemFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        const osId = urlParams.get('id') || urlParams.get('cod');
+        const osId = urlParams.get('cod') || urlParams.get('id');
         
         if (!osId) {
             this.showNotification(

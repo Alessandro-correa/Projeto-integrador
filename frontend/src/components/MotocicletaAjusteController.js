@@ -6,9 +6,8 @@
 
 console.log('[MotocicletaAjusteController.js] Script carregado!');
 
-class MotocicletaAjusteController extends BasePageController {
+class MotocicletaAjusteController {
     constructor() {
-        super();
         this.baseURL = 'http://localhost:3000/api';
         this.apiUrl = `${this.baseURL}/motocicletas`;
         this.clientesApiUrl = `${this.baseURL}/clientes`;

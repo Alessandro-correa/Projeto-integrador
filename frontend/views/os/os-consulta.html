@@ -2,11 +2,12 @@
 <html lang="pt-BR">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
 	<link rel="stylesheet" href="../../assets/css/template.css">
 	<link rel="stylesheet" href="../../assets/css/consulta.css">
+	<link rel="stylesheet" href="../../assets/css/mobile-cards.css">
 	<link rel="stylesheet" href="../../assets/css/os-ajuste.css">
 	<style>
 		.modal-overlay {
@@ -40,6 +41,7 @@
 		.modal-header h3 {
 			margin: 0;
 			color: #333;
+			padding-right: 30px;
 		}
 		.modal-close {
 			position: absolute;
@@ -50,6 +52,12 @@
 			font-size: 24px;
 			cursor: pointer;
 			color: #666;
+			padding: 8px;
+			min-width: 44px;
+			min-height: 44px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 		.modal-close:hover {
 			color: #333;
@@ -59,6 +67,137 @@
 			margin-top: 20px;
 			padding-top: 15px;
 			text-align: right;
+		}
+
+		/* Responsive table styles */
+		@media screen and (max-width: 768px) {
+			.orders {
+				margin: 0 -15px;
+			}
+
+			.table-wrapper {
+				overflow-x: auto;
+				-webkit-overflow-scrolling: touch;
+				margin: 0 15px;
+				position: relative;
+			}
+
+			table {
+				min-width: 600px;
+			}
+
+			.filter-container {
+				flex-direction: column;
+				gap: 15px;
+				padding: 15px;
+			}
+
+			.filter-group {
+				width: 100%;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.filter-group input,
+			.filter-group select,
+			.filter-group button {
+				width: 100%;
+				min-height: 40px;
+			}
+
+			.head {
+				flex-direction: column;
+				gap: 15px;
+				padding: 15px;
+			}
+
+			.head .btn-primary {
+				width: 100%;
+				justify-content: center;
+			}
+
+			/* Card view for mobile */
+			.mobile-card {
+				display: none;
+				background: var(--light);
+				border-radius: 8px;
+				padding: 15px;
+				margin: 10px 15px;
+				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			}
+
+			.mobile-card-row {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 8px;
+				align-items: center;
+			}
+
+			.mobile-card-label {
+				font-weight: 600;
+				color: var(--dark-grey);
+				font-size: 0.9rem;
+			}
+
+			.mobile-card-value {
+				color: var(--dark);
+				font-size: 0.9rem;
+			}
+
+			.mobile-card-actions {
+				display: flex;
+				gap: 10px;
+				margin-top: 15px;
+				justify-content: flex-end;
+			}
+
+			.mobile-card-actions .action-icon {
+				min-width: 44px;
+				min-height: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+		}
+
+		@media screen and (max-width: 576px) {
+			.orders table {
+				display: none;
+			}
+
+			.mobile-card {
+				display: block;
+			}
+
+			.filter-container {
+				padding: 10px;
+			}
+
+			.head {
+				padding: 10px;
+			}
+
+			.mobile-card-actions {
+				flex-wrap: wrap;
+			}
+
+			.mobile-card-actions .action-icon {
+				flex: 1;
+			}
+		}
+
+		/* Dark mode adjustments */
+		body.dark .mobile-card {
+			background: var(--dark-surface);
+			border: 1px solid var(--dark-border);
+		}
+
+		body.dark .mobile-card-label {
+			color: var(--dark-text-secondary);
+		}
+
+		body.dark .mobile-card-value {
+			color: var(--dark-text-primary);
 		}
 	</style>
 	<title>Sistema Campos Moto Peças - Consulta O.S.</title>
@@ -134,55 +273,71 @@
 						<a href="os-cadastro.html" class="btn-primary">Nova O.S.</a>
 					</div>
 					<div class="orders">
-						<table id="ordens-table">
-							<thead>
-								<tr>
-									<th class="sortable" data-column="cod">
-										Código
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="titulo">
-										Título
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="cliente_nome">
-										Cliente
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="motocicleta_placa">
-										Placa
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th class="sortable" data-column="data" data-default-sort="desc">
-										Data
-										<i class='bx bx-sort-down sort-icon active'></i>
-									</th>
-									<th class="sortable" data-column="status">
-										Status
-										<i class='bx bx-sort-alt-2 sort-icon'></i>
-									</th>
-									<th>Ações</th>
-								</tr>
-							</thead>
-							<tbody>
-								<!-- Dados carregados dinamicamente -->
-							</tbody>
-						</table>
+						<div class="table-wrapper">
+							<table id="ordens-table">
+								<thead>
+									<tr>
+										<th class="sortable" data-column="cod">
+											Código
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="titulo">
+											Título
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="cliente_nome">
+											Cliente
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="motocicleta_placa">
+											Placa
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th class="sortable" data-column="data" data-default-sort="desc">
+											Data
+											<i class='bx bx-sort-down sort-icon active'></i>
+										</th>
+										<th class="sortable" data-column="status">
+											Status
+											<i class='bx bx-sort-alt-2 sort-icon'></i>
+										</th>
+										<th>Ações</th>
+									</tr>
+								</thead>
+								<tbody>
+									<!-- Dados carregados dinamicamente -->
+								</tbody>
+							</table>
+						</div>
+						<!-- Template for mobile cards -->
+						<div id="mobile-cards">
+							<!-- Cards will be dynamically generated here -->
+						</div>
 					</div>
 				</div>
 			</div>
 		</main>
 	</section>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-	<script src="../../src/components/BasePageController.js"></script>
-	<script src="../../src/components/SidebarController.js"></script>
-	<script src="../../src/components/ThemeController.js"></script>
-	<script src="../../src/components/OrdemController.js"></script>
-	<script>
-		// Inicializar controllers
-		if (!window.ordemController) {
-			window.ordemController = new OrdemController();
-		}
-	</script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="../../src/services/ApiService.js"></script>
+    <script src="../../src/components/BasePageController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
+    <script src="../../src/components/ThemeController.js"></script>
+    <script src="../../src/components/OrdemController.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize SidebarController
+            if (!window.sidebarController) {
+                window.sidebarController = new SidebarController();
+                console.log('[SidebarController] Instanciado manualmente em os-consulta.html');
+            }
+            
+            // Initialize OrdemController
+            if (!window.ordemController) {
+                window.ordemController = new OrdemController();
+            }
+        });
+    </script>
 </body>
 </html>

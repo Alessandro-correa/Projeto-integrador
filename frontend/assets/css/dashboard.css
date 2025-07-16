@@ -455,124 +455,127 @@ body.dark ::-webkit-scrollbar-thumb:hover {
 @media (max-width: 768px) {
     .charts-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .chart-card.full-width {
-        grid-column: 1;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 15px;
     }
-    
-    .stat-card {
-        padding: 20px;
+
+    .chart-card.full-width {
+        max-width: 100%;
     }
-    
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
     .stat-content h2 {
         font-size: 2rem;
     }
-    
+
     .stat-icon {
         width: 50px;
         height: 50px;
         font-size: 20px;
     }
-    
+
     .dashboard-controls {
         flex-direction: column;
         align-items: stretch;
         padding: 15px;
     }
-    
+
     .dashboard-controls .btn {
         width: 100%;
-        min-width: auto;
     }
-    
+
     .chart-container {
-        padding: 15px 20px 20px;
+        padding: 10px;
         min-height: 300px;
     }
-    
+
     .chart {
-        height: 300px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
-    
+
     .chart-header {
-        padding: 15px 20px;
+        padding: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
-    
+
     .chart-header h3 {
         font-size: 16px;
+        width: 100%;
     }
 }
 
 @media (max-width: 576px) {
     .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+        padding: 0 10px;
     }
-    
+
     .stat-card {
-        padding: 15px;
+        margin-bottom: 10px;
     }
-    
+
     .stat-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
-    
-    .stat-content h2 {
-        font-size: 1.8rem;
-    }
-    
-    .chart-container {
-        padding: 10px 15px 15px;
-        min-height: 280px;
-    }
-    
-    .chart {
-        height: 280px;
-    }
-    
-    .chart-header {
-        padding: 12px 15px;
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
+
+    .stat-content h2 {
+        font-size: 1.8rem;
+    }
+
+    .stat-icon {
+        margin-left: auto;
+    }
+
+    .chart-container {
+        padding: 5px;
+        min-height: 250px;
+    }
+
+    .chart {
+        min-height: 200px;
+    }
+
+    .chart-header {
+        padding: 10px;
+    }
+
     .chart-actions {
-        align-self: flex-end;
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 
 @media (max-width: 480px) {
     .stat-header {
-        text-align: center;
-        align-items: center;
+        gap: 8px;
     }
-    
+
     .stat-content h2 {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
     }
-    
+
     .stat-icon {
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         font-size: 18px;
     }
-    
+
     .chart-container {
-        min-height: 250px;
+        min-height: 200px;
     }
-    
+
     .chart {
-        height: 250px;
+        min-height: 180px;
     }
 }
 
@@ -697,27 +700,38 @@ html {
     letter-spacing: 0.025em;
 }
 
+/* Touch device optimizations */
 @media (hover: none) {
     .stat-card:hover,
     .chart-card:hover {
         transform: none;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
-    
-    body.dark .stat-card:hover,
-    body.dark .chart-card:hover {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+    .btn-refresh:hover {
+        background: rgba(252, 59, 86, 0.1);
+        color: var(--blue);
+    }
+
+    .dashboard-controls .btn-primary:hover {
+        transform: none;
     }
 }
 
-.stat-icon,
-.chart-actions,
-.btn,
-.btn-refresh {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+/* Improved sidebar interaction on mobile */
+@media (max-width: 992px) {
+    .stat-icon,
+    .btn-refresh,
+    .dashboard-controls .btn {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .dashboard-controls,
+    .stats-grid,
+    .charts-grid {
+        margin: 0 10px 20px;
+    }
 }
 
 @supports (padding: max(0px)) {

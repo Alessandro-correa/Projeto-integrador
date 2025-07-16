@@ -5,26 +5,32 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
+	<link rel="stylesheet" href="../../assets/css/dashboard.css">
+	<link rel="stylesheet" href="../../assets/css/template.css">
 	<link rel="stylesheet" href="../../assets/css/forms.css">
-	<title>Sistema Campos Moto Peças - Ajuste de Fornecedor</title>
+	<link rel="stylesheet" href="../../assets/css/ajuste.css">
+	<title>Sistema Campos Moto Peças - Ajustar Fornecedor</title>
 </head>
 <body>
+	<!-- Sidebar -->
 	<section id="sidebar">
 		<a href="../../views/dashboard/index.html" class="brand"><img src="../../assets/images/logo.png" alt="Campos Moto Peças"></a>
 		<ul class="side-menu">
-			<li><a href="../../views/dashboard/index.html"><i class='bx bxs-dashboard icon'></i> Dashboard</a></li>
+			<li><a href="../dashboard/index.html"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
 			<li class="divider" data-text="principal">Principal</li>
-			<li><a href="../../views/os/os-consulta.html"><i class='bx bxs-notepad icon'></i> Ordem de Serviço</a></li>
-			<li><a href="../../views/orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon'></i> Orçamentos</a></li>
+			<li><a href="../os/os-consulta.html"><i class='bx bxs-notepad icon' ></i> Ordem de Serviço</a></li>
+			<li><a href="../orcamentos/orcamentos-consulta.html"><i class='bx bxs-calculator icon' ></i> Orçamentos</a></li>
 			<li class="divider" data-text="gestão">Gestão</li>
-			<li><a href="../../views/clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon'></i> Clientes</a></li>
-			<li><a href="../../views/motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
-			<li><a href="../../views/marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
+			<li><a href="../clientes/clientes-consulta.html"><i class='bx bxs-user-detail icon' ></i> Clientes</a></li>
+			<li><a href="../motos/motos-consulta.html"><i class='bx bx-car icon'></i> Motocicletas</a></li>
+			<li><a href="../marcas/marcas-consulta.html"><i class='bx bxs-tag-alt icon'></i> Marcas</a></li>
 			<li><a href="fornecedores-consulta.html" class="active"><i class='bx bxs-truck icon'></i> Fornecedores</a></li>
-			<li><a href="../../views/pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
-			<li><a href="../../views/usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
+			<li><a href="../pecas/pecas-consulta.html"><i class='bx bxs-wrench icon'></i> Peças</a></li>
+			<li><a href="../usuarios/usuarios-consulta.html"><i class='bx bxs-shield-alt-2 icon'></i> Usuários</a></li>
 		</ul>
 	</section>
+
+	<!-- Main Content -->
 	<section id="content">
 		<nav>
 			<i class='bx bx-menu toggle-sidebar'></i>
@@ -96,6 +102,11 @@
 			</div>
 		</main>
 	</section>
+
+	<!-- Scripts -->
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script type="module" src="../../assets/js/main.js"></script>
+	<script src="../../src/components/BasePageController.js"></script>
 	<script src="../../src/components/FornecedorAjusteController.js"></script>
 </body>
 </html>

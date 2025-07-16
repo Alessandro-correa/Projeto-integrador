@@ -321,3 +321,299 @@ body.dark .sortable.sorted-asc .sort-icon::after,
 body.dark .sortable.sorted-desc .sort-icon::after {
     content: '' !important;
 }
+
+/* Mobile-first responsive design */
+@media screen and (max-width: 992px) {
+    .filter-container {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .filter-group {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filter-group input,
+    .filter-group select,
+    .filter-group button {
+        width: 100%;
+        min-height: 44px;
+        font-size: 16px;
+        padding: 10px 12px;
+    }
+
+    .content-data {
+        padding: 15px;
+    }
+
+    .head {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .head h3 {
+        font-size: 1.2rem;
+    }
+
+    .head .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .table-wrapper {
+        margin: 0 -15px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 600px;
+        margin: 0 15px;
+    }
+
+    th, td {
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    [class*="status-"] {
+        font-size: 12px;
+        padding: 6px 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .actions {
+        gap: 8px;
+    }
+
+    .action-btn, .action-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .filter-container {
+        padding: 12px;
+    }
+
+    .filter-group {
+        gap: 8px;
+    }
+
+    .filter-group input,
+    .filter-group select,
+    .filter-group button {
+        font-size: 15px;
+        padding: 8px 10px;
+    }
+
+    .content-data {
+        padding: 12px;
+    }
+
+    .head {
+        gap: 12px;
+    }
+
+    .head h3 {
+        font-size: 1.1rem;
+    }
+
+    table {
+        margin: 0 12px;
+    }
+
+    th, td {
+        padding: 10px 6px;
+        font-size: 13px;
+    }
+
+    [class*="status-"] {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .actions {
+        gap: 6px;
+    }
+
+    .action-btn, .action-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .filter-container {
+        padding: 10px;
+    }
+
+    .filter-group {
+        gap: 6px;
+    }
+
+    .filter-group input,
+    .filter-group select,
+    .filter-group button {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .content-data {
+        padding: 10px;
+    }
+
+    .head {
+        gap: 10px;
+    }
+
+    .head h3 {
+        font-size: 1rem;
+    }
+
+    [class*="status-"] {
+        font-size: 10px;
+        padding: 3px 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .actions {
+        gap: 4px;
+    }
+
+    .action-btn, .action-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+    .action-btn:hover,
+    .action-icon:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .action-btn:active,
+    .action-icon:active {
+        transform: scale(0.95);
+    }
+
+    .action-btn[title]:hover::after,
+    .action-icon[title]:hover::after {
+        display: none;
+    }
+
+    .sortable:hover {
+        background: none;
+    }
+}
+
+/* Improved touch targets */
+@media (pointer: coarse) {
+    .action-btn,
+    .action-icon,
+    .btn,
+    select,
+    input[type="date"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    th {
+        padding: 12px 8px;
+    }
+
+    .sortable {
+        position: relative;
+        padding-right: 24px;
+    }
+
+    .sort-icon {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 8px;
+        min-width: 32px;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Dark mode adjustments for mobile */
+@media screen and (max-width: 992px) {
+    body.dark .filter-container {
+        background: var(--dark-surface);
+        border: 1px solid var(--dark-border);
+    }
+
+    body.dark .filter-group input,
+    body.dark .filter-group select {
+        background: var(--dark-bg);
+        border-color: var(--dark-border);
+        color: var(--dark-text-primary);
+    }
+
+    body.dark .content-data {
+        background: var(--dark-surface);
+    }
+
+    body.dark th {
+        background: var(--dark-bg);
+        color: var(--dark-text-primary);
+    }
+
+    body.dark td {
+        border-color: var(--dark-border);
+    }
+}
+
+/* Prevent zoom on input focus for iOS */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    select,
+    textarea,
+    input {
+        font-size: 16px !important;
+    }
+}
+
+/* Improved scrollbar for touch devices */
+.table-wrapper {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--dark-grey) transparent;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background-color: var(--dark-grey);
+    border-radius: 3px;
+}
+
+/* Prevent content shifting when scrollbar appears */
+html {
+    scrollbar-gutter: stable;
+}

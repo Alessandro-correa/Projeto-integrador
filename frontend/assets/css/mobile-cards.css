@@ -1,0 +1,112 @@
+/* Mobile Cards Styling */
+.mobile-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.mobile-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-card-row:last-child {
+    border-bottom: none;
+}
+
+.mobile-card-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.mobile-card-value {
+    color: #333;
+    font-size: 0.9em;
+}
+
+.mobile-card-actions {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Dark mode support */
+body.dark .mobile-card {
+    background: var(--dark-surface, #2d2d2d);
+    border-color: var(--dark-border, #444);
+}
+
+body.dark .mobile-card-row {
+    border-bottom-color: var(--dark-border, #444);
+}
+
+body.dark .mobile-card-label {
+    color: var(--dark-text-secondary, #aaa);
+}
+
+body.dark .mobile-card-value {
+    color: var(--dark-text-primary, #fff);
+}
+
+body.dark .mobile-card-actions {
+    border-top-color: var(--dark-border, #444);
+}
+
+/* Visibility control */
+#mobile-cards {
+    display: none;
+}
+
+.table-wrapper {
+    display: block;
+}
+
+/* Responsive breakpoints */
+@media screen and (max-width: 768px) {
+    #mobile-cards {
+        display: block;
+    }
+    
+    .table-wrapper {
+        display: none;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+    .mobile-card {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .mobile-card:active {
+        background: #f8f9fa;
+    }
+    
+    body.dark .mobile-card:active {
+        background: var(--dark-bg-active, #3d3d3d);
+    }
+}
+
+/* Larger touch targets for mobile */
+@media (max-width: 480px) {
+    .mobile-card {
+        padding: 12px;
+    }
+    
+    .mobile-card-row {
+        padding: 10px 0;
+    }
+    
+    .mobile-card-actions .action-icon {
+        width: 44px;
+        height: 44px;
+    }
+} 

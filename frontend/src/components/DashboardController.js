@@ -3,18 +3,26 @@ class DashboardController {
         this.API_BASE_URL = 'http://localhost:3000/api';
         this.charts = {};
         this.isLoading = false;
-        console.log('DashboardController: Inicializando...');
+        console.log('[Dashboard] Inicializando...');
+        
+        // Verificar estado da autenticação
+        const token = localStorage.getItem('token');
+        const userType = localStorage.getItem('userType');
+        console.log('[Dashboard] Estado inicial:', {
+            token: token ? 'Presente' : 'Ausente',
+            userType: userType || 'Não definido'
+        });
+        
         this.bindEvents();
         this.handleOrientationChange();
 
         setTimeout(async () => {
-            console.log('DashboardController: Carregando dashboard...');
-
+            console.log('[Dashboard] Iniciando carregamento...');
             const isConnected = await this.testConnection();
             if (isConnected) {
                 this.loadDashboard();
             } else {
-                console.error('DashboardController: Falha na conexão, carregamento cancelado');
+                console.error('[Dashboard] Falha na conexão, carregamento cancelado');
             }
         }, 100);
     }
@@ -39,19 +47,21 @@ class DashboardController {
     }
 
     async loadDashboard() {
-        if (this.isLoading) return;
+        if (this.isLoading) {
+            console.log('[Dashboard] Carregamento já em andamento, ignorando...');
+            return;
+        }
         
         this.isLoading = true;
         this.showLoading();
 
         try {
-            
+            console.log('[Dashboard] Iniciando carregamento do dashboard...');
             await this.loadStats();
-
             await this.loadCharts();
-            
+            console.log('[Dashboard] Dashboard carregado com sucesso');
         } catch (error) {
-            console.error('Erro ao carregar dashboard:', error);
+            console.error('[Dashboard] Erro ao carregar dashboard:', error);
             this.showError('Erro ao carregar dados do dashboard');
         } finally {
             this.isLoading = false;
@@ -61,23 +71,19 @@ class DashboardController {
 
     async loadStats() {
         try {
-            console.log('DashboardController: Carregando estatísticas...');
-            const response = await fetch(`${this.API_BASE_URL}/dashboard/stats`);
+            console.log('[Dashboard] Iniciando carregamento de estatísticas...');
+            const data = await window.apiService.getDashboardStats();
             
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('DashboardController: Dados de estatísticas recebidos:', data);
+            console.log('[Dashboard] Estatísticas recebidas:', data);
 
             if (data.success) {
                 this.updateStatsCards(data.data);
+                console.log('[Dashboard] Estatísticas atualizadas com sucesso');
             } else {
                 throw new Error(data.message);
             }
         } catch (error) {
-            console.error('DashboardController: Erro ao carregar estatísticas:', error);
+            console.error('[Dashboard] Erro ao carregar estatísticas:', error);
             throw error;
         }
     }
@@ -130,13 +136,8 @@ class DashboardController {
     async loadCharts() {
         try {
             console.log('DashboardController: Carregando gráficos...');
-            const response = await fetch(`${this.API_BASE_URL}/dashboard/charts`);
+            const data = await window.apiService.getDashboardCharts();
             
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-            
-            const data = await response.json();
             console.log('DashboardController: Dados de gráficos recebidos:', data);
 
             if (data.success) {

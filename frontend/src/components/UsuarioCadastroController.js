@@ -204,9 +204,16 @@ class UsuarioCadastroController extends BasePageController {
         return labels[field] || field;
     }
 
-    validateCPF(cpf) {
-        const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-        return cpfRegex.test(cpf);
+    async validateCPF(cpf) {
+        if (!cpf) return false;
+        
+        try {
+            return await ApiService.validateCPF(cpf);
+        } catch (error) {
+            console.error('Erro na validação do CPF:', error);
+            BasePageController.showNotification(error.message, 'error');
+            return false;
+        }
     }
 
     validateEmail(email) {

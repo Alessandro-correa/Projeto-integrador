@@ -239,9 +239,16 @@ class UsuarioController {
         return true;
     }
 
-    validateCPF(cpf) {
-        const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-        return cpfRegex.test(cpf);
+    async validateCPF(cpf) {
+        if (!cpf) return false;
+        
+        try {
+            return await ApiService.validateCPF(cpf);
+        } catch (error) {
+            console.error('Erro na validação do CPF:', error);
+            this.showError(error.message);
+            return false;
+        }
     }
 
     validateEmail(email) {

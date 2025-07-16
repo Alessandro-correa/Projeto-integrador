@@ -109,6 +109,7 @@
     <script type="module" src="../../assets/js/main.js"></script>
     <script src="../../src/components/BasePageController.js"></script>
     <script src="../../src/components/ClientePageController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
 	<!-- Bootstrap JavaScript -->
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	
@@ -117,6 +118,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (!window.clienteController) {
                 window.clienteController = new ClienteController();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.sidebarController) {
+                window.sidebarController = new SidebarController();
+                console.log('[SidebarController] Instanciado manualmente em clientes-consulta.html');
             }
         });
     </script>

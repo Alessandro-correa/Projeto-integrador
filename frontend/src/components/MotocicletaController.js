@@ -107,10 +107,18 @@ class MotocicletaController {
             });
             if (!response.ok) throw new Error('Erro ao carregar marcas');
             
-            this.marcas = await response.json();
-            this.populateSelectMarcas();
+            const result = await response.json();
+            console.log('[MotocicletaController] Dados de marcas recebidos:', result);
+            
+            if (result.success && Array.isArray(result.data)) {
+                this.marcas = result.data;
+                this.populateSelectMarcas();
+            } else {
+                throw new Error('Formato de dados inválido');
+            }
         } catch (error) {
             console.error('Erro ao carregar marcas:', error);
+            this.showNotification('Erro ao carregar marcas', 'error');
         }
     }
 

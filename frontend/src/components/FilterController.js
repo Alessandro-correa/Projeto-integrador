@@ -356,7 +356,7 @@ class FilterController {
         
         switch (this.entity) {
             case 'ordens':
-                return `${basePath}/os-ajustar.html?id=${item.codigo}`;
+                return `${basePath}/os-ajustar.html?cod=${item.codigo}`;
             case 'motocicletas':
                 return `${basePath}/motos-ajustar.html?id=${item.id}`;
             default:

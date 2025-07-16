@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="../../assets/css/style.css">
 	<link rel="stylesheet" href="../../assets/css/consulta.css">
+	<link rel="stylesheet" href="../../assets/css/modal.css">
+	<link rel="stylesheet" href="../../assets/css/ajuste.css">
 	<title>Sistema Campos Moto Peças - Peças</title>
 </head>
 <body>
@@ -62,9 +64,6 @@
 				<div class="filter-group">
 					<select id="filter-fornecedor">
 						<option value="">Todos os Fornecedores</option>
-						<option value="Fornecedor A">Fornecedor A</option>
-						<option value="Fornecedor B">Fornecedor B</option>
-						<option value="Fornecedor C">Fornecedor C</option>
 					</select>
 					<button id="clear-filters" class="btn-secondary">Limpar Filtros</button>
 				</div>
@@ -72,7 +71,7 @@
 			<div class="data">
 				<div class="content-data">
 					<div class="head">
-						<h3>Peças</h3>
+						<h3>Lista de Peças</h3>
 						<a href="pecas-cadastro.html" class="btn-primary">Nova Peça <i class='bx bx-plus'></i></a>
 					</div>
 					<div class="orders">
@@ -80,25 +79,24 @@
 							<thead>
 								<tr>
 									<th>ID</th>
-									<th class="sortable">Nome <span class="sort-icon"></span></th>
+									<th class="sortable">
+										Nome
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
 									<th>Descrição</th>
-									<th class="sortable">Fornecedor <span class="sort-icon"></span></th>
-									<th class="sortable">Valor <span class="sort-icon"></span></th>
+									<th class="sortable">
+										Fornecedor
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
+									<th class="sortable">
+										Valor
+										<i class='bx bx-sort-alt-2 sort-icon'></i>
+									</th>
 									<th>Ações</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>PEC-001</td>
-									<td>Óleo 20W50</td>
-									<td>Óleo lubrificante mineral para motor</td>
-									<td>Moto Peças Brasil</td>
-									<td>R$ 35,00</td>
-									<td>
-										<a href="#" class="action-icon"><i class='bx bxs-edit-alt'></i></a>
-										<a href="#" class="action-icon"><i class='bx bxs-trash'></i></a>
-									</td>
-								</tr>
+								<!-- Dados carregados via JS -->
 							</tbody>
 						</table>
 					</div>
@@ -106,8 +104,19 @@
 			</div>
 		</main>
 	</section>
+
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="../../assets/js/main.js"></script>
+    <script src="../../src/components/BasePageController.js"></script>
     <script src="../../src/components/PecaController.js"></script>
+    <script src="../../src/components/SidebarController.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!window.sidebarController) {
+          window.sidebarController = new SidebarController();
+          console.log('[SidebarController] Instanciado manualmente em pecas-consulta.html');
+        }
+      });
+    </script>
 </body>
 </html>

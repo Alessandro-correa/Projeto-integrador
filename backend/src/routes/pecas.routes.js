@@ -1,6 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const PecaApiController = require('../controllers/pecaApiController');
+
+console.log('[pecas.routes] Iniciando configuração das rotas');
+
+console.log('[pecas.routes] Importando controller');
+const controller = require('../controllers/PecaApiController');
+
+console.log('[pecas.routes] Controller importado:', {
+  controller: typeof controller,
+  methods: {
+    create: typeof controller.create,
+    findAll: typeof controller.findAll,
+    findOne: typeof controller.findOne,
+    update: typeof controller.update,
+    delete: typeof controller.delete,
+    findByFornecedor: typeof controller.findByFornecedor
+  }
+});
+
+// Middleware para verificar se os métodos existem
+const verifyMethod = (methodName) => (req, res, next) => {
+  console.log(`[pecas.routes] Verificando método ${methodName}`);
+  if (typeof controller[methodName] !== 'function') {
+    console.error(`[pecas.routes] ERRO: Método ${methodName} não encontrado no controller`);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno do servidor',
+      error: `Método ${methodName} não implementado`
+    });
+  }
+  next();
+};
 
 /**
  * @swagger
@@ -9,11 +39,13 @@ const PecaApiController = require('../controllers/pecaApiController');
  *   description: Gerenciamento de peças
  */
 
+console.log('[pecas.routes] Configurando rotas');
+
 /**
  * @swagger
  * /pecas:
  *   post:
- *     summary: Cria uma nova peça
+ *     summary: Criar nova peça
  *     tags: [Peças]
  *     requestBody:
  *       required: true
@@ -25,41 +57,68 @@ const PecaApiController = require('../controllers/pecaApiController');
  *               - descricao
  *               - nome
  *               - valor
- *               - fornecedor
  *             properties:
  *               descricao:
  *                 type: string
+ *                 description: Descrição detalhada da peça
  *               nome:
  *                 type: string
+ *                 description: Nome da peça
  *               valor:
  *                 type: number
- *               fornecedor:
+ *                 format: float
+ *                 description: Valor unitário da peça
+ *               forn_id:
  *                 type: integer
+ *                 description: ID do fornecedor da peça
  *     responses:
  *       201:
  *         description: Peça criada com sucesso
  *       400:
  *         description: Dados inválidos
  */
-router.post('/', PecaApiController.create);
+router.post('/', verifyMethod('create'), (req, res, next) => {
+  console.log('[pecas.routes] Chamada POST /');
+  return controller.create(req, res, next);
+});
 
 /**
  * @swagger
  * /pecas:
  *   get:
- *     summary: Lista todas as peças
+ *     summary: Listar todas as peças
  *     tags: [Peças]
  *     responses:
  *       200:
  *         description: Lista de peças
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   descricao:
+ *                     type: string
+ *                   nome:
+ *                     type: string
+ *                   valor:
+ *                     type: number
+ *                   forn_id:
+ *                     type: integer
  */
-router.get('/', PecaApiController.findAll);
+router.get('/', verifyMethod('findAll'), (req, res, next) => {
+  console.log('[pecas.routes] Chamada GET /');
+  return controller.findAll(req, res, next);
+});
 
 /**
  * @swagger
  * /pecas/{id}:
  *   get:
- *     summary: Busca uma peça pelo ID
+ *     summary: Buscar peça por ID
  *     tags: [Peças]
  *     parameters:
  *       - in: path
@@ -67,19 +126,38 @@ router.get('/', PecaApiController.findAll);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID da peça
  *     responses:
  *       200:
  *         description: Peça encontrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 descricao:
+ *                   type: string
+ *                 nome:
+ *                   type: string
+ *                 valor:
+ *                   type: number
+ *                 forn_id:
+ *                   type: integer
  *       404:
  *         description: Peça não encontrada
  */
-router.get('/:id', PecaApiController.findOne);
+router.get('/:id', verifyMethod('findOne'), (req, res, next) => {
+  console.log('[pecas.routes] Chamada GET /:id');
+  return controller.findOne(req, res, next);
+});
 
 /**
  * @swagger
  * /pecas/{id}:
  *   put:
- *     summary: Atualiza uma peça existente
+ *     summary: Atualizar peça
  *     tags: [Peças]
  *     parameters:
  *       - in: path
@@ -87,6 +165,7 @@ router.get('/:id', PecaApiController.findOne);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID da peça
  *     requestBody:
  *       required: true
  *       content:
@@ -100,21 +179,27 @@ router.get('/:id', PecaApiController.findOne);
  *                 type: string
  *               valor:
  *                 type: number
- *               fornecedor:
+ *                 format: float
+ *               forn_id:
  *                 type: integer
  *     responses:
  *       200:
  *         description: Peça atualizada com sucesso
+ *       400:
+ *         description: Dados inválidos
  *       404:
  *         description: Peça não encontrada
  */
-router.put('/:id', PecaApiController.update);
+router.put('/:id', verifyMethod('update'), (req, res, next) => {
+  console.log('[pecas.routes] Chamada PUT /:id');
+  return controller.update(req, res, next);
+});
 
 /**
  * @swagger
  * /pecas/{id}:
  *   delete:
- *     summary: Remove uma peça pelo ID
+ *     summary: Excluir peça
  *     tags: [Peças]
  *     parameters:
  *       - in: path
@@ -122,12 +207,18 @@ router.put('/:id', PecaApiController.update);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID da peça
  *     responses:
  *       200:
- *         description: Peça removida com sucesso
+ *         description: Peça excluída com sucesso
  *       404:
  *         description: Peça não encontrada
  */
-router.delete('/:id', PecaApiController.delete);
+router.delete('/:id', verifyMethod('delete'), (req, res, next) => {
+  console.log('[pecas.routes] Chamada DELETE /:id');
+  return controller.delete(req, res, next);
+});
+
+console.log('[pecas.routes] Rotas configuradas');
 
 module.exports = router; 

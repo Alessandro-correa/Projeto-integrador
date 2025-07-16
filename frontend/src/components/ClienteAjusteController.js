@@ -10,7 +10,7 @@ class ClienteAjusteController {
         this.setupEventListeners();
         this.setupMasks();
         
-        // Carregar cliente se CPF estiver na URL
+        // Carregar cliente se ID estiver na URL
         setTimeout(() => this.loadClienteFromURL(), 100);
     }
 
@@ -65,42 +65,42 @@ class ClienteAjusteController {
 
     async loadClienteFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        const cpf = urlParams.get('cpf');
+        const id = urlParams.get('id');
         
         console.log(`🔗 URL atual: ${window.location.href}`);
         console.log(`📋 Parâmetros da URL:`, urlParams.toString());
-        console.log(`👤 CPF extraído da URL: "${cpf}"`);
+        console.log(`👤 ID extraído da URL: "${id}"`);
         
-        if (cpf) {
+        if (id) {
             try {
-                await this.loadCliente(cpf);
+                await this.loadCliente(id);
             } catch (error) {
                 console.error('❌ Erro ao carregar cliente da URL:', error);
-                this.showNotification('Erro ao carregar dados do cliente. Verifique se o CPF é válido.', 'error', 'Erro!', 5000);
+                this.showNotification('Erro ao carregar dados do cliente. Verifique se o ID é válido.', 'error', 'Erro!', 5000);
                 setTimeout(() => {
                     window.location.href = 'clientes-consulta.html';
                 }, 3000);
             }
         } else {
-            console.error('❌ CPF não encontrado na URL');
-            this.showNotification('CPF não informado na URL.', 'error', 'Erro!', 5000);
+            console.error('❌ ID não encontrado na URL');
+            this.showNotification('ID não informado na URL.', 'error', 'Erro!', 5000);
             setTimeout(() => {
                 window.location.href = 'clientes-consulta.html';
             }, 3000);
         }
     }
 
-    async loadCliente(cpf) {
+    async loadCliente(id) {
         try {
             this.showLoading(true);
             
-            // Formatar CPF para busca
-            const cpfFormatted = cpf.replace(/\D/g, '');
+            // Formatar ID para busca (remover pontos e traços)
+            const idFormatted = id.replace(/[.-]/g, '');
             
-            console.log(`🔍 Buscando cliente com CPF: ${cpf} (formatado: ${cpfFormatted})`);
+            console.log(`🔍 Buscando cliente com ID: ${id} (formatado: ${idFormatted})`);
             
             const token = localStorage.getItem('token');
-            const response = await fetch(`${this.baseURL}/${cpfFormatted}`, {
+            const response = await fetch(`${this.baseURL}/${idFormatted}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -108,7 +108,7 @@ class ClienteAjusteController {
             
             if (!response.ok) {
                 if (response.status === 404) {
-                    throw new Error('Cliente não encontrado. Verifique se o CPF está correto.');
+                    throw new Error('Cliente não encontrado. Verifique se o ID está correto.');
                 }
                 throw new Error(`Erro HTTP: ${response.status}`);
             }
@@ -292,10 +292,10 @@ class ClienteAjusteController {
             
             this.showLoading(true, 'Salvando alterações...');
             
-            const cpf = this.currentItem.cpf.replace(/\D/g, '');
+            const id = this.currentItem.id.replace(/[.-]/g, '');
             
             const token = localStorage.getItem('token');
-            const response = await fetch(`${this.baseURL}/${cpf}`, {
+            const response = await fetch(`${this.baseURL}/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ class ClienteAjusteController {
                 this.showNotification('Cliente atualizado com sucesso!', 'success', 'Sucesso!', 3000);
                 
                 // Atualizar dados originais
-                this.originalData = { ...dados, cpf: this.currentItem.cpf };
+                this.originalData = { ...dados, id: this.currentItem.id };
                 
                 setTimeout(() => {
                     window.location.href = 'clientes-consulta.html';

@@ -215,6 +215,14 @@
             window.ordemAjusteController = new OrdemAjusteController();
         }
     </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!window.sidebarController) {
+          window.sidebarController = new SidebarController();
+          console.log('[SidebarController] Instanciado manualmente em os-ajustar.html');
+        }
+      });
+    </script>
 </body>
 </html>
 

@@ -1,6 +1,6 @@
 
-import ThemeController from '../../src/components/ThemeController.js';
-import SidebarController from '../../src/components/SidebarController.js';
+import '../../src/components/ThemeController.js';
+import '../../src/components/SidebarController.js';
 import NavbarController from '../../src/components/NavbarController.js';
 import FilterController from '../../src/components/FilterController.js';
 

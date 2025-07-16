@@ -142,7 +142,7 @@ class OrdemServicoApiController {
   // Buscar ordem de serviço por ID
   async findOne(req, res) {
     try {
-      const { id } = req.params;
+      const { cod } = req.params;
 
       // Buscar dados principais da ordem
       const ordem = await db.oneOrNone(`
@@ -169,7 +169,7 @@ class OrdemServicoApiController {
         JOIN Cliente c ON os.cliente_cpf = c.cpf
         JOIN Motocicleta m ON os.motocicleta_placa = m.placa
         WHERE os.cod = $1
-      `, [id]);
+      `, [cod]);
 
       if (!ordem) {
         return res.status(404).json({
@@ -191,7 +191,7 @@ class OrdemServicoApiController {
         JOIN Peca p ON pp.peca_id = p.id
         WHERE pp.ordem_de_servico_cod = $1
         ORDER BY p.nome
-      `, [id]);
+      `, [cod]);
 
       // Buscar orçamento relacionado
       const orcamento = await db.oneOrNone(`
@@ -205,7 +205,7 @@ class OrdemServicoApiController {
         WHERE ordem_servico_cod = $1
         ORDER BY id DESC
         LIMIT 1
-      `, [id]);
+      `, [cod]);
 
       // Processar descrição do orçamento se existir e estiver aprovado
       let servicosProcessados = [];
@@ -312,7 +312,7 @@ class OrdemServicoApiController {
   // Atualizar ordem de serviço
   async update(req, res) {
     try {
-      const { id } = req.params;
+      const { cod } = req.params;
       // Permitir tanto camelCase quanto snake_case no body
       const {
         titulo,
@@ -330,7 +330,7 @@ class OrdemServicoApiController {
       } = req.body;
 
       // Verificar se ordem existe
-      const existingOrdem = await db.oneOrNone('SELECT * FROM Ordem_de_servico WHERE cod = $1', [id]);
+      const existingOrdem = await db.oneOrNone('SELECT * FROM Ordem_de_servico WHERE cod = $1', [cod]);
       if (!existingOrdem) {
         return res.status(404).json({
           success: false,
@@ -405,13 +405,13 @@ class OrdemServicoApiController {
         clienteCpfFinal,
         valorFinal,
         valorMaoDeObraFinal,
-        id
+        cod
       ]);
 
       // Se peças foram enviadas, atualizá-las
       if (pecas && Array.isArray(pecas)) {
         // Primeiro, remover todas as peças existentes desta ordem
-        await db.none('DELETE FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [id]);
+        await db.none('DELETE FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [cod]);
 
         // Depois, inserir as novas peças
         for (const peca of pecas) {
@@ -436,7 +436,7 @@ class OrdemServicoApiController {
             // Inserir na tabela de relacionamento
             await db.none(
               'INSERT INTO Possui_peca (Ordem_de_servico_COD, Peca_ID, Qtd_pecas) VALUES ($1, $2, $3)',
-              [id, pecaId, peca.quantidade]
+              [cod, pecaId, peca.quantidade]
             );
           }
         }
@@ -461,10 +461,10 @@ class OrdemServicoApiController {
   // Remover ordem de serviço
   async delete(req, res) {
     try {
-      const { id } = req.params;
+      const { cod } = req.params;
 
       // Verificar se ordem existe
-      const existingOrdem = await db.oneOrNone('SELECT * FROM Ordem_de_servico WHERE cod = $1', [id]);
+      const existingOrdem = await db.oneOrNone('SELECT * FROM Ordem_de_servico WHERE cod = $1', [cod]);
       if (!existingOrdem) {
         return res.status(404).json({
           success: false,
@@ -473,15 +473,15 @@ class OrdemServicoApiController {
       }
 
       // Se houver orçamento vinculado, desvincular e voltar para pendente
-      const orcamentoVinculado = await db.oneOrNone('SELECT id FROM Orcamento WHERE ordem_servico_cod = $1', [id]);
+      const orcamentoVinculado = await db.oneOrNone('SELECT id FROM Orcamento WHERE ordem_servico_cod = $1', [cod]);
       if (orcamentoVinculado) {
         await db.none('UPDATE Orcamento SET ordem_servico_cod = NULL, status = $1 WHERE id = $2', ['P', orcamentoVinculado.id]);
       }
 
       // Remover todas as peças vinculadas antes de excluir a ordem
-      await db.none('DELETE FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [id]);
+      await db.none('DELETE FROM Possui_peca WHERE Ordem_de_servico_COD = $1', [cod]);
 
-      await db.none('DELETE FROM Ordem_de_servico WHERE cod = $1', [id]);
+      await db.none('DELETE FROM Ordem_de_servico WHERE cod = $1', [cod]);
 
       res.json({
         success: true,

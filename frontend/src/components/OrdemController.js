@@ -1,139 +1,20 @@
 class OrdemController {
     constructor() {
-        this.apiUrl = 'http://localhost:3000/api/ordens';
-        this.tableBody = document.querySelector('#ordens-table tbody');
+        this.baseURL = 'http://localhost:3000/api';
+        this.apiUrl = this.baseURL + '/ordens';
+        this.currentSort = { column: 'cod', direction: 'desc' }; // Initialize default sort
+        this.setupEventListeners();
+        this.loadOrdens();
+    }
+
+    setupEventListeners() {
+        // Filter elements
         this.filterText = document.getElementById('filter-text');
         this.filterStatus = document.getElementById('filter-status');
         this.filterData = document.getElementById('filter-data');
         this.clearFiltersBtn = document.getElementById('clear-filters');
-        this.novoBtn = document.querySelector('.btn-primary[href="os-cadastro.html"]');
-        this.ordens = [];
-        this.currentUser = this.getCurrentUser(); 
 
-        this.currentSort = {
-            column: 'data',
-            direction: 'desc' 
-        };
-        
-        this.init();
-    }
-
-    initSortableHeaders() {
-        const sortableHeaders = document.querySelectorAll('.sortable');
-        sortableHeaders.forEach(header => {
-            header.addEventListener('click', () => {
-                const column = header.getAttribute('data-column');
-                this.sortBy(column);
-            });
-        });
-    }
-
-    sortBy(column) {
-        
-        if (this.currentSort.column === column) {
-            this.currentSort.direction = this.currentSort.direction === 'asc' ? 'desc' : 'asc';
-        } else {
-            
-            const header = document.querySelector(`[data-column="${column}"]`);
-            const defaultSort = header.getAttribute('data-default-sort') || 'asc';
-            this.currentSort.column = column;
-            this.currentSort.direction = defaultSort;
-        }
-
-        this.updateSortIcons();
-        this.renderTable();
-    }
-
-    updateSortIcons() {
-        
-        document.querySelectorAll('.sort-icon').forEach(icon => {
-            icon.classList.remove('active');
-            icon.className = 'bx bx-sort-alt-2 sort-icon';
-        });
-        
-        document.querySelectorAll('.sortable').forEach(header => {
-            header.classList.remove('sorted');
-        });
-
-        const currentHeader = document.querySelector(`[data-column="${this.currentSort.column}"]`);
-        if (currentHeader) {
-            const icon = currentHeader.querySelector('.sort-icon');
-            if (icon) {
-                icon.classList.add('active');
-                currentHeader.classList.add('sorted');
-
-                if (this.currentSort.direction === 'asc') {
-                    icon.className = 'bx bx-sort-up sort-icon active';
-                } else {
-                    icon.className = 'bx bx-sort-down sort-icon active';
-                }
-            }
-        }
-    }
-
-    sortOrdens(ordens) {
-        return [...ordens].sort((a, b) => {
-            const column = this.currentSort.column;
-            const direction = this.currentSort.direction;
-            
-            let valueA = a[column];
-            let valueB = b[column];
-
-            switch (column) {
-                case 'cod':
-                    valueA = parseInt(valueA) || 0;
-                    valueB = parseInt(valueB) || 0;
-                    break;
-                    
-                case 'data':
-                    valueA = new Date(valueA || 0);
-                    valueB = new Date(valueB || 0);
-                    break;
-                    
-                case 'titulo':
-                case 'cliente_nome':
-                case 'motocicleta_placa':
-                case 'status':
-                    valueA = (valueA || '').toString().toLowerCase();
-                    valueB = (valueB || '').toString().toLowerCase();
-                    break;
-                    
-                default:
-                    valueA = valueA || '';
-                    valueB = valueB || '';
-                    break;
-            }
-
-            let comparison = 0;
-            if (valueA > valueB) {
-                comparison = 1;
-            } else if (valueA < valueB) {
-                comparison = -1;
-            }
-
-            return direction === 'desc' ? comparison * -1 : comparison;
-        });
-    }
-
-    getCurrentUser() {
-
-        const userType = localStorage.getItem('userType') || 'Mecânico'; 
-        return {
-            tipo: userType, 
-            nome: localStorage.getItem('userName') || 'Usuário'
-        };
-    }
-
-    escapeHtml(text) {
-        if (!text) return 'N/A';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    init() {
-        this.loadOrdens();
-        this.initSortableHeaders();
+        // Add event listeners
         if (this.filterText) {
             this.filterText.addEventListener('input', () => this.renderTable());
         }
@@ -146,167 +27,305 @@ class OrdemController {
         if (this.clearFiltersBtn) {
             this.clearFiltersBtn.addEventListener('click', () => this.clearFilters());
         }
-        if (this.novoBtn) {
-            this.novoBtn.addEventListener('click', () => {
-                window.location.href = 'os-cadastro.html';
+
+        // Setup sortable headers
+        const sortableHeaders = document.querySelectorAll('.sortable');
+        sortableHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.getAttribute('data-column');
+                this.sortBy(column);
             });
-        }
+        });
+
+        // Setup action listeners
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.excluir-ordem')) {
+                e.preventDefault();
+                const id = e.target.closest('.excluir-ordem').dataset.id;
+                if (confirm('Tem certeza que deseja excluir esta ordem de serviço?')) {
+                    this.excluirOrdem(id);
+                }
+            }
+        });
     }
 
     async loadOrdens() {
         try {
-            console.log('Carregando ordens de serviço da API...');
             const token = localStorage.getItem('token');
-            const res = await fetch(this.apiUrl, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch(this.apiUrl, {
+                headers: { Authorization: 'Bearer ' + token }
             });
-            console.log('Response status:', res.status);
             
-            if (!res.ok) {
-                throw new Error(`Erro HTTP: ${res.status}`);
-            }
+            if (!response.ok) throw new Error('Erro ao carregar ordens de serviço');
             
-            const json = await res.json();
-            console.log('Dados recebidos:', json);
+            const result = await response.json();
+            if (!result.success) throw new Error(result.message || 'Erro desconhecido');
             
-            this.ordens = json.data || [];
-            this.updateSortIcons(); 
+            this.ordens = result.data;
             this.renderTable();
-        } catch (e) {
-            console.error('Erro ao carregar ordens de serviço:', e);
-            alert(`Erro ao carregar dados: ${e.message}`);
-            if (this.tableBody) {
-                this.tableBody.innerHTML = '<tr><td colspan="7">Erro ao carregar ordens de serviço</td></tr>';
-            }
+        } catch (error) {
+            console.error('Erro ao carregar ordens:', error);
+            alert('Erro ao carregar ordens de serviço');
+            this.showError('Erro ao carregar ordens de serviço');
+        }
+    }
+
+    showError(message) {
+        const tbody = document.querySelector('#ordens-table tbody');
+        const mobileCards = document.querySelector('#mobile-cards');
+        
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7">' + message + '</td></tr>';
+        }
+        
+        if (mobileCards) {
+            const errorCard = document.createElement('div');
+            errorCard.className = 'mobile-card';
+            const errorRow = document.createElement('div');
+            errorRow.className = 'mobile-card-row';
+            const errorSpan = document.createElement('span');
+            errorSpan.textContent = message;
+            errorRow.appendChild(errorSpan);
+            errorCard.appendChild(errorRow);
+            mobileCards.innerHTML = '';
+            mobileCards.appendChild(errorCard);
         }
     }
 
     renderTable() {
-        if (!this.tableBody) return;
+        if (!this.ordens) return;
 
+        const filtered = this.filterOrdens(this.ordens);
+        const sorted = this.sortOrdens(filtered);
+        this.renderOrdens(sorted);
+    }
+
+    filterOrdens(ordens) {
         const text = this.filterText ? this.filterText.value.toLowerCase() : '';
         const status = this.filterStatus ? this.filterStatus.value : '';
         const dataFiltro = this.filterData ? this.filterData.value : '';
 
-        const filtered = this.ordens.filter(o => {
+        return ordens.filter(ordem => {
             let match = true;
 
             if (text) {
-                const codigo = `OS-${String(o.cod).padStart(3, '0')}`.toLowerCase();
-                const cliente = (o.cliente_nome || '').toLowerCase();
-                const placa = (o.motocicleta_placa || '').toLowerCase();
-                const titulo = (o.titulo || '').toLowerCase();
-                match = codigo.includes(text) || cliente.includes(text) || placa.includes(text) || titulo.includes(text);
+                const searchableFields = [
+                    'OS-' + String(ordem.cod).padStart(3, '0'),
+                    ordem.titulo || '',
+                    ordem.cliente_nome || '',
+                    ordem.motocicleta_placa || ''
+                ].map(field => field.toLowerCase());
+
+                match = searchableFields.some(field => field.includes(text));
             }
 
-            if (status && status !== '') {
-                match = match && (o.status === status);
+            if (status) {
+                match = match && ordem.status === status;
             }
 
-            if (dataFiltro && dataFiltro !== '') {
-                const dataOrdem = new Date(o.data);
+            if (dataFiltro) {
+                const dataOrdem = new Date(ordem.data);
                 const dataFiltroObj = new Date(dataFiltro);
-
-                const dataOrdemStr = dataOrdem.toISOString().split('T')[0];
-                const dataFiltroStr = dataFiltroObj.toISOString().split('T')[0];
-                
-                match = match && (dataOrdemStr === dataFiltroStr);
+                match = match && (
+                    dataOrdem.getFullYear() === dataFiltroObj.getFullYear() &&
+                    dataOrdem.getMonth() === dataFiltroObj.getMonth() &&
+                    dataOrdem.getDate() === dataFiltroObj.getDate()
+                );
             }
             
             return match;
         });
+    }
 
-        if (filtered.length === 0) {
-            this.tableBody.innerHTML = '<tr><td colspan="7">Nenhuma ordem de serviço encontrada</td></tr>';
+    sortOrdens(ordens) {
+        return [...ordens].sort((a, b) => {
+            const aValue = this.getSortValue(a);
+            const bValue = this.getSortValue(b);
+            return this.currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+        });
+    }
+
+    getSortValue(ordem) {
+        switch (this.currentSort.column) {
+            case 'cod':
+                return parseInt(ordem.cod) || 0;
+            case 'data':
+                return new Date(ordem.data || 0).getTime();
+            default:
+                return (ordem[this.currentSort.column] || '').toString().toLowerCase();
+        }
+    }
+
+    renderOrdens(ordens) {
+        const tbody = document.querySelector('#ordens-table tbody');
+        const mobileCards = document.querySelector('#mobile-cards');
+        
+        if (!tbody || !mobileCards) return;
+        
+        tbody.innerHTML = '';
+        mobileCards.innerHTML = '';
+        
+        if (ordens.length === 0) {
+            this.showError('Nenhuma ordem de serviço encontrada');
             return;
         }
 
-        const sorted = this.sortOrdens(filtered);
-
-        this.tableBody.innerHTML = sorted.map(o => `
-            <tr>
-                <td><p>OS-${String(o.cod).padStart(3, '0')}</p></td>
-                <td><p>${o.titulo || 'N/A'}</p></td>
-                <td><p>${o.cliente_nome || 'N/A'}</p></td>
-                <td><p>${o.motocicleta_placa || 'N/A'}</p></td>
-                <td>${o.data ? new Date(o.data).toLocaleDateString('pt-BR') : 'N/A'}</td>
-                <td><span class="status-${this.getStatusClass(o.status)}">${o.status}</span></td>
-                <td>
-                    ${this.getActionsForStatus(o)}
-                </td>
-            </tr>
-        `).join('');
-
-        this.addActionListeners();
+        ordens.forEach(ordem => {
+            tbody.appendChild(this.createTableRow(ordem));
+            mobileCards.appendChild(this.createMobileCard(ordem));
+        });
     }
 
-    getActionsForStatus(ordem) {
-        const actions = [];
-        const isMecanico = this.currentUser.tipo === 'Mecânico';
-        const isSecretaria = this.currentUser.tipo === 'Atendente';
+    createTableRow(ordem) {
+        const tr = document.createElement('tr');
+        const cells = [
+            { text: 'OS-' + ordem.cod.toString().padStart(3, '0'), wrap: true },
+            { text: ordem.titulo, wrap: true },
+            { text: ordem.cliente_nome, wrap: true },
+            { text: ordem.motocicleta_placa, wrap: true },
+            { text: this.formatDate(ordem.data), wrap: false },
+            { 
+                html: '<span class="status-' + this.getStatusClass(ordem.status) + '">' + 
+                      this.getStatusText(ordem.status) + '</span>',
+                wrap: false
+            },
+            { html: '<div class="actions">' + this.getActionsForStatus(ordem) + '</div>', wrap: false }
+        ];
 
-        switch(ordem.status) {
-            case 'Em Andamento':
-            case 'Ajuste Pendente':
-                
-                actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Visualizar"><i class='bx bx-show'></i></a>`);
-                actions.push(`<a href="os-ajustar.html?id=${ordem.cod}" class="action-icon" title="Editar"><i class='bx bx-edit'></i></a>`);
+        cells.forEach(cell => {
+            const td = document.createElement('td');
+            if (cell.wrap) {
+                const p = document.createElement('p');
+                p.textContent = cell.text;
+                td.appendChild(p);
+            } else if (cell.html) {
+                td.innerHTML = cell.html;
+            } else {
+                td.textContent = cell.text;
+            }
+            tr.appendChild(td);
+        });
 
-                if (isMecanico) {
-                    actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Enviar para Validação"><i class='bx bx-check-circle'></i></a>`);
-                }
-                // Adicionar botão de excluir
-                actions.push(`<a href="#" class="action-icon excluir-ordem" data-id="${ordem.cod}" title="Excluir Ordem de Serviço"><i class='bx bx-trash'></i></a>`);
-                break;
-                
-            case 'Validação Pendente':
-            case 'ValidaÇão Pendente': 
-                
-                actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Visualizar"><i class='bx bx-show'></i></a>`);
-                actions.push(`<a href="os-ajustar.html?id=${ordem.cod}" class="action-icon" title="Editar"><i class='bx bx-edit'></i></a>`);
+        return tr;
+    }
 
-                if (isSecretaria) {
-                    actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Validar OS"><i class='bx bx-check-double'></i></a>`);
-                    actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Rejeitar OS"><i class='bx bx-x-circle'></i></a>`);
-                }
-                // Adicionar botão de excluir
-                actions.push(`<a href="#" class="action-icon excluir-ordem" data-id="${ordem.cod}" title="Excluir Ordem de Serviço"><i class='bx bx-trash'></i></a>`);
-                break;
-                
-            case 'Validado':
-            case 'Validada':
-                
-                actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Visualizar Completo"><i class='bx bx-show'></i></a>`);
-                break;
-                
-            case 'Rejeitado':
-            case 'Rejeitada':
-                
-                actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Visualizar Completo"><i class='bx bx-show'></i></a>`);
-                break;
-                
-            default:
-                
-                actions.push(`<a href="#" class="action-icon" data-id="${ordem.cod}" title="Visualizar"><i class='bx bx-show'></i></a>`);
-                break;
-        }
+    createMobileCard(ordem) {
+        const card = document.createElement('div');
+        card.className = 'mobile-card';
+
+        const fields = [
+            { label: 'Código', value: 'OS-' + ordem.cod.toString().padStart(3, '0') },
+            { label: 'Título', value: ordem.titulo },
+            { label: 'Cliente', value: ordem.cliente_nome },
+            { label: 'Placa', value: ordem.motocicleta_placa },
+            { label: 'Data', value: this.formatDate(ordem.data) }
+        ];
+
+        fields.forEach(field => {
+            const row = document.createElement('div');
+            row.className = 'mobile-card-row';
+
+            const label = document.createElement('span');
+            label.className = 'mobile-card-label';
+            label.textContent = field.label + ':';
+
+            const value = document.createElement('span');
+            value.className = 'mobile-card-value';
+            value.textContent = field.value;
+
+            row.appendChild(label);
+            row.appendChild(value);
+            card.appendChild(row);
+        });
+
+        // Add status
+        const statusRow = document.createElement('div');
+        statusRow.className = 'mobile-card-row';
         
-        return `<div class="actions">${actions.join('')}</div>`;
+        const statusLabel = document.createElement('span');
+        statusLabel.className = 'mobile-card-label';
+        statusLabel.textContent = 'Status:';
+        
+        const statusValue = document.createElement('span');
+        statusValue.className = 'status-' + this.getStatusClass(ordem.status);
+        statusValue.textContent = this.getStatusText(ordem.status);
+        
+        statusRow.appendChild(statusLabel);
+        statusRow.appendChild(statusValue);
+        card.appendChild(statusRow);
+
+        // Add actions
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'mobile-card-actions';
+        actionsDiv.innerHTML = '<div class="actions">' + this.getActionsForStatus(ordem) + '</div>';
+        card.appendChild(actionsDiv);
+
+        return card;
+    }
+
+    formatDate(date) {
+        return date ? new Date(date).toLocaleDateString('pt-BR') : 'N/A';
+    }
+
+    getStatusText(status) {
+        const map = {
+            'Em Andamento': 'Em Andamento',
+            'Ajuste Pendente': 'Ajuste Pendente',
+            'Validação Pendente': 'Validação Pendente',
+            'Validada': 'Validada',
+            'Rejeitada': 'Rejeitada'
+        };
+        return map[status] || status;
     }
 
     getStatusClass(status) {
         const map = {
             'Em Andamento': 'progress',
             'Ajuste Pendente': 'pending',
-            'Validado': 'completed',
-            'Validada': 'completed',
             'Validação Pendente': 'validation-pending',
-            'ValidaÇão Pendente': 'validation-pending', 
-            'ValidaþÒo Pendente': 'validation-pending', 
-            'Rejeitado': 'rejected',
+            'Validada': 'completed',
             'Rejeitada': 'rejected'
         };
-        return map[status] || 'pending';
+        return map[status] || 'default';
+    }
+
+    getActionsForStatus(ordem) {
+        const actions = [];
+        
+        // Visualizar é sempre permitido
+        actions.push('<a href="#" class="action-icon" data-id="' + ordem.cod + '" title="Visualizar"><i class="bx bx-show"></i></a>');
+        
+        // Editar e excluir só são permitidos se não estiver validada ou rejeitada
+        if (!['Validada', 'Rejeitada'].includes(ordem.status)) {
+            actions.push('<a href="os-ajustar.html?cod=' + ordem.cod + '" class="action-icon" title="Editar"><i class="bx bx-edit"></i></a>');
+            actions.push('<a href="#" class="action-icon excluir-ordem" data-id="' + ordem.cod + '" title="Excluir Ordem de Serviço"><i class="bx bx-trash"></i></a>');
+        }
+        
+        return actions.join('');
+    }
+
+    async excluirOrdem(id) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(this.apiUrl + '/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token
+                }
+            });
+            
+            if (!response.ok) throw new Error('Erro ao excluir ordem de serviço');
+            
+            const result = await response.json();
+            if (!result.success) throw new Error(result.message || 'Erro desconhecido');
+            
+                alert('Ordem de serviço excluída com sucesso!');
+                this.loadOrdens();
+        } catch (error) {
+            console.error('Erro ao excluir ordem:', error);
+            alert('Erro ao excluir ordem de serviço: ' + error.message);
+        }
     }
 
     clearFilters() {
@@ -316,303 +335,24 @@ class OrdemController {
         this.renderTable();
     }
 
-    addActionListeners() {
-        
-        this.tableBody.querySelectorAll('.action-icon[title*="Visualizar"]').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const isCompleto = btn.getAttribute('title').includes('Completo');
-                if (isCompleto) {
-                    await this.visualizarOrdemCompleta(id);
-                } else {
-                    await this.visualizarOrdem(id);
-                }
-            });
-        });
-
-        this.tableBody.querySelectorAll('.action-icon[title*="Enviar"]').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                if (confirm('Deseja enviar esta ordem para validação?')) {
-                    await this.atualizarStatusOrdem(id, 'Validação Pendente');
-                }
-            });
-        });
-
-        this.tableBody.querySelectorAll('.action-icon[title*="Validar"]').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                if (confirm('Deseja validar esta ordem de serviço?')) {
-                    await this.atualizarStatusOrdem(id, 'Validada');
-                }
-            });
-        });
-
-        this.tableBody.querySelectorAll('.action-icon[title*="Rejeitar"]').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                if (confirm('Deseja rejeitar esta ordem de serviço?')) {
-                    await this.atualizarStatusOrdem(id, 'Rejeitada');
-                }
-            });
-        });
-
-        this.tableBody.querySelectorAll('.continuar-ordem').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                if (confirm('Deseja continuar esta ordem de serviço?')) {
-                    await this.atualizarStatusOrdem(id, 'Em Andamento');
-                }
-            });
-        });
-
-        // Excluir ordem de serviço
-        this.tableBody.querySelectorAll('.excluir-ordem').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const id = btn.getAttribute('data-id');
-                const confirmar = confirm('Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita.');
-                if (confirmar) {
-                    await this.excluirOrdem(id);
-                }
-            });
-        });
-    }
-
-    async visualizarOrdem(id) {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${this.apiUrl}/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!res.ok) throw new Error('Erro ao buscar ordem de serviço');
-            
-            const json = await res.json();
-            const ordem = json.data;
-
-            this.mostrarModalVisualizacao(ordem);
-            
-        } catch (e) {
-            console.error('Erro ao visualizar ordem de serviço:', e);
-            alert('Erro ao visualizar ordem de serviço');
-        }
-    }
-
-    mostrarModalVisualizacao(ordem) {
-        const modalHtml = `
-            <div id="modal-visualizar" class="modal-overlay">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Detalhes da Ordem de Serviço OS-${String(ordem.cod).padStart(3, '0')}</h3>
-                        <button class="modal-close" onclick="document.getElementById('modal-visualizar').remove()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Título:</strong> ${ordem.titulo || 'N/A'}</p>
-                        <p><strong>Cliente:</strong> ${ordem.cliente_nome || 'N/A'}</p>
-                        <p><strong>CPF:</strong> ${ordem.cliente_cpf || 'N/A'}</p>
-                        <p><strong>Motocicleta:</strong> ${ordem.motocicleta_modelo || 'N/A'}</p>
-                        <p><strong>Placa:</strong> ${ordem.motocicleta_placa || 'N/A'}</p>
-                        <p><strong>Ano:</strong> ${ordem.motocicleta_ano || 'N/A'}</p>
-                        <p><strong>Cor:</strong> ${ordem.motocicleta_cor || 'N/A'}</p>
-                        <p><strong>Data:</strong> ${ordem.data ? new Date(ordem.data).toLocaleDateString('pt-BR') : 'N/A'}</p>
-                        <p><strong>Status:</strong> <span class="status-${this.getStatusClass(ordem.status)}">${ordem.status}</span></p>
-                        <p><strong>Validada:</strong> ${ordem.validada ? 'Sim' : 'Não'}</p>
-                        <p><strong>Descrição:</strong></p>
-                        <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 5px;">${ordem.descricao || 'N/A'}</p>
-                        ${ordem.observacao ? `
-                            <p><strong>Observação:</strong></p>
-                            <p style="background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 5px;">${ordem.observacao}</p>
-                        ` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        document.getElementById('modal-visualizar').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.remove();
-            }
-        });
-    }
-
-    async visualizarOrdemCompleta(id) {
-        try {
-            
-            const token = localStorage.getItem('token');
-            const resOrdem = await fetch(`${this.apiUrl}/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (!resOrdem.ok) throw new Error('Erro ao buscar ordem de serviço');
-            
-            const jsonOrdem = await resOrdem.json();
-            const ordem = jsonOrdem.data;
-
-            const resOrcamentos = await fetch(`http://localhost:3000/api/orcamentos?ordem=${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            let orcamentos = [];
-            if (resOrcamentos.ok) {
-                const jsonOrcamentos = await resOrcamentos.json();
-                orcamentos = jsonOrcamentos.data || [];
-            }
-
-            this.mostrarModalVisualizacaoCompleta(ordem, orcamentos);
-            
-        } catch (e) {
-            console.error('Erro ao visualizar ordem de serviço completa:', e);
-            alert('Erro ao visualizar ordem de serviço');
-        }
-    }
-
-    mostrarModalVisualizacaoCompleta(ordem, orcamentos) {
-        const statusClass = this.getStatusClass(ordem.status);
-        
-        let orcamentosHtml = '';
-        if (orcamentos.length > 0) {
-            orcamentosHtml = `
-                <div class="orcamentos-section">
-                    <h4>Orçamentos Vinculados</h4>
-                    <div class="orcamentos-list">
-                        ${orcamentos.map(orc => `
-                            <div class="orcamento-item">
-                                <p><strong>Orçamento #${orc.id}</strong></p>
-                                <p>Valor: R$ ${orc.valor?.toFixed(2) || '0.00'}</p>
-                                <p>Validade: ${orc.validade ? new Date(orc.validade).toLocaleDateString('pt-BR') : 'N/A'}</p>
-                                <p>Status: <span class="status-orcamento-${orc.status?.toLowerCase()}">${this.getStatusOrcamentoText(orc.status)}</span></p>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
+    sortBy(column) {
+        if (this.currentSort.column === column) {
+            // If clicking the same column, toggle direction
+            this.currentSort.direction = this.currentSort.direction === 'asc' ? 'desc' : 'asc';
         } else {
-            orcamentosHtml = '<p><em>Nenhum orçamento vinculado a esta ordem de serviço.</em></p>';
+            // If clicking a new column, set it with default descending direction
+            this.currentSort.column = column;
+            this.currentSort.direction = 'desc';
         }
 
-        const modalHtml = `
-            <div id="modal-visualizar-completa" class="modal-overlay">
-                <div class="modal-content modal-large">
-                    <div class="modal-header">
-                        <h3>Ordem de Serviço OS-${String(ordem.cod).padStart(3, '0')} - Visualização Completa</h3>
-                        <button class="modal-close" onclick="document.getElementById('modal-visualizar-completa').remove()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="ordem-detalhes">
-                            <div class="detalhes-grid">
-                                <div class="detalhes-coluna">
-                                    <h4>Informações Gerais</h4>
-                                    <p><strong>Título:</strong> ${ordem.titulo || 'N/A'}</p>
-                                    <p><strong>Data:</strong> ${ordem.data ? new Date(ordem.data).toLocaleDateString('pt-BR') : 'N/A'}</p>
-                                    <p><strong>Status:</strong> <span class="status-${statusClass}">${ordem.status}</span></p>
-                                    <p><strong>Validada:</strong> ${ordem.validada ? 'Sim' : 'Não'}</p>
-                                    <p><strong>Usuário Responsável:</strong> ${ordem.usuario_nome || 'N/A'}</p>
-                                </div>
-                                <div class="detalhes-coluna">
-                                    <h4>Cliente e Motocicleta</h4>
-                                    <p><strong>Cliente:</strong> ${ordem.cliente_nome || 'N/A'}</p>
-                                    <p><strong>CPF:</strong> ${ordem.cliente_cpf || 'N/A'}</p>
-                                    <p><strong>Motocicleta:</strong> ${ordem.motocicleta_modelo || 'N/A'}</p>
-                                    <p><strong>Placa:</strong> ${ordem.motocicleta_placa || 'N/A'}</p>
-                                    <p><strong>Ano:</strong> ${ordem.motocicleta_ano || 'N/A'}</p>
-                                    <p><strong>Cor:</strong> ${ordem.motocicleta_cor || 'N/A'}</p>
-                                </div>
-                            </div>
-                            <div class="descricao-section">
-                                <h4>Descrição dos Serviços</h4>
-                                <div class="descricao-box">${ordem.descricao || 'N/A'}</div>
-                            </div>
-                            ${ordem.observacao ? `
-                                <div class="observacao-section">
-                                    <h4>Observações</h4>
-                                    <div class="observacao-box">${ordem.observacao}</div>
-                                </div>
-                            ` : ''}
-                            ${orcamentosHtml}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        document.getElementById('modal-visualizar-completa').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.remove();
+        // Update sort indicators in the UI
+        document.querySelectorAll('.sortable').forEach(header => {
+            header.classList.remove('asc', 'desc');
+            if (header.getAttribute('data-column') === column) {
+                header.classList.add(this.currentSort.direction);
             }
         });
-    }
 
-    getStatusOrcamentoText(status) {
-        const map = {
-            'V': 'Validado',
-            'R': 'Rejeitado', 
-            'P': 'Pendente'
-        };
-        return map[status] || status;
-    }
-
-    async atualizarStatusOrdem(id, novoStatus) {
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${this.apiUrl}/${id}/status`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    status: novoStatus,
-                    validada: novoStatus === 'Validada'
-                })
-            });
-            
-            if (!res.ok) throw new Error('Erro ao atualizar status da ordem de serviço');
-            
-            const statusMessage = {
-                'Em Andamento': 'Ordem de serviço iniciada com sucesso!',
-                'Ajuste Pendente': 'Ordem de serviço pendente para ajustes!',
-                'Validado': 'Ordem de serviço finalizada com sucesso!',
-                'Validada': 'Ordem de serviço validada com sucesso!',
-                'Validação Pendente': 'Ordem de serviço enviada para validação!',
-                'Rejeitado': 'Ordem de serviço rejeitada!',
-                'Rejeitada': 'Ordem de serviço rejeitada!'
-            };
-            
-            alert(statusMessage[novoStatus] || 'Status atualizado com sucesso!');
-            this.loadOrdens();
-        } catch (e) {
-            console.error('Erro ao atualizar status da ordem de serviço:', e);
-            alert('Erro ao atualizar status da ordem de serviço');
-        }
-    }
-
-    async excluirOrdem(id) {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${this.apiUrl}/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if (!response.ok) throw new Error('Erro ao excluir ordem de serviço');
-            const result = await response.json();
-            if (result.success) {
-                alert('Ordem de serviço excluída com sucesso!');
-                this.loadOrdens();
-            } else {
-                throw new Error(result.message || 'Erro desconhecido');
-            }
-        } catch (error) {
-            alert('Erro ao excluir ordem de serviço: ' + error.message);
-        }
+        this.renderTable();
     }
 }

@@ -161,16 +161,59 @@ class FornecedorController {
 
   async visualizarFornecedor(id) {
     try {
+      console.log(`[FornecedorController] Iniciando visualização do fornecedor ID: ${id}`);
       const token = localStorage.getItem('token');
-      const res = await fetch(`${this.apiUrl}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      
+      console.log(`[FornecedorController] Fazendo requisições para:
+        - Fornecedor: ${this.apiUrl}/${id}
+        - Peças: ${this.apiUrl}/${id}/pecas`);
+
+      const [fornecedorRes, pecasRes] = await Promise.all([
+        fetch(`${this.apiUrl}/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${this.apiUrl}/${id}/pecas`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+
+      console.log(`[FornecedorController] Status das respostas:
+        - Fornecedor: ${fornecedorRes.status}
+        - Peças: ${pecasRes.status}`);
+
+      if (!fornecedorRes.ok) {
+        console.error('[FornecedorController] Erro na resposta do fornecedor:', await fornecedorRes.text());
+        throw new Error('Erro ao buscar fornecedor');
+      }
+      if (!pecasRes.ok) {
+        console.error('[FornecedorController] Erro na resposta das peças:', await pecasRes.text());
+        throw new Error('Erro ao buscar peças do fornecedor');
+      }
+
+      const [fornecedorJson, pecasJson] = await Promise.all([
+        fornecedorRes.json(),
+        pecasRes.json()
+      ]);
+
+      console.log('[FornecedorController] Dados recebidos:', {
+        fornecedor: fornecedorJson,
+        pecas: pecasJson
       });
-      if (!res.ok) throw new Error('Erro ao buscar fornecedor');
-      const json = await res.json();
-      const f = json.data;
+
+      const f = fornecedorJson.data;
+      const pecas = pecasJson.data || [];
+
+      console.log(`[FornecedorController] Processando dados:
+        - Fornecedor: ${f.nome}
+        - Quantidade de peças: ${pecas.length}`);
+
       // Remove modal anterior se existir
       const modalExistente = document.getElementById('modal-visualizar-fornecedor');
-      if (modalExistente) modalExistente.remove();
+      if (modalExistente) {
+        console.log('[FornecedorController] Removendo modal existente');
+        modalExistente.remove();
+      }
+
       const modalHtml = `
         <div id="modal-visualizar-fornecedor" class="modal-overlay">
           <div class="modal-content">
@@ -186,19 +229,43 @@ class FornecedorController {
                 <p><strong>Telefone:</strong> <span>${f.telefone || 'N/A'}</span></p>
                 <p><strong>Endereço:</strong> <span>${f.endereco || 'N/A'}</span></p>
               </div>
+              <div class="pecas-list">
+                <h4>Peças Fornecidas</h4>
+                ${pecas.length > 0 
+                  ? `<ul>${pecas.map(p => {
+                      const valor = typeof p.valor === 'number' ? p.valor : parseFloat(p.valor) || 0;
+                      return `<li>
+                        <span class="peca-nome">${p.nome}</span>
+                        <span class="peca-valor">R$ ${valor.toFixed(2)}</span>
+                      </li>`;
+                    }).join('')}</ul>`
+                  : '<p>Nenhuma peça cadastrada para este fornecedor.</p>'
+                }
+              </div>
             </div>
           </div>
         </div>
       `;
+
+      console.log('[FornecedorController] Inserindo novo modal no DOM');
       document.body.insertAdjacentHTML('beforeend', modalHtml);
+
       // Fechar ao clicar fora do modal ou no botão de fechar
       document.getElementById('modal-visualizar-fornecedor').addEventListener('click', function(e) {
-        if (e.target === this) this.remove();
+        if (e.target === this) {
+          console.log('[FornecedorController] Fechando modal (clique fora)');
+          this.remove();
+        }
       });
       document.getElementById('close-modal-fornecedor').onclick = function() {
+        console.log('[FornecedorController] Fechando modal (botão fechar)');
         document.getElementById('modal-visualizar-fornecedor').remove();
       };
+
+      console.log('[FornecedorController] Modal criado e exibido com sucesso');
     } catch (e) {
+      console.error('[FornecedorController] Erro ao visualizar fornecedor:', e);
+      console.error('[FornecedorController] Stack trace:', e.stack);
       this.showNotification('Erro ao visualizar fornecedor: ' + e.message, 'error');
     }
   }
