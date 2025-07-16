@@ -2,11 +2,12 @@
 
 ## 👥 Equipe Responsável pelo Projeto
 
-- **Alessandro Luigi Ferreira Correa** — 20230003860  
+- *Alessandro Luigi Ferreira Correa* — 20230003860  
  [🔗 LinkedIn](https://www.linkedin.com/in/alessandro-corr%C3%AAa-644551223/)
 
-- **Rhuan Lehmen de Souza Leite** — 20230001285  
+- *Rhuan Lehmen de Souza Leite* — 20230001285  
  [🔗 LinkedIn](https://www.linkedin.com/in/rhuan-leite/)
+
 
 Projeto integrador das disciplinas:
 
@@ -18,11 +19,11 @@ Projeto integrador das disciplinas:
 
 ## 📁 Estrutura
 
-Toda a documentação do projeto está localizada na pasta **`docs/`**.
+Toda a documentação do projeto está localizada na pasta **docs/**.
 
 ---
 
-## Sistema de Gerenciamento de Oficina de Motocicletas 🏍️🛠️
+## Sistema de Gerenciamento de Oficina de Motocicletas 🏍🛠
 
 ### Descrição:
 Este sistema foi desenvolvido para gerenciar as operações de uma oficina de motocicletas, abrangendo o controle de clientes, motocicletas, ordens de serviço, orçamentos, peças, fornecedores, marcas e usuários. O objetivo é otimizar o fluxo de trabalho, facilitar o acompanhamento dos serviços realizados.
@@ -31,7 +32,7 @@ O sistema conta com um painel de controle (dashboard) para visualização de dad
 
 ---
 
-### **Tecnologias Utilizadas 📎**
+### *Tecnologias Utilizadas 📎*
 
 #### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg" width="25" height="25"> Visual Studio Code:
 IDE utilizada para o desenvolvimento do projeto.
@@ -62,8 +63,6 @@ Biblioteca JavaScript utilizada para criação de gráficos interativos no dashb
 
 ---
 
-## ▶️ Como Executar o Projeto
-
 ### 🔧 Pré-requisitos
 
 Certifique-se de ter os seguintes itens instalados:
@@ -74,14 +73,31 @@ Certifique-se de ter os seguintes itens instalados:
 
 ---
 
-### Iniciar o projeto
+## Como executar o projeto
 
-1. Acesse a pasta do backend:
-cd backend
+1. Inicialize o banco de dados:
+   
+   No terminal, execute:
+   
+   sh
+   psql -U postgres -f Database/oficina.sql
+   
+   (Use o caminho completo se necessário e informe a senha do usuário do banco quando solicitado)
 
-2. Instale as dependências:
-npm install
+2. Acesse a pasta do backend:
+   
+   sh
+   cd backend
+   
 
-3. Inicie o servidor:
-npm start
+3. Instale as dependências:
+   
+   sh
+   npm install
+   
 
+4. Inicie o servidor:
+   
+   sh
+   npm start
+   
