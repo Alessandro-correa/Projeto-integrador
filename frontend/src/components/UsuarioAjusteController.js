@@ -41,22 +41,52 @@ class UsuarioAjusteController {
 
     async loadUsuario() {
         try {
+            console.log('🔍 Carregando usuário com CPF:', this.cpf);
+            
             const token = localStorage.getItem('token');
+            console.log('🔑 Token encontrado:', token ? 'Sim' : 'Não');
+            if (token) {
+                console.log('🔑 Token (primeiros 50 chars):', token.substring(0, 50) + '...');
+            }
+            
             const res = await fetch(`${this.apiUrl}/${this.cpf}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error('Erro ao buscar usuário');
+            
+            console.log('📡 Resposta da API:', res.status, res.statusText);
+            console.log('📡 Headers da resposta:', Object.fromEntries(res.headers.entries()));
+            
+            if (!res.ok) {
+                if (res.status === 404) {
+                    throw new Error('Usuário não encontrado. Verifique se o CPF está correto.');
+                } else if (res.status === 401) {
+                    throw new Error('Token de autenticação inválido ou expirado.');
+                }
+                throw new Error(`Erro HTTP: ${res.status}`);
+            }
+            
             const json = await res.json();
-            const u = json.data;
-            this.form.nome.value = u.nome;
-            this.form.cpf.value = u.cpf;
-            this.form.email.value = u.email;
-            this.form.telefone.value = u.telefone || '';
-            this.form.funcao.value = u.funcao;
-            this.form.status.value = u.status;
+            console.log('📦 Dados recebidos:', json);
+            
+            if (json.success && json.data) {
+                const u = json.data;
+                this.form.nome.value = u.nome;
+                this.form.cpf.value = u.cpf;
+                this.form.email.value = u.email;
+                this.form.telefone.value = u.telefone || '';
+                this.form.funcao.value = u.funcao;
+                this.form.codigo.value = u.codigo || '';
+                
+                console.log('✅ Usuário carregado com sucesso');
+            } else {
+                throw new Error(json.message || 'Erro ao carregar dados do usuário');
+            }
         } catch (e) {
+            console.error('❌ Erro ao carregar usuário:', e);
             alert('Erro ao carregar usuário: ' + e.message);
-            window.location.href = 'usuarios-consulta.html';
+            setTimeout(() => {
+                window.location.href = 'usuarios-consulta.html';
+            }, 2000);
         }
     }
 
@@ -69,10 +99,10 @@ class UsuarioAjusteController {
         const email = this.form.email.value.trim();
         const telefone = this.form.telefone.value.trim();
         const funcao = this.form.funcao.value;
-        const status = this.form.status.value;
+        const codigo = this.form.codigo.value.trim();
         const senha = this.form.senha.value;
 
-        if (!nome || !email || !funcao || !status) {
+        if (!nome || !email || !funcao || !codigo) {
             alert('Preencha todos os campos obrigatórios!');
             this.isSubmitting = false;
             return;
@@ -85,13 +115,15 @@ class UsuarioAjusteController {
                 email,
                 telefone,
                 funcao,
-                status
+                codigo
             };
 
             // Adiciona senha apenas se foi preenchida
-            if (senha) {
+            if (senha && senha.trim() !== '') {
                 userData.senha = senha;
             }
+
+            console.log('📤 Enviando dados para atualização:', userData);
 
             const res = await fetch(`${this.apiUrl}/${this.cpf}`, {
                 method: 'PUT',
@@ -103,13 +135,18 @@ class UsuarioAjusteController {
             });
 
             const json = await res.json();
+            console.log('📡 Resposta da atualização:', json);
+            
             if (res.ok && json.success) {
                 alert('Usuário atualizado com sucesso!');
-                window.location.href = 'usuarios-consulta.html';
+                setTimeout(() => {
+                    window.location.href = 'usuarios-consulta.html';
+                }, 1000);
             } else {
-                alert(json.message || 'Erro ao atualizar usuário');
+                throw new Error(json.message || 'Erro ao atualizar usuário');
             }
         } catch (e) {
+            console.error('❌ Erro ao atualizar usuário:', e);
             alert('Erro ao atualizar usuário: ' + e.message);
         } finally {
             this.isSubmitting = false;

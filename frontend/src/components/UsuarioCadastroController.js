@@ -132,15 +132,26 @@ class UsuarioCadastroController {
             const result = await response.json();
 
             if (response.ok && result.success) {
-                window.location.href = 'usuarios-consulta.html';
-                setTimeout(() => alert('Usuário cadastrado com sucesso!'), 100);
+                alert('Usuário cadastrado com sucesso!');
+                setTimeout(() => {
+                    window.location.href = 'usuarios-consulta.html';
+                }, 100);
                 return;
             } 
             
-            throw new Error(result.message || 'Erro ao cadastrar usuário');
+            // Se chegou aqui, houve erro no servidor
+            console.error('Erro do servidor:', result);
+            throw new Error(result.message || result.error || 'Erro ao cadastrar usuário');
         } catch (error) {
             console.error('Erro no cadastro:', error);
-            alert(error.message || 'Erro ao cadastrar usuário');
+            
+            // Tratar erros específicos
+            if (error.message.includes('Failed to fetch')) {
+                alert('Erro de conexão. Verifique se o servidor está funcionando.');
+            } else {
+                alert(error.message || 'Erro ao cadastrar usuário');
+            }
+            
             submitButton.disabled = false;
         } finally {
             this.isSubmitting = false;

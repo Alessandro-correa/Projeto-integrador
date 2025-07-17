@@ -473,12 +473,10 @@ class BasePageController {
     }
 
     handleLogout() {
-        // Clear all authentication data
         localStorage.removeItem('token');
         localStorage.removeItem('userType');
         localStorage.removeItem('userName');
         
-        // Redirect to login page
         window.location.href = '/frontend/views/login/login.html';
     }
 }

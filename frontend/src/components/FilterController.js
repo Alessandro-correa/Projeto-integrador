@@ -359,6 +359,8 @@ class FilterController {
                 return `${basePath}/os-ajustar.html?cod=${item.codigo}`;
             case 'motocicletas':
                 return `${basePath}/motos-ajustar.html?id=${item.id}`;
+            case 'clientes':
+                return `${basePath}/clientes-ajustar.html?cpf=${item.cpf}`;
             default:
                 return `${basePath}/${this.entity}-ajustar.html?id=${item.id || item.codigo || item.cpf}`;
         }

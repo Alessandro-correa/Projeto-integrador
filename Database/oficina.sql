@@ -1,5 +1,5 @@
 -- Criação do banco e seleção
-CREATE DATABASE IF NOT EXISTS oficina;
+CREATE DATABASE oficina;
 \c oficina;
 
 -- Ajustes de formato de data e codificação

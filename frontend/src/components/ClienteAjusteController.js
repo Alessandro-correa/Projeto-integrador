@@ -44,9 +44,22 @@ class ClienteAjusteController {
         if (telefoneInput) {
             telefoneInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/(\d{2})(\d)/, '($1) $2');
-                value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+                if (value.length > 11) value = value.slice(0, 11);
+                if (value.length >= 2) value = '(' + value.slice(0,2) + ') ' + value.slice(2);
+                if (value.length >= 10) value = value.slice(0,10) + '-' + value.slice(10);
                 e.target.value = value;
+            });
+
+            // Adicionar validação no blur
+            telefoneInput.addEventListener('blur', (e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                if (value.length < 10 || value.length > 11) {
+                    this.showNotification('Telefone inválido. Use o formato (99) 99999-9999', 'error', 'Erro!', 3000);
+                    e.target.classList.add('invalid');
+                    return false;
+                }
+                e.target.classList.remove('invalid');
+                return true;
             });
         }
 
@@ -65,42 +78,42 @@ class ClienteAjusteController {
 
     async loadClienteFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
+        const cpf = urlParams.get('cpf');
         
-        console.log(`🔗 URL atual: ${window.location.href}`);
-        console.log(`📋 Parâmetros da URL:`, urlParams.toString());
-        console.log(`👤 ID extraído da URL: "${id}"`);
+        console.log(`URL atual: ${window.location.href}`);
+        console.log(`Parâmetros da URL:`, urlParams.toString());
+        console.log(`CPF extraído da URL: "${cpf}"`);
         
-        if (id) {
+        if (cpf) {
             try {
-                await this.loadCliente(id);
+                await this.loadCliente(cpf);
             } catch (error) {
-                console.error('❌ Erro ao carregar cliente da URL:', error);
-                this.showNotification('Erro ao carregar dados do cliente. Verifique se o ID é válido.', 'error', 'Erro!', 5000);
+                console.error('Erro ao carregar cliente da URL:', error);
+                this.showNotification('Erro ao carregar dados do cliente. Verifique se o CPF é válido.', 'error', 'Erro!', 5000);
                 setTimeout(() => {
                     window.location.href = 'clientes-consulta.html';
                 }, 3000);
             }
         } else {
-            console.error('❌ ID não encontrado na URL');
-            this.showNotification('ID não informado na URL.', 'error', 'Erro!', 5000);
+            console.error('CPF não encontrado na URL');
+            this.showNotification('CPF não informado na URL.', 'error', 'Erro!', 5000);
             setTimeout(() => {
                 window.location.href = 'clientes-consulta.html';
             }, 3000);
         }
     }
 
-    async loadCliente(id) {
+    async loadCliente(cpf) {
         try {
             this.showLoading(true);
             
-            // Formatar ID para busca (remover pontos e traços)
-            const idFormatted = id.replace(/[.-]/g, '');
+            // Formatar CPF para busca (remover pontos e traços)
+            const cpfFormatted = cpf.replace(/[.-]/g, '');
             
-            console.log(`🔍 Buscando cliente com ID: ${id} (formatado: ${idFormatted})`);
+            console.log(`🔍 Buscando cliente com CPF: ${cpf} (formatado: ${cpfFormatted})`);
             
             const token = localStorage.getItem('token');
-            const response = await fetch(`${this.baseURL}/${idFormatted}`, {
+            const response = await fetch(`${this.baseURL}/${cpfFormatted}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -108,7 +121,7 @@ class ClienteAjusteController {
             
             if (!response.ok) {
                 if (response.status === 404) {
-                    throw new Error('Cliente não encontrado. Verifique se o ID está correto.');
+                    throw new Error('Cliente não encontrado. Verifique se o CPF está correto.');
                 }
                 throw new Error(`Erro HTTP: ${response.status}`);
             }
@@ -127,7 +140,7 @@ class ClienteAjusteController {
             }
             
         } catch (error) {
-            console.error('❌ Erro ao carregar cliente:', error);
+            console.error('Erro ao carregar cliente:', error);
             this.showNotification(error.message || 'Erro ao carregar dados do cliente', 'error', 'Erro!', 5000);
             throw error;
         } finally {
@@ -203,28 +216,40 @@ class ClienteAjusteController {
     }
 
     validarFormulario(dados) {
+        let isValid = true;
         const camposObrigatorios = ['nome', 'email', 'telefone', 'sexo', 'profissao', 'endereco', 'data_de_nascimento'];
         
+        // Validar campos obrigatórios
         for (const campo of camposObrigatorios) {
-            if (!dados[campo]) {
-                this.showNotification(`O campo ${this.getFieldLabel(campo)} é obrigatório`, 'error', 'Campo obrigatório!', 5000);
-                return false;
+            const valor = dados[campo];
+            if (!valor || valor.trim() === '') {
+                this.showNotification(`O campo ${this.getFieldLabel(campo)} é obrigatório.`, 'error', 'Erro!', 3000);
+                isValid = false;
+            }
+        }
+
+        // Validar formato do telefone
+        if (dados.telefone) {
+            const telefoneNumeros = dados.telefone.replace(/\D/g, '');
+            if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+                this.showNotification('Telefone inválido. Use o formato (99) 99999-9999', 'error', 'Erro!', 3000);
+                isValid = false;
             }
         }
 
         // Validar email
-        if (!this.validarEmail(dados.email)) {
-            this.showNotification('Email inválido', 'error', 'Email inválido!', 5000);
-            return false;
+        if (dados.email && !this.validarEmail(dados.email)) {
+            this.showNotification('Email inválido.', 'error', 'Erro!', 3000);
+            isValid = false;
         }
 
         // Validar data de nascimento
-        if (!this.validarDataNascimento(dados.data_de_nascimento)) {
-            this.showNotification('Data de nascimento inválida', 'error', 'Data inválida!', 5000);
-            return false;
+        if (dados.data_de_nascimento && !this.validarDataNascimento(dados.data_de_nascimento)) {
+            this.showNotification('Data de nascimento inválida.', 'error', 'Erro!', 3000);
+            isValid = false;
         }
 
-        return true;
+        return isValid;
     }
 
     getFieldLabel(campo) {
@@ -261,7 +286,7 @@ class ClienteAjusteController {
     verificarMudancas(dadosNovos) {
         if (!this.originalData) return true;
 
-        const camposParaComparar = ['nome', 'email', 'telefone', 'sexo', 'profissao', 'endereco'];
+        const camposParaComparar = ['nome', 'email', 'telefone', 'sexo', 'profissao', 'endereco', 'data_de_nascimento'];
         
         for (const campo of camposParaComparar) {
             const valorOriginal = this.originalData[campo] || '';
@@ -272,12 +297,7 @@ class ClienteAjusteController {
             }
         }
 
-        // Comparar data de nascimento
-        const dataOriginal = this.originalData.data_de_nascimento ? 
-            new Date(this.originalData.data_de_nascimento).toISOString().split('T')[0] : '';
-        const dataNova = dadosNovos.data_de_nascimento || '';
-        
-        return dataOriginal !== dataNova;
+        return false;
     }
 
     async salvarAlteracoes(dados) {
@@ -292,7 +312,8 @@ class ClienteAjusteController {
             
             this.showLoading(true, 'Salvando alterações...');
             
-            const id = this.currentItem.id.replace(/[.-]/g, '');
+            // Pegar o ID do CPF diretamente do formulário, já que é readonly
+            const id = document.getElementById('cpf').value.replace(/[.-]/g, '');
             
             const token = localStorage.getItem('token');
             const response = await fetch(`${this.baseURL}/${id}`, {
@@ -310,7 +331,7 @@ class ClienteAjusteController {
                 this.showNotification('Cliente atualizado com sucesso!', 'success', 'Sucesso!', 3000);
                 
                 // Atualizar dados originais
-                this.originalData = { ...dados, id: this.currentItem.id };
+                this.originalData = { ...dados, id: id };
                 
                 setTimeout(() => {
                     window.location.href = 'clientes-consulta.html';

@@ -38,13 +38,13 @@ class OrdemController {
         });
 
         // Setup action listeners
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.excluir-ordem')) {
+        document.addEventListener('click', async (e) => {
+            const deleteButton = e.target.closest('.excluir-ordem');
+            if (deleteButton) {
                 e.preventDefault();
-                const id = e.target.closest('.excluir-ordem').dataset.id;
-                if (confirm('Tem certeza que deseja excluir esta ordem de serviço?')) {
-                    this.excluirOrdem(id);
-                }
+                e.stopPropagation(); // Prevent event bubbling
+                const id = deleteButton.dataset.id;
+                await this.confirmarExclusao(id);
             }
         });
     }
@@ -260,7 +260,7 @@ class OrdemController {
         
         // Visualizar é sempre permitido
         actionsDiv.innerHTML = `
-            <button class="action-btn" onclick="window.location.href='os-visualizar.html?cod=${ordem.cod}'" title="Visualizar">
+            <button class="action-btn" onclick="ordemController.visualizarOrdem('${ordem.cod}')" title="Visualizar">
                 <i class='bx bx-show'></i>
             </button>
         `;
@@ -313,7 +313,7 @@ class OrdemController {
         
         // Visualizar é sempre permitido
         actions.push(`
-            <button class="action-btn" onclick="window.location.href='os-visualizar.html?cod=${ordem.cod}'" title="Visualizar">
+            <button class="action-btn" onclick="ordemController.visualizarOrdem('${ordem.cod}')" title="Visualizar">
                 <i class='bx bx-show'></i>
             </button>
         `);
@@ -333,8 +333,206 @@ class OrdemController {
         return actions.join('');
     }
 
-    async excluirOrdem(id) {
+    async visualizarOrdem(id) {
         try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${this.apiUrl}/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Erro ao buscar ordem de serviço');
+            
+            const json = await res.json();
+            const ordem = json.data;
+
+            this.mostrarModalVisualizacao(ordem);
+            
+        } catch (e) {
+            console.error('Erro ao visualizar ordem:', e);
+            alert('Erro ao visualizar ordem de serviço');
+        }
+    }
+
+    mostrarModalVisualizacao(ordem) {
+        // Processar peças se existirem
+        let pecasHTML = '';
+        if (ordem.pecas && ordem.pecas.length > 0) {
+            pecasHTML = `
+                <div class="section-divider">
+                    <h4>Peças Utilizadas</h4>
+                    <div class="items-list">
+                        ${ordem.pecas.map(peca => `
+                            <div class="item-row">
+                                <span class="item-description">${peca.nome} (Qtd: ${peca.qtd_pecas})</span>
+                                <span class="item-value">R$ ${parseFloat(peca.valor_total || 0).toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Garantir que os valores sejam números
+        const valorPecas = parseFloat(ordem.valor_total_pecas || 0);
+        const valorMaoDeObra = parseFloat(ordem.valor_mao_de_obra || 0);
+        const valorTotal = parseFloat(ordem.valor_total_os || 0);
+
+        const modalHtml = `
+            <div id="modal-visualizar" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Detalhes da Ordem de Serviço OS-${String(ordem.cod).padStart(3, '0')}</h3>
+                        <button class="modal-close" onclick="document.getElementById('modal-visualizar').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="basic-info">
+                            <p><strong>Título:</strong> ${ordem.titulo || 'N/A'}</p>
+                            <p><strong>Cliente:</strong> ${ordem.cliente_nome || 'N/A'}</p>
+                            <p><strong>CPF:</strong> ${ordem.cliente_cpf || 'N/A'}</p>
+                            <p><strong>Motocicleta:</strong> ${ordem.motocicleta_modelo || 'N/A'}</p>
+                            <p><strong>Placa:</strong> ${ordem.motocicleta_placa || 'N/A'}</p>
+                            <p><strong>Data:</strong> ${ordem.data ? new Date(ordem.data).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                            <p><strong>Status:</strong> <span class="status-${this.getStatusClass(ordem.status)}">${this.getStatusText(ordem.status)}</span></p>
+                        </div>
+
+                        <div class="section-divider">
+                            <h4>Descrição do Serviço</h4>
+                            <div class="items-list">
+                                <p>${ordem.descricao || 'Nenhuma descrição disponível'}</p>
+                            </div>
+                        </div>
+                        
+                        ${pecasHTML}
+                        
+                        <div class="section-divider">
+                            <h4>Valores</h4>
+                            <div class="items-list">
+                                <div class="item-row">
+                                    <span class="item-description">Valor das Peças</span>
+                                    <span class="item-value">R$ ${valorPecas.toFixed(2)}</span>
+                                </div>
+                                <div class="item-row">
+                                    <span class="item-description">Valor Mão de Obra</span>
+                                    <span class="item-value">R$ ${valorMaoDeObra.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div class="total-geral">
+                                <strong>Total Geral: R$ ${valorTotal.toFixed(2)}</strong>
+                            </div>
+                        </div>
+
+                        ${ordem.observacao ? `
+                            <div class="section-divider">
+                                <h4>Observações</h4>
+                                <div class="items-list">
+                                    <p>${ordem.observacao}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <style>
+                            .section-divider {
+                                margin-top: 20px;
+                                padding-top: 15px;
+                                border-top: 1px solid #eee;
+                            }
+                            .section-divider h4 {
+                                margin: 0 0 10px 0;
+                                color: #333;
+                                font-size: 16px;
+                            }
+                            .items-list {
+                                background: #f8f9fa;
+                                border-radius: 8px;
+                                padding: 10px;
+                                margin-bottom: 10px;
+                            }
+                            .item-row {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 8px 0;
+                                border-bottom: 1px solid #e9ecef;
+                            }
+                            .item-row:last-child {
+                                border-bottom: none;
+                            }
+                            .item-description {
+                                flex: 1;
+                                font-weight: 500;
+                            }
+                            .item-value {
+                                font-weight: 600;
+                                color: #dc3545;
+                            }
+                            .total-geral {
+                                margin-top: 20px;
+                                padding: 15px;
+                                background: #f8f9fa;
+                                border-radius: 8px;
+                                text-align: center;
+                                font-size: 18px;
+                                color: #000;
+                            }
+                        </style>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        document.getElementById('modal-visualizar').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.remove();
+            }
+        });
+    }
+
+    async confirmarExclusao(id) {
+        // Remover modal existente se houver
+        const existingModal = document.getElementById('modal-confirm-delete');
+        if (existingModal) existingModal.remove();
+
+        // Criar e mostrar o modal de confirmação
+        const modalHtml = `
+            <div id="modal-confirm-delete" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Confirmar Exclusão</h3>
+                        <button class="modal-close" onclick="document.getElementById('modal-confirm-delete').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita.</p>
+                        <div style="margin-top: 24px; display: flex; gap: 16px; justify-content: flex-end;">
+                            <button id="btn-cancel-delete" class="btn btn-secondary">Cancelar</button>
+                            <button id="btn-confirm-delete" class="btn btn-danger">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Configurar eventos do modal
+        const modal = document.getElementById('modal-confirm-delete');
+        const btnCancel = document.getElementById('btn-cancel-delete');
+        const btnConfirm = document.getElementById('btn-confirm-delete');
+
+        // Fechar modal ao clicar no botão Cancelar
+        btnCancel.onclick = () => modal.remove();
+
+        // Fechar modal ao clicar fora dele
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
+        };
+
+        // Configurar ação de exclusão
+        btnConfirm.onclick = async () => {
+            try {
+                btnConfirm.disabled = true;
+                btnConfirm.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Excluindo...';
+                
             const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl + '/' + id, {
                 method: 'DELETE',
@@ -344,17 +542,31 @@ class OrdemController {
                 }
             });
             
-            if (!response.ok) throw new Error('Erro ao excluir ordem de serviço');
-            
             const result = await response.json();
-            if (!result.success) throw new Error(result.message || 'Erro desconhecido');
-            
-                alert('Ordem de serviço excluída com sucesso!');
-                this.loadOrdens();
+                
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Erro ao excluir ordem de serviço');
+                }
+
+                // Remover o modal
+                modal.remove();
+
+                // Mostrar notificação de sucesso
+                this.showNotification('Ordem de serviço excluída com sucesso!', 'success');
+                
+                // Remover a ordem excluída da lista local
+                this.ordens = this.ordens.filter(ordem => ordem.cod !== parseInt(id));
+                
+                // Atualizar a tabela sem fazer nova chamada à API
+                this.renderTable();
+                
         } catch (error) {
             console.error('Erro ao excluir ordem:', error);
-            alert('Erro ao excluir ordem de serviço: ' + error.message);
+                this.showNotification(error.message || 'Erro ao excluir ordem de serviço', 'error');
+            } finally {
+                if (modal) modal.remove();
         }
+        };
     }
 
     clearFilters() {

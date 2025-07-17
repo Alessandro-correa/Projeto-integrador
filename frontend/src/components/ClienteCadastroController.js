@@ -12,20 +12,16 @@ class ClienteCadastroController extends BasePageController {
     }
 
     init() {
-        // Sobrescrever init do BasePageController para evitar conflitos
         this.setupFormSubmission();
         this.setupFormValidation();
         this.setupFieldMasks();
         
-        // Garantir que o método de notificação correto seja usado
         this.ensureCorrectNotificationMethod();
         
-        console.log('✅ ClienteCadastroController inicializado');
+        console.log('ClienteCadastroController inicializado');
     }
 
     ensureCorrectNotificationMethod() {
-        // Garantir que usamos o método de notificação avançado, não o do BasePageController
-        // Criar uma versão interceptada do showNotification
         this.originalShowAdvancedNotification = this.showAdvancedNotification.bind(this);
         this.showNotification = (message, type, title, duration) => {
             if (this.blockFurtherProcessing && (type === 'error' || type === 'warning')) {
@@ -36,31 +32,27 @@ class ClienteCadastroController extends BasePageController {
             return this.originalShowAdvancedNotification(message, type, title, duration);
         };
         
-        // Interceptar chamadas do BasePageController
         const originalShowNotification = BasePageController.showNotification;
         BasePageController.showNotification = (message, type) => {
-            console.log('🔄 Interceptando chamada do BasePageController, redirecionando para método avançado...');
+            console.log('Interceptando chamada do BasePageController, redirecionando para método avançado...');
             
-            // Aplicar o mesmo bloqueio
             if (this.blockFurtherProcessing && (type === 'error' || type === 'warning')) {
-                console.log(`🚫 BLOQUEANDO BasePageController notificação ${type}: "${message}"`);
+                console.log(`BLOQUEANDO BasePageController notificação ${type}: "${message}"`);
                 return;
             }
             
             return this.showAdvancedNotification(message, type);
         };
         
-        // Verificar se o CSS de notificações está carregado
         this.ensureNotificationStyles();
     }
 
     ensureNotificationStyles() {
-        // Verificar se o CSS de ajuste está carregado
         const ajusteCss = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
             .find(link => link.href.includes('ajuste.css'));
         
         if (!ajusteCss) {
-            console.warn('⚠️ CSS de ajuste não encontrado, carregando dinamicamente...');
+            console.warn('CSS de ajuste não encontrado, carregando dinamicamente...');
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = '../../assets/css/ajuste.css';
@@ -84,30 +76,22 @@ class ClienteCadastroController extends BasePageController {
 
     async handleFormSubmit() {
         try {
-            console.log('🚀 INICIANDO PROCESSO DE CADASTRO');
-            console.log('🧹 Limpando notificações anteriores...');
+            console.log('INICIANDO PROCESSO DE CADASTRO');
             
-            // Limpar TODAS as notificações antes de começar
             this.clearAllNotifications();
             this.removeOldNotifications();
             
-            // Garantir que o método correto de notificação está sendo usado
             this.ensureCorrectNotificationMethod();
             
             const formData = this.getFormData();
             
-            // VALIDAÇÃO BÁSICA APENAS - SEM NOTIFICAÇÕES DE DUPLICAÇÃO
-            if (!this.validateFormBasic(formData)) {
+            if (!(await this.validateFormBasic(formData))) {
                 return;
             }
 
-            // REMOVENDO QUALQUER validação prévia - deixar apenas o backend validar
-            console.log('✅ Pulando validação prévia de campos únicos - backend será responsável');
-
-            // Mostrar loading
             this.showLoading('Cadastrando cliente...');
 
-            console.log('📤 Enviando dados do cliente:', formData);
+            console.log('Enviando dados do cliente:', formData);
 
             const token = localStorage.getItem('token');
             const response = await fetch(this.apiUrl, {
@@ -130,12 +114,10 @@ class ClienteCadastroController extends BasePageController {
             console.log('OK:', response.ok);
             console.log('Result:', result);
 
-            // PROCESSAR RESULTADO - APENAS UMA NOTIFICAÇÃO
             if (response.ok && result.success) {
-                console.log('✅ SUCESSO: Cliente cadastrado corretamente!');
+                console.log('SUCESSO: Cliente cadastrado corretamente!');
                 this.showNotification('Cliente cadastrado com sucesso!', 'success', 'Sucesso!', 8000);
                 
-                // BLOQUEAR qualquer processamento adicional
                 this.blockFurtherProcessing = true;
                 
                 this.clearForm();
@@ -143,40 +125,40 @@ class ClienteCadastroController extends BasePageController {
                     window.location.href = 'clientes-consulta.html';
                 }, 2000);
                 
-                return; // PARAR AQUI - NÃO PROCESSAR MAIS NADA
+                return;
                 
             } else {
-                console.log('❌ ERRO: Falha no cadastro');
-                console.log('❌ Response.ok:', response.ok);
-                console.log('❌ Result.success:', result.success);
-                console.log('❌ Mensagem do servidor:', result.message);
+                console.log('ERRO: Falha no cadastro');
+                console.log('Response.ok:', response.ok);
+                console.log('Result.success:', result.success);
+                console.log('Mensagem do servidor:', result.message);
                 
                 // Tratar erros específicos do servidor
                 const errorMessage = result.message || 'Erro ao cadastrar cliente';
-                console.log('❌ Mensagem processada:', errorMessage);
+                console.log('Mensagem processada:', errorMessage);
                 
                 if (errorMessage.toLowerCase().includes('cpf') && errorMessage.toLowerCase().includes('já')) {
-                    console.log('❌ DETECTADO: Erro de CPF duplicado');
+                    console.log('DETECTADO: Erro de CPF duplicado');
                     this.showNotification('Este CPF já está cadastrado no sistema', 'error', 'CPF Duplicado!', 8000);
                     this.focusField('cpf');
                 } else if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('já')) {
-                    console.log('❌ DETECTADO: Erro de email duplicado');
+                    console.log('DETECTADO: Erro de email duplicado');
                     this.showNotification('Este email já está cadastrado no sistema', 'error', 'Email Duplicado!', 8000);
                     this.focusField('email');
                 } else if (errorMessage.toLowerCase().includes('cpf') && errorMessage.toLowerCase().includes('inválido')) {
-                    console.log('❌ DETECTADO: Erro de CPF inválido');
+                    console.log('DETECTADO: Erro de CPF inválido');
                     this.showNotification('CPF inválido', 'error', 'CPF Inválido!', 8000);
                     this.focusField('cpf');
                 } else if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('inválido')) {
-                    console.log('❌ DETECTADO: Erro de email inválido');
+                    console.log('DETECTADO: Erro de email inválido');
                     this.showNotification('Email inválido', 'error', 'Email Inválido!', 8000);
                     this.focusField('email');
                 } else {
-                    console.log('❌ DETECTADO: Erro genérico');
+                    console.log('DETECTADO: Erro genérico');
                     this.showNotification(errorMessage, 'error', 'Erro!', 8000);
                 }
                 
-                console.log('❌ Erro do servidor COMPLETO:', result);
+                console.log('Erro do servidor COMPLETO:', result);
             }
 
         } catch (error) {
@@ -217,57 +199,50 @@ class ClienteCadastroController extends BasePageController {
         };
     }
 
-    validateFormBasic(data) {
-        console.log('🔍 Validação básica de formulário (SEM verificação de duplicação)');
+    async validateFormBasic(data) {
+        let isValid = true;
+        const camposObrigatorios = ['nome', 'email', 'cpf', 'telefone', 'sexo', 'endereco', 'profissao', 'dataDeNascimento'];
         
         // Validar campos obrigatórios
-        const requiredFields = ['nome', 'email', 'cpf', 'telefone', 'sexo', 'endereco', 'profissao', 'dataDeNascimento'];
-        
-        for (const field of requiredFields) {
-            if (!data[field]) {
-                this.showNotification(`O campo ${this.getFieldLabel(field)} é obrigatório`, 'warning', 'Campo Obrigatório!', 8000);
-                this.focusField(field);
-                return false;
+        for (const campo of camposObrigatorios) {
+            const valor = data[campo];
+            if (!valor || valor.trim() === '') {
+                this.showNotification(`O campo ${this.getFieldLabel(campo)} é obrigatório.`, 'error', 'Erro!', 3000);
+                isValid = false;
             }
         }
 
-        // Validar CPF (formato apenas, NÃO duplicação)
-        if (!this.validateCPF(data.cpf)) {
-            this.showNotification('CPF inválido. Verifique o formato (000.000.000-00)', 'error', 'CPF Inválido!', 8000);
-            this.focusField('cpf');
-            return false;
+        // Validar formato do telefone
+        if (data.telefone) {
+            const telefoneNumeros = data.telefone.replace(/\D/g, '');
+            if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+                this.showNotification('Telefone inválido. Use o formato (99) 99999-9999', 'error', 'Erro!', 3000);
+                isValid = false;
+            }
         }
 
-        // Validar email (formato apenas, NÃO duplicação)
-        if (!this.validateEmail(data.email)) {
-            this.showNotification('Email inválido. Verifique o formato (exemplo@dominio.com)', 'error', 'Email Inválido!', 8000);
-            this.focusField('email');
-            return false;
+        // Validar CPF
+        if (data.cpf) {
+            const cpfValido = await this.validateCPF(data.cpf);
+            if (!cpfValido) {
+                this.showNotification('CPF inválido.', 'error', 'Erro!', 3000);
+                isValid = false;
+            }
         }
 
-        // Validar telefone
-        if (!this.validateTelefone(data.telefone)) {
-            this.showNotification('Telefone inválido. Use apenas números de celular (11 dígitos)', 'error', 'Telefone Inválido!', 8000);
-            this.focusField('telefone');
-            return false;
+        // Validar email
+        if (data.email && !this.validateEmail(data.email)) {
+            this.showNotification('Email inválido.', 'error', 'Erro!', 3000);
+            isValid = false;
         }
 
         // Validar data de nascimento
-        if (!this.validateDataNascimento(data.dataDeNascimento)) {
-            this.showNotification('Data de nascimento inválida. Cliente deve ter entre 16 e 120 anos', 'error', 'Data Inválida!', 8000);
-            this.focusField('data_nascimento');
-            return false;
+        if (data.dataDeNascimento && !this.validateDataNascimento(data.dataDeNascimento)) {
+            this.showNotification('Data de nascimento inválida.', 'error', 'Erro!', 3000);
+            isValid = false;
         }
 
-        // Validar nome (mínimo 2 nomes)
-        if (!this.validateNome(data.nome)) {
-            this.showNotification('Nome deve conter pelo menos nome e sobrenome', 'error', 'Nome Inválido!', 8000);
-            this.focusField('nome');
-            return false;
-        }
-
-        console.log('✅ Validação básica concluída com sucesso');
-        return true;
+        return isValid;
     }
 
     validateForm(data) {
@@ -543,135 +518,61 @@ class ClienteCadastroController extends BasePageController {
     }
 
     setupFieldMasks() {
-        // Máscara CPF - Aceita apenas números e formata automaticamente
+        // Máscara para CPF
         const cpfInput = document.getElementById('cpf');
         if (cpfInput) {
-            // Bloquear entrada de caracteres não numéricos
-            cpfInput.addEventListener('keypress', (e) => {
-                // Permitir teclas especiais (backspace, delete, tab, etc.)
-                if ([8, 9, 27, 13, 46, 37, 38, 39, 40].indexOf(e.keyCode) !== -1 ||
-                    // Permitir Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                    (e.keyCode === 65 && e.ctrlKey === true) ||
-                    (e.keyCode === 67 && e.ctrlKey === true) ||
-                    (e.keyCode === 86 && e.ctrlKey === true) ||
-                    (e.keyCode === 88 && e.ctrlKey === true)) {
-                    return;
-                }
-                // Bloquear se não for número (0-9)
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
             cpfInput.addEventListener('input', (e) => {
-                // Remove tudo que não for número
                 let value = e.target.value.replace(/\D/g, '');
-                
-                // Limita a 11 dígitos
                 if (value.length > 11) value = value.slice(0, 11);
-                
-                // Aplica a formatação do CPF
-                if (value.length <= 3) {
-                    value = value;
-                } else if (value.length <= 6) {
-                    value = value.replace(/(\d{3})(\d+)/, '$1.$2');
-                } else if (value.length <= 9) {
-                    value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
-                } else {
-                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
-                }
-                
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
                 e.target.value = value;
-                
-                // Reset border color on valid input
-                if (this.validateCPF(value) || value.length === 0) {
-                    e.target.style.borderColor = '';
-                }
+
+                // Remove classes de validação enquanto digita
+                e.target.classList.remove('invalid', 'valid');
+                e.target.style.borderColor = '';
             });
 
-            // Bloquear colar texto não numérico
-            cpfInput.addEventListener('paste', (e) => {
-                setTimeout(() => {
-                    let value = e.target.value.replace(/\D/g, '');
-                    if (value.length > 11) value = value.slice(0, 11);
-                    
-                    if (value.length <= 3) {
-                        value = value;
-                    } else if (value.length <= 6) {
-                        value = value.replace(/(\d{3})(\d+)/, '$1.$2');
-                    } else if (value.length <= 9) {
-                        value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+            cpfInput.addEventListener('blur', async (e) => {
+                const cpf = e.target.value.replace(/\D/g, '');
+                if (cpf) {
+                    const isValid = await this.validateCPF(cpf);
+                    if (isValid) {
+                        e.target.classList.remove('invalid');
+                        e.target.classList.add('valid');
+                        e.target.style.borderColor = '#4caf50';
                     } else {
-                        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+                        this.showNotification('CPF inválido. Por favor, verifique os números informados.', 'error', 'CPF Inválido!', 3000);
+                        e.target.classList.remove('valid');
+                        e.target.classList.add('invalid');
+                        e.target.style.borderColor = '#f44336';
                     }
-                    
-                    e.target.value = value;
-                }, 10);
+                }
             });
         }
 
-        // Máscara Telefone - Aceita apenas números e formata automaticamente para celular brasileiro
+        // Máscara para telefone
         const telefoneInput = document.getElementById('telefone');
         if (telefoneInput) {
-            // Bloquear entrada de caracteres não numéricos
-            telefoneInput.addEventListener('keypress', (e) => {
-                // Permitir teclas especiais (backspace, delete, tab, etc.)
-                if ([8, 9, 27, 13, 46, 37, 38, 39, 40].indexOf(e.keyCode) !== -1 ||
-                    // Permitir Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                    (e.keyCode === 65 && e.ctrlKey === true) ||
-                    (e.keyCode === 67 && e.ctrlKey === true) ||
-                    (e.keyCode === 86 && e.ctrlKey === true) ||
-                    (e.keyCode === 88 && e.ctrlKey === true)) {
-                    return;
-                }
-                // Bloquear se não for número (0-9)
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-                    e.preventDefault();
+            telefoneInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.slice(0, 11);
+                if (value.length >= 2) value = '(' + value.slice(0,2) + ') ' + value.slice(2);
+                if (value.length >= 10) value = value.slice(0,10) + '-' + value.slice(10);
+                e.target.value = value;
+            });
+
+            // Adicionar validação no blur
+            telefoneInput.addEventListener('blur', (e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                if (value.length < 10 || value.length > 11) {
+                    this.showNotification('Telefone inválido. Use o formato (99) 99999-9999', 'error', 'Erro!', 3000);
+                    e.target.classList.add('invalid');
                     return false;
                 }
-            });
-
-            telefoneInput.addEventListener('input', (e) => {
-                // Remove tudo que não for número
-                let value = e.target.value.replace(/\D/g, '');
-                
-                // Limita a 11 dígitos (padrão brasileiro para celular)
-                if (value.length > 11) value = value.slice(0, 11);
-                
-                // Aplica a formatação do telefone brasileiro (XX) 9XXXX-XXXX
-                if (value.length <= 2) {
-                    value = value.length > 0 ? `(${value}` : value;
-                } else if (value.length <= 7) {
-                    value = `(${value.substring(0, 2)}) ${value.substring(2)}`;
-                } else {
-                    value = `(${value.substring(0, 2)}) ${value.substring(2, 7)}-${value.substring(7, 11)}`;
-                }
-                
-                e.target.value = value;
-                
-                // Reset border color on valid input
-                if (this.validateTelefone(value) || value.length === 0) {
-                    e.target.style.borderColor = '';
-                }
-            });
-
-            // Bloquear colar texto não numérico
-            telefoneInput.addEventListener('paste', (e) => {
-                setTimeout(() => {
-                    let value = e.target.value.replace(/\D/g, '');
-                    if (value.length > 11) value = value.slice(0, 11);
-                    
-                    if (value.length <= 2) {
-                        value = value.length > 0 ? `(${value}` : value;
-                    } else if (value.length <= 7) {
-                        value = `(${value.substring(0, 2)}) ${value.substring(2)}`;
-                    } else {
-                        value = `(${value.substring(0, 2)}) ${value.substring(2, 7)}-${value.substring(7, 11)}`;
-                    }
-                    
-                    e.target.value = value;
-                }, 10);
+                e.target.classList.remove('invalid');
+                return true;
             });
         }
 
@@ -693,8 +594,8 @@ class ClienteCadastroController extends BasePageController {
         const inputs = document.querySelectorAll('#cadastroForm input, #cadastroForm select, #cadastroForm textarea');
         
         inputs.forEach(input => {
-            input.addEventListener('blur', () => {
-                this.validateField(input);
+            input.addEventListener('blur', async () => {
+                await this.validateField(input);
             });
             
             input.addEventListener('input', () => {
@@ -706,7 +607,7 @@ class ClienteCadastroController extends BasePageController {
         });
     }
 
-    validateField(field) {
+    async validateField(field) {
         const value = field.value.trim();
         const isRequired = field.hasAttribute('required');
         
@@ -721,9 +622,12 @@ class ClienteCadastroController extends BasePageController {
         // Validações específicas - SEM NOTIFICAÇÕES, apenas bordes visuais
         switch (field.id) {
             case 'cpf':
-                if (value && !this.validateCPF(value)) {
-                    field.style.borderColor = '#f44336';
-                    return false;
+                if (value) {
+                    const cpfValido = await this.validateCPF(value);
+                    if (!cpfValido) {
+                        field.style.borderColor = '#f44336';
+                        return false;
+                    }
                 }
                 break;
             case 'email':
@@ -1012,12 +916,12 @@ class ClienteCadastroController extends BasePageController {
                 this.showNotification('Teste de cadastro realizado com sucesso!', 'success', 'Teste Concluído!', 3000);
                 return true;
             } else {
-                console.log('❌ Teste falhou:', result);
+                console.log('Teste falhou:', result);
                 this.showNotification(`Teste falhou: ${result.message}`, 'error', 'Teste Falhou!', 8000);
                 return false;
             }
         } catch (error) {
-            console.error('❌ Erro no teste:', error);
+            console.error('Erro no teste:', error);
             this.showNotification(`Erro no teste: ${error.message}`, 'error', 'Erro no Teste!', 8000);
             return false;
         }
@@ -1038,6 +942,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 100);
     } else {
-        console.error('❌ BasePageController não encontrado');
+        console.error('BasePageController não encontrado');
     }
 });

@@ -13,7 +13,7 @@ const ClienteApiController = require('../controllers/clienteApiController');
  * @swagger
  * /clientes:
  *   post:
- *     summary: Criar novo cliente
+ *     summary: Cadastrar novo cliente
  *     tags: [Clientes]
  *     requestBody:
  *       required: true

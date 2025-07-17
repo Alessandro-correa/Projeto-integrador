@@ -1,4 +1,3 @@
-
 import '../../src/components/ThemeController.js';
 import '../../src/components/SidebarController.js';
 import NavbarController from '../../src/components/NavbarController.js';
@@ -13,11 +12,47 @@ class App {
 
     // Inicializa controladores e recursos globais
     init() {
-        this.themeController = new ThemeController();
-        this.sidebarController = new SidebarController();
-        this.navbarController = new NavbarController();
-        this.initPageSpecificControllers();
-        this.initProgressBars();
+        const currentPage = window.location.pathname;
+        
+        // Inicializar o ThemeController
+        if (!window.themeController) {
+            window.themeController = new ThemeController();
+        }
+
+        // Inicializar o NavbarController
+        if (!window.navbarController) {
+            window.navbarController = new NavbarController();
+        }
+
+        // Inicializar o FilterController apenas nas páginas de consulta
+        if (currentPage.includes('-consulta.html')) {
+            const tableId = this.getTableId(currentPage);
+            if (tableId) {
+                this.filterController = new FilterController(tableId);
+                window.filterController = this.filterController;
+            }
+        }
+    }
+
+    // Mapeia a página atual para o ID da tabela correspondente
+    getTableId(currentPage) {
+        const tableMap = {
+            'os-consulta': 'os-table',
+            'clientes-consulta': 'clientes-table',
+            'motos-consulta': 'motos-table',
+            'marcas-consulta': 'marcas-table',
+            'fornecedores-consulta': 'fornecedores-table',
+            'pecas-consulta': 'pecas-table',
+            'orcamentos-consulta': 'orcamentos-table',
+            'usuarios-consulta': 'usuarios-table'
+        };
+
+        for (const [page, tableId] of Object.entries(tableMap)) {
+            if (currentPage.includes(page)) {
+                return tableId;
+            }
+        }
+        return null;
     }
 
     // Inicializa filtros para tabelas específicas
@@ -42,28 +77,7 @@ class App {
 }
 
 
-// Preenche o select de aquisições na página
-function preencherSelectAquisicoes() {
-    const select = document.getElementById('aquisicaoId');
-    if (!select) return;
-    fetch('http://localhost:3000/api/aquisicoes')
-        .then(res => res.json())
-        .then(result => {
-            if (result.success && Array.isArray(result.data)) {
-                result.data.forEach(aquisicao => {
-                    const option = document.createElement('option');
-                    const data = aquisicao.dia_da_compra ? new Date(aquisicao.dia_da_compra).toLocaleDateString() : '';
-                    option.value = aquisicao.id;
-                    option.textContent = `${aquisicao.id} - ${data}`;
-                    select.appendChild(option);
-                });
-            }
-        });
-}
-
-
 // Inicializa a aplicação ao carregar o DOM
 document.addEventListener('DOMContentLoaded', () => {
     new App();
-    preencherSelectAquisicoes();
 });

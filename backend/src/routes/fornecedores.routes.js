@@ -10,27 +10,15 @@ const pecaController = require('../controllers/PecaApiController');
  *   description: Gerenciamento de fornecedores
  */
 
-console.log('[fornecedores.routes] Iniciando configuração das rotas');
-console.log('[fornecedores.routes] Controllers importados:', {
-  fornecedorController: typeof fornecedorController,
-  pecaController: typeof pecaController,
-  pecaControllerMethods: {
-    findByFornecedor: typeof pecaController.findByFornecedor
-  }
-});
-
 // Middleware para verificar se os métodos existem
 const verifyMethod = (controller, methodName) => (req, res, next) => {
-  console.log(`[fornecedores.routes] Verificando método ${methodName} em ${controller === fornecedorController ? 'fornecedorController' : 'pecaController'}`);
   if (typeof controller[methodName] !== 'function') {
-    console.error(`[fornecedores.routes] ERRO: Método ${methodName} não encontrado no controller`);
     return res.status(500).json({
       success: false,
       message: 'Erro interno do servidor',
       error: `Método ${methodName} não implementado`
     });
   }
-  console.log(`[fornecedores.routes] Método ${methodName} encontrado e é uma função`);
   next();
 };
 
@@ -76,7 +64,6 @@ const verifyMethod = (controller, methodName) => (req, res, next) => {
  *         description: Dados inválidos
  */
 router.post('/', verifyMethod(fornecedorController, 'create'), (req, res) => {
-  console.log('[fornecedores.routes] Chamada POST /');
   return fornecedorController.create(req, res);
 });
 
@@ -110,7 +97,6 @@ router.post('/', verifyMethod(fornecedorController, 'create'), (req, res) => {
  *                     type: string
  */
 router.get('/', verifyMethod(fornecedorController, 'findAll'), (req, res) => {
-  console.log('[fornecedores.routes] Chamada GET /');
   return fornecedorController.findAll(req, res);
 });
 
@@ -151,7 +137,6 @@ router.get('/', verifyMethod(fornecedorController, 'findAll'), (req, res) => {
  *         description: Fornecedor não encontrado
  */
 router.get('/:id', verifyMethod(fornecedorController, 'findOne'), (req, res) => {
-  console.log('[fornecedores.routes] Chamada GET /:id');
   return fornecedorController.findOne(req, res);
 });
 
@@ -195,7 +180,6 @@ router.get('/:id', verifyMethod(fornecedorController, 'findOne'), (req, res) => 
  *         description: Fornecedor não encontrado
  */
 router.put('/:id', verifyMethod(fornecedorController, 'update'), (req, res) => {
-  console.log('[fornecedores.routes] Chamada PUT /:id');
   return fornecedorController.update(req, res);
 });
 
@@ -219,22 +203,16 @@ router.put('/:id', verifyMethod(fornecedorController, 'update'), (req, res) => {
  *         description: Fornecedor não encontrado
  */
 router.delete('/:id', verifyMethod(fornecedorController, 'delete'), (req, res) => {
-  console.log('[fornecedores.routes] Chamada DELETE /:id');
   return fornecedorController.delete(req, res);
 });
 
 // Rota para buscar peças por fornecedor
 router.get('/:id/pecas', verifyMethod(pecaController, 'findByFornecedor'), (req, res) => {
-  console.log('[fornecedores.routes] Chamada GET /:id/pecas');
-  console.log('[fornecedores.routes] Parâmetros:', req.params);
   
   // Ajusta o parâmetro para corresponder ao esperado pelo controller
   req.params.fornecedorId = req.params.id;
   
-  console.log('[fornecedores.routes] Parâmetros ajustados:', req.params);
   return pecaController.findByFornecedor(req, res);
 });
-
-console.log('[fornecedores.routes] Rotas configuradas');
 
 module.exports = router; 

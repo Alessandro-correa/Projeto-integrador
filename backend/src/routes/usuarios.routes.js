@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const UsuarioApiController = require('../controllers/usuarioApiController');
-const { authorizeRoles } = require('../controllers/usuarioApiController');
+const UsuarioApiController = require('../controllers/UsuarioApiController');
+const { authorizeRoles } = require('../controllers/UsuarioApiController');
 
 /**
  * @swagger
@@ -104,6 +104,140 @@ router.post('/', authorizeRoles('Administrador'), UsuarioApiController.create);
  *         description: Acesso negado
  */
 router.get('/', authorizeRoles('Administrador'), UsuarioApiController.findAll);
+
+/**
+ * @swagger
+ * /usuarios/mecanicos:
+ *   get:
+ *     summary: Listar todos os mecânicos
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de mecânicos
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso negado
+ */
+router.get('/mecanicos/list', authorizeRoles('Administrador', 'Secretária'), UsuarioApiController.findMecanicos);
+
+// Rota de debug (temporária)
+router.get('/debug/:cpf', UsuarioApiController.debugUser);
+
+/**
+ * @swagger
+ * /usuarios/{cpf}:
+ *   get:
+ *     summary: Buscar usuário por CPF
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: cpf
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: CPF do usuário
+ *     responses:
+ *       200:
+ *         description: Dados do usuário
+ *       404:
+ *         description: Usuário não encontrado
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso negado
+ */
+router.get('/:cpf', authorizeRoles('Administrador'), UsuarioApiController.findOne);
+
+/**
+ * @swagger
+ * /usuarios/{cpf}:
+ *   put:
+ *     summary: Atualizar usuário
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: cpf
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: CPF do usuário
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nome
+ *               - funcao
+ *               - email
+ *               - telefone
+ *               - codigo
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               funcao:
+ *                 type: string
+ *                 enum: [Administrador, Secretária, Mecânico]
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               telefone:
+ *                 type: string
+ *               codigo:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *                 description: Nova senha (opcional)
+ *     responses:
+ *       200:
+ *         description: Usuário atualizado com sucesso
+ *       404:
+ *         description: Usuário não encontrado
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso negado
+ */
+router.put('/:cpf', authorizeRoles('Administrador'), UsuarioApiController.update);
+
+/**
+ * @swagger
+ * /usuarios/{cpf}:
+ *   delete:
+ *     summary: Remover usuário
+ *     tags: [Usuários]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: cpf
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: CPF do usuário
+ *     responses:
+ *       200:
+ *         description: Usuário removido com sucesso
+ *       404:
+ *         description: Usuário não encontrado
+ *       400:
+ *         description: Não é possível remover usuário com ordens vinculadas
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso negado
+ */
+router.delete('/:cpf', authorizeRoles('Administrador'), UsuarioApiController.delete);
 
 /**
  * @swagger

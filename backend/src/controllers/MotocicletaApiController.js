@@ -231,10 +231,10 @@ class MotocicletaApiController {
   // Buscar motocicletas por cliente
   async findByCliente(req, res) {
     try {
-      const { clienteCpf } = req.params;
+      const { cpf } = req.params;
 
       // Verificar se cliente existe
-      const cliente = await db.oneOrNone('SELECT cpf FROM Cliente WHERE cpf = $1', [clienteCpf]);
+      const cliente = await db.oneOrNone('SELECT cpf FROM Cliente WHERE cpf = $1', [cpf]);
       if (!cliente) {
         return res.status(404).json({
           success: false,
@@ -242,13 +242,22 @@ class MotocicletaApiController {
         });
       }
 
+      // Buscar todas as motocicletas do cliente
       const motocicletas = await db.any(`
-        SELECT m.*, c.nome as nome_cliente
-        FROM Motocicleta m 
-        LEFT JOIN Cliente c ON m.cliente_cpf = c.cpf 
+        SELECT 
+          m.placa,
+          m.ano,
+          m.cor,
+          m.modelo,
+          m.cilindrada,
+          m.cliente_cpf,
+          ma.nome as marca_nome,
+          ma.id as marca_id
+        FROM Motocicleta m
+        LEFT JOIN Marca ma ON m.marca_id = ma.id
         WHERE m.cliente_cpf = $1
         ORDER BY m.placa
-      `, [clienteCpf]);
+      `, [cpf]);
 
       res.json({
         success: true,
@@ -257,7 +266,7 @@ class MotocicletaApiController {
       });
 
     } catch (error) {
-      console.error('Erro ao buscar motocicletas por cliente:', error);
+      console.error('Erro ao buscar motocicletas do cliente:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',

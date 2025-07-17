@@ -134,6 +134,27 @@ router.get('/:placa', MotocicletaApiController.findOne);
 
 /**
  * @swagger
+ * /motocicletas/cliente/{cpf}:
+ *   get:
+ *     summary: Buscar motocicletas por CPF do cliente
+ *     tags: [Motocicletas]
+ *     parameters:
+ *       - in: path
+ *         name: cpf
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: CPF do cliente
+ *     responses:
+ *       200:
+ *         description: Lista de motocicletas do cliente
+ *       404:
+ *         description: Cliente não encontrado
+ */
+router.get('/cliente/:cpf', MotocicletaApiController.findByCliente);
+
+/**
+ * @swagger
  * /motocicletas/{placa}:
  *   put:
  *     summary: Atualizar motocicleta

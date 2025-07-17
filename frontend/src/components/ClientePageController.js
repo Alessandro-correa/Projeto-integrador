@@ -266,8 +266,10 @@ class ClienteController {
             }
         }
 
-        if (!this.validateCPF(data.cpf)) {
-            this.showError('CPF inválido');
+        // Validação específica do CPF
+        const cpfLimpo = data.cpf.replace(/\D/g, '');
+        if (!this.validateCPF(cpfLimpo)) {
+            this.showError('CPF inválido. Por favor, verifique os números informados.');
             return false;
         }
 
@@ -299,8 +301,48 @@ class ClienteController {
     }
 
     validateCPF(cpf) {
-        const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-        return cpfRegex.test(cpf);
+        // Remove caracteres não numéricos
+        cpf = cpf.replace(/\D/g, '');
+
+        // Verifica se tem 11 dígitos
+        if (cpf.length !== 11) return false;
+
+        // Verifica se todos os dígitos são iguais
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+        // Calcula o primeiro dígito verificador
+        let soma = 0;
+        let peso = 10;
+        for (let i = 0; i < 9; i++) {
+            soma += parseInt(cpf.charAt(i)) * peso;
+            peso--;
+        }
+
+        let digito = 11 - (soma % 11);
+        let dv1 = digito >= 10 ? 0 : digito;
+
+        // Verifica o primeiro dígito verificador
+        if (dv1 !== parseInt(cpf.charAt(9))) {
+            return false;
+        }
+
+        // Calcula o segundo dígito verificador
+        soma = 0;
+        peso = 11;
+        for (let i = 0; i < 10; i++) {
+            soma += parseInt(cpf.charAt(i)) * peso;
+            peso--;
+        }
+
+        digito = 11 - (soma % 11);
+        let dv2 = digito >= 10 ? 0 : digito;
+
+        // Verifica o segundo dígito verificador
+        if (dv2 !== parseInt(cpf.charAt(10))) {
+            return false;
+        }
+
+        return true;
     }
 
     validateEmail(email) {
@@ -323,15 +365,32 @@ class ClienteController {
     }
 
     setupFormValidation() {
-        
         const cpfInput = document.getElementById('cpf');
         if (cpfInput) {
             cpfInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                if (value.length > 11) value = value.slice(0, 11);
+                if (value.length >= 3) value = value.slice(0, 3) + '.' + value.slice(3);
+                if (value.length >= 7) value = value.slice(0, 7) + '.' + value.slice(7);
+                if (value.length >= 11) value = value.slice(0, 11) + '-' + value.slice(11);
                 e.target.value = value;
+
+                // Remove classes de validação enquanto digita
+                e.target.classList.remove('invalid', 'valid');
+            });
+
+            cpfInput.addEventListener('blur', (e) => {
+                const cpf = e.target.value.replace(/\D/g, '');
+                if (cpf) {
+                    if (this.validateCPF(cpf)) {
+                        e.target.classList.remove('invalid');
+                        e.target.classList.add('valid');
+                    } else {
+                        this.showError('CPF inválido. Por favor, verifique os números informados.');
+                        e.target.classList.remove('valid');
+                        e.target.classList.add('invalid');
+                    }
+                }
             });
         }
 
@@ -339,8 +398,9 @@ class ClienteController {
         if (telefoneInput) {
             telefoneInput.addEventListener('input', (e) => {
                 let value = e.target.value.replace(/\D/g, '');
-                value = value.replace(/(\d{2})(\d)/, '($1) $2');
-                value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+                if (value.length > 11) value = value.slice(0, 11);
+                if (value.length >= 2) value = '(' + value.slice(0, 2) + ') ' + value.slice(2);
+                if (value.length >= 9) value = value.slice(0, 9) + '-' + value.slice(9);
                 e.target.value = value;
             });
         }
@@ -348,12 +408,11 @@ class ClienteController {
 
     editarCliente(cpf) {
         // Redirecionar para a página de ajuste de cliente
-        const cpfFormatted = cpf.replace(/\D/g, '');
-        window.location.href = `clientes-ajustar.html?cpf=${cpfFormatted}`;
+        window.location.href = `clientes-ajustar.html?cpf=${cpf}`;
     }
 
     async confirmarExclusao(cpf, nome) {
-        if (confirm(`Tem certeza que deseja excluir o cliente "${nome}"?\n\nEsta ação não pode ser desfeita.`)) {
+        if (confirm(`Deseja realmente excluir o cliente "${nome}"?`)) {
             await this.excluirCliente(cpf);
         }
     }
@@ -372,7 +431,7 @@ class ClienteController {
 
             if (response.ok && result.success) {
                 this.showSuccess('Cliente excluído com sucesso!');
-                this.loadClientes();
+                await this.loadClientes();
             } else {
                 throw new Error(result.message || 'Erro ao excluir cliente');
             }
