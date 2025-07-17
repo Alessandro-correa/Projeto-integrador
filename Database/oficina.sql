@@ -75,14 +75,6 @@ CREATE TABLE IF NOT EXISTS Orcamento (
 );
 
 
-CREATE TABLE IF NOT EXISTS Possui (
-    Cliente_Cpf        VARCHAR(14),
-    Motocicleta_placa  VARCHAR(8),
-    PRIMARY KEY (Cliente_Cpf, Motocicleta_placa),
-    FOREIGN KEY (Cliente_Cpf)       REFERENCES Cliente(Cpf),
-    FOREIGN KEY (Motocicleta_placa) REFERENCES Motocicleta(Placa)
-);
-
 CREATE TABLE IF NOT EXISTS Fornecedor (
     Id       SERIAL      PRIMARY KEY,
     CNPJ     VARCHAR(18) NOT NULL UNIQUE,
@@ -195,21 +187,6 @@ VALUES
   (120.00, '2025-07-22', 'P', 'SERVIÇO: Lavagem completa da motocicleta - R$ 60,00;SERVIÇO: Aplicação de cera protetiva - R$ 60,00', NULL, '100.200.300-07'),  -- Julho (pendente, sem OS)
   
   (380.00, '2025-11-15', 'P', 'SERVIÇO: Instalação de baú traseiro - R$ 60,00;SERVIÇO: Instalação de protetor de motor - R$ 60,00;SERVIÇO: Instalação de farol auxiliar - R$ 60,00;PEÇA: Baú traseiro 35L - Qtd: 1 - Valor unit: R$ 120,00;PEÇA: Protetor de motor - Qtd: 1 - Valor unit: R$ 80,00', NULL, '100.200.300-10'); -- Outubro (pendente, sem OS)
-
-
--- RELACIONAMENTO CLIENTE-MOTOCICLETA (10 exemplos)
-INSERT INTO Possui (Cliente_Cpf, Motocicleta_placa) 
-VALUES
-  ('100.200.300-01', 'ABC1234'),
-  ('100.200.300-02', 'DEF5678'),
-  ('100.200.300-03', 'GHI9012'),
-  ('100.200.300-04', 'JKL3456'),
-  ('100.200.300-05', 'MNO7890'),
-  ('100.200.300-06', 'PQR1234'),
-  ('100.200.300-07', 'STU5678'),
-  ('100.200.300-08', 'VWX9012'),
-  ('100.200.300-09', 'YZA3456'),
-  ('100.200.300-10', 'BCD7890');
 
 -- FORNECEDORES (10 exemplos)
 INSERT INTO Fornecedor (CNPJ, Email, Endereco, Telefone, Nome) 
